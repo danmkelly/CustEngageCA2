@@ -8,6 +8,7 @@
  */
 var CATALOGUE_URL = "https://docs.google.com/spreadsheets/d/1fY7974AdL4rrO2gnCxcCBUFWWSkVhOi9euJI7lNjo2Q/export?format=csv";
 var OFF_URL = "https://world.openfoodfacts.org/api/v2/product/";
+var OFF_SEARCH_URL = "https://world.openfoodfacts.org/cgi/search.pl?json=1&page_size=1&search_terms=";
 
 export default {
   async fetch(request, env, ctx) {
@@ -116,7 +117,7 @@ async function getEnrichedCatalogue(env, url, ctx) {
   // OFF nutritional data cached 1 hour; Google Sheet price/stock always live
   var offCache = caches.default;
   var enrichmentFutures = products.map(function(p) {
-    return enrichProduct(p, offCache);
+    return enrichProduct(p, offCache, ctx);
   });
   var enrichedProducts = await Promise.all(enrichmentFutures);
 
@@ -150,11 +151,10 @@ async function getEnrichedCatalogue(env, url, ctx) {
   });
 }
 
-async function enrichProduct(product, offCache) {
+async function enrichProduct(product, offCache, ctx) {
   var barcode = product.barcode;
   if (!barcode || barcode.length < 8) return product;
 
-  // Try OFF cache first (1-hour TTL for nutritional data)
   var cacheKey = "https://cache.off/" + barcode;
   var cacheReq = new Request(cacheKey, { method: "GET" });
   var cached = await offCache.match(cacheReq);
@@ -163,28 +163,32 @@ async function enrichProduct(product, offCache) {
     return Object.assign({}, product, cachedData);
   }
 
-  // Fetch from OFF API
+  // Try barcode lookup - only source that works reliably without auth
   try {
-    var offResp = await fetch(OFF_URL + barcode + ".json");
-    if (!offResp.ok) return product;
-    var offData = await offResp.json();
-    if (offData.status !== 1 || !offData.product) return product;
-
-    var enrichment = extractOffFields(offData.product);
-
-    // Cache for 1 hour
-    var cacheResp = new Response(JSON.stringify(enrichment), {
-      headers: { "Cache-Control": "public, max-age=3600" },
+    var offResp = await fetch(OFF_URL + barcode + ".json", {
+      headers: { "User-Agent": "EmeraldPantry/1.0 (academic project; danmkelly.github.io/CustEngageCA2)" }
     });
-    // Use ctx if available, otherwise skip caching
-    if (typeof ctx !== "undefined" && ctx && ctx.waitUntil) {
-      ctx.waitUntil(offCache.put(cacheReq, cacheResp));
+    if (offResp.ok) {
+      var offData = await offResp.json();
+      if (offData.status === 1 && offData.product) {
+        return cacheAndMerge(product, barcode, offData.product, offCache, ctx);
+      }
     }
+  } catch (e) {}
 
-    return Object.assign({}, product, enrichment);
-  } catch (e) {
-    return product;
+  return product;
+}
+
+function cacheAndMerge(product, barcode, offProduct, offCache, ctx) {
+  var enrichment = extractOffFields(offProduct);
+  var cacheResp = new Response(JSON.stringify(enrichment), {
+    headers: { "Cache-Control": "public, max-age=3600" },
+  });
+  var cacheReq = new Request("https://cache.off/" + barcode, { method: "GET" });
+  if (ctx && ctx.waitUntil) {
+    ctx.waitUntil(offCache.put(cacheReq, cacheResp));
   }
+  return Object.assign({}, product, enrichment);
 }
 
 function extractOffFields(p) {

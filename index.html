@@ -363,6 +363,8 @@ var conv = [];
 var products = [];
 var categoryNames = ["store-cupboard","bakery","dairy","drinks","snacks"];
 var categoryLabels = {"store-cupboard":"Store Cupboard","bakery":"Bakery","dairy":"Dairy","drinks":"Drinks","snacks":"Snacks"};
+var categoryIcons = {"bakery":"&#127838;","dairy":"&#129371;","drinks":"&#9749;","snacks":"&#127790;","store-cupboard":"&#129746;"};
+var categoryColours = {"bakery":"#8B6914","dairy":"#F5F0E0","drinks":"#4A90D9","snacks":"#E87722","store-cupboard":"#5C4033"};
 var emberMemory = {visits:0,lastVisit:"",recentSearches:[],totalSearches:0,userName:"",consent:""};
 var expectingName = false;
 var expectingConsent = false;
@@ -689,7 +691,12 @@ function renderProducts(prods,searchTerm){
       var allergens = p.allergens.split(",").slice(0,2).map(function(a){return a.trim()}).join(", ");
       if(allergens) badges += '<span class="allergen-badge" title="Contains: '+escapeHtml(p.allergens)+'">'+escapeHtml(allergens)+'</span>';
     }
-    var imgHtml = p.image_url ? '<img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.parentElement.style.background=\'var(--surface2)\';this.style.display=\'none\'">' : '<div class="off-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem;opacity:0.3">&#129367;</div>';
+    var catIcon = categoryIcons[p.category] || "&#129367;";
+    var catColour = categoryColours[p.category] || "#163322";
+    var imgHtml = p.image_url
+      ? '<img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" style="position:relative;z-index:0">'
+      : '';
+    imgHtml += '<div class="off-img" style="display:'+(p.image_url?'none':'flex')+';align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08);position:relative;'+(p.image_url?'position:absolute;top:0;left:0;':'')+'">'+catIcon+'</div>';
     return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + (badges ? '<div class="product-badges">'+badges+'</div>' : '') +'</div></div>';
   }).join("");
 
@@ -749,7 +756,11 @@ function openDetail(sku){
   if(hasVegan)badges+='<span class="diet-badge">Vegan</span>';else if(hasVegetarian)badges+='<span class="diet-badge">Vegetarian</span>';
   if(isOrganic)badges+='<span class="diet-badge">Organic</span>';
   if(p.allergens){var allergens=p.allergens.split(",").slice(0,3).map(function(a){return a.trim()}).join(", ");if(allergens)badges+='<span class="allergen-badge">Contains: '+escapeHtml(allergens)+'</span>'}
-  var imgHtml=p.image_url?'<div class="detail-img-wrap"><img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" onerror="this.style.display=\'none\'"></div>':'<div class="detail-img-wrap" style="display:flex;align-items:center;justify-content:center;height:150px;font-size:3rem;opacity:0.2">&#129367;</div>';
+  var catIcon = categoryIcons[p.category] || "&#129367;";
+  var catColour = categoryColours[p.category] || "#163322";
+  var imgHtml = p.image_url
+    ? '<div class="detail-img-wrap"><img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" onerror="this.style.display=\'none\'" style="position:relative;z-index:0"><div style="display:none;align-items:center;justify-content:center;height:150px;font-size:3rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div></div>'
+    : '<div class="detail-img-wrap" style="display:flex;align-items:center;justify-content:center;height:150px;font-size:3rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div>';
   var inBasket = basket[sku];
   var qty = inBasket ? inBasket.qty : 1;
   dContent.innerHTML = '<div class="detail-view">'+
