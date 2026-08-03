@@ -325,7 +325,7 @@ body{display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family
       <button class="chat-mic" id="chatMic" aria-label="Voice input" title="Talk to Ember">&#127908;</button>
       <button class="chat-send" id="chatSend" aria-label="Send">&#8594;</button>
     </div>
-    <div class="chat-human-ramp" onclick="document.getElementById('chatInput').value='human';document.getElementById('chatSend').click()">
+    <div class="chat-human-ramp" onclick="humanContact()">
       <span class="human-ramp-icon">&#128100;</span> Prefer a real human? <span class="human-ramp-cta">Click here</span> for our contact details
     </div>
   </div>
@@ -1030,9 +1030,18 @@ async function send(){
   function showHumanContact(){
     addMsg("Of course! Here's how to reach the real humans at Emerald Pantry:",'bot');
     addMsg("<strong>Emerald Pantry</strong><br>Dublin, Ireland<br><br><strong>Email:</strong> <a href='mailto:hello@emeraldpantry.ie' style='color:var(--accent2)'>hello@emeraldpantry.ie</a><br><br><strong>Phone:</strong> +353 1 555 1234<br><br><strong>Opening hours:</strong><br>Mon-Sat: 09:00 - 18:00<br>Sun: 11:00 - 16:00<br><br><strong>Web orders:</strong> Open 24/7",'bot');
+    addMsg("We'd love to hear from you! Anything else I can help with in the meantime?",'bot');
+    addSugg(["Keep shopping","Bakery","Special offers"]);
   }
 
-  if(txt.toLowerCase()==="human"){hideTyping();showHumanContact();addMsg("We'd love to hear from you! Anything else I can help with in the meantime?",'bot');return}
+  function humanContact(){
+    // Clear any onboarding state so the panel unlocks
+    expectingHumanBot = false; expectingConsent = false; expectingName = false; onboardingStep = 4;
+    updateOnboardingLock();
+    showHumanContact();
+  }
+
+  if(txt.toLowerCase()==="human"){hideTyping();showHumanContact();return}
 
   // STEP 1: Fetch matching products from catalogue
   document.getElementById("loadingSpinner").classList.add("active");
