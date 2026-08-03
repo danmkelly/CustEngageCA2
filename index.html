@@ -829,11 +829,22 @@ function prodByCat(prods){
     prods.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; total++; });
   }
   var ordered = ["bakery","dairy","drinks","snacks","store-cupboard"];
-  catChips.innerHTML = '<span class="cat-chip'+(activeCategory===""?" active":"")+'" onclick="filterCat(\'\')">All ('+total+')</span>' +
-    ordered.map(function(c){
-      var count = cats[c] || 0;
-      return '<span class="cat-chip'+(activeCategory===c?" active":"")+'" onclick="filterCat(\''+c+'\')">'+(categoryLabels[c]||c)+' ('+count+')</span>';
-    }).join("");
+  catChips.innerHTML = '';
+  // All chip
+  var allChip = document.createElement("span");
+  allChip.className = "cat-chip" + (activeCategory === "" ? " active" : "");
+  allChip.textContent = "All (" + total + ")";
+  allChip.onclick = function(){ filterCat(""); };
+  catChips.appendChild(allChip);
+  // Category chips
+  ordered.forEach(function(c){
+    var count = cats[c] || 0;
+    var chip = document.createElement("span");
+    chip.className = "cat-chip" + (activeCategory === c ? " active" : "");
+    chip.textContent = (categoryLabels[c]||c) + " (" + count + ")";
+    chip.onclick = function(){ filterCat(c); };
+    catChips.appendChild(chip);
+  });
 }
 
 function filterCat(cat){
