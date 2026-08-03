@@ -133,6 +133,69 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .allergen-badge{font-size:0.53rem;padding:2px 6px;border-radius:3px;font-weight:600;background:rgba(196,77,77,0.12);color:#D46B6B;border:1px solid rgba(196,77,77,0.2)}
 .off-img{width:100%;height:100px;object-fit:cover;display:block;background:var(--surface2)}
 
+/* Product detail view (purchase flow) */
+.detail-view{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.detail-back{display:flex;align-items:center;gap:8px;padding:12px 20px;cursor:pointer;font-size:0.76rem;color:var(--accent2);font-weight:600;border-bottom:1px solid var(--border);transition:all .15s;flex-shrink:0}
+.detail-back:hover{background:rgba(45,139,78,0.08)}
+.detail-back-arrow{font-size:1rem}
+.detail-img-wrap{width:100%;max-height:200px;overflow:hidden;background:var(--surface2)}
+.detail-img-wrap img{width:100%;height:200px;object-fit:cover;display:block}
+.detail-body{padding:20px;flex:1}
+.detail-category{font-size:0.62rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px}
+.detail-name{font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:10px}
+.detail-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;margin-bottom:16px}
+.detail-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.detail-price{font-size:1.4rem;font-weight:900;color:var(--accent2)}
+.detail-unit{font-size:0.7rem;color:var(--text-dim);align-self:flex-end;margin-bottom:3px}
+.detail-stock{font-size:0.64rem;padding:4px 10px;border-radius:10px;font-weight:600;align-self:center}
+.detail-stock.in-stock{background:rgba(45,139,78,0.2);color:var(--accent)}
+.detail-stock.seasonal{background:rgba(212,168,75,0.2);color:var(--accent2)}
+.detail-stock.pre-order{background:rgba(196,77,77,0.2);color:#C44D4D}
+.detail-offer{font-size:0.68rem;color:var(--accent2);font-weight:700;margin-bottom:16px;padding:8px 12px;background:rgba(212,168,75,0.08);border-radius:6px;border:1px dashed rgba(212,168,75,0.3);text-align:center}
+.detail-section-label{font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px}
+.detail-section{margin-bottom:16px}
+.qty-selector{display:flex;align-items:center;gap:0;margin:16px 0 20px}
+.qty-btn{width:40px;height:40px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .15s}
+.qty-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.qty-btn:first-child{border-radius:8px 0 0 8px}
+.qty-btn:last-child{border-radius:0 8px 8px 0}
+.qty-val{width:50px;height:40px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.add-basket-btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:0.3px}
+.add-basket-btn:hover{background:#24763F;box-shadow:0 4px 16px rgba(45,139,78,0.4)}
+.add-basket-btn:disabled{background:var(--border);color:var(--text-dim);cursor:not-allowed;box-shadow:none}
+.add-basket-btn.added{background:var(--accent2);animation:popIn 0.3s ease}
+@keyframes popIn{0%{transform:scale(0.95)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+
+/* Basket indicator in brand bar */
+.basket-indicator{display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 14px;border-radius:20px;border:1px solid var(--border);transition:all .15s;margin-left:auto;flex-shrink:0}
+.basket-indicator:hover{border-color:var(--accent2);background:rgba(212,168,75,0.08)}
+.basket-icon{font-size:1rem}
+.basket-count{font-size:0.72rem;font-weight:800;color:var(--accent2);min-width:20px;text-align:center}
+.basket-empty{font-size:0.62rem;color:var(--text-dim)}
+
+/* Basket drawer in discovery panel */
+.basket-drawer{background:var(--surface);border-top:1px solid var(--border);max-height:300px;overflow-y:auto;flex-shrink:0}
+.basket-drawer-header{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.basket-drawer-header h4{font-size:0.72rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px}
+.basket-close{font-size:1rem;cursor:pointer;color:var(--text-dim);padding:2px 6px;border-radius:4px;transition:all .15s}
+.basket-close:hover{color:var(--text);background:var(--surface2)}
+.basket-item{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border)}
+.basket-item-info{flex:1;min-width:0}
+.basket-item-name{font-size:0.76rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.basket-item-price{font-size:0.64rem;color:var(--text-dim)}
+.basket-item-qty{font-size:0.7rem;color:var(--accent2);font-weight:700;white-space:nowrap}
+.basket-item-remove{font-size:0.7rem;color:var(--text-dim);cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid transparent;background:transparent;font-family:inherit;transition:all .15s}
+.basket-item-remove:hover{color:#C44D4D;border-color:rgba(196,77,77,0.3);background:rgba(196,77,77,0.08)}
+.basket-total{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;font-weight:700;border-top:2px solid var(--border)}
+.basket-total-label{font-size:0.76rem;color:var(--text)}
+.basket-total-price{font-size:1rem;color:var(--accent2)}
+.basket-checkout{width:100%;padding:14px;border:none;background:var(--accent2);color:#0A1F12;font-size:0.82rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:0.3px;text-transform:uppercase}
+.basket-checkout:hover{background:#E0B84F}
+.basket-empty-msg{padding:24px 20px;text-align:center;font-size:0.72rem;color:var(--text-dim)}
+.added-confirm{display:flex;align-items:center;gap:8px;margin-top:12px;padding:8px 12px;background:rgba(45,139,78,0.1);border-radius:8px;font-size:0.72rem;color:var(--accent);font-weight:600}
+.added-confirm-icon{font-size:0.9rem}
+/* End detail view */
+
 /* Category filter chips */
 .cat-section{padding:0 16px 10px}
 .cat-chips{display:flex;flex-wrap:wrap;gap:4px}
@@ -222,6 +285,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <span class="app-brand-tagline">Irish Grocery &amp; Specialty Foods</span>
     <div class="app-brand-sub"><span>Online Grocery</span><span>AI-Powered Shopping</span><span class="brand-info-link" onclick="showMemInfo()">What I store</span></div>
   </div>
+  <div class="basket-indicator" id="basketIndicator" onclick="toggleBasket()" title="View basket">
+    <span class="basket-icon">&#128722;</span>
+    <span class="basket-count" id="basketCount">0</span>
+    <span class="basket-empty">Basket</span>
+  </div>
 </div>
 <div class="app">
 
@@ -302,6 +370,7 @@ var lastEmberAsked = false;
 var spokeLast = false;
 var activeCategory = "";
 var knownProductNames = [];
+var basket = {};
 
 // === Memory ===
 function loadMemory(){
@@ -329,6 +398,7 @@ function clearMemory(){
   expectingConsent = false;
   expectingHumanBot = true;
   loadedCatalogue = false;
+  basket = {}; updateBasketIndicator();
   addMsg("All clear! I've forgotten everything about you. Fresh start.",'bot');
   document.getElementById("emberLabel").textContent = "Your pantry guide · AI-powered";
   updateMemoryButtons();
@@ -618,7 +688,7 @@ function renderProducts(prods,searchTerm){
       if(allergens) badges += '<span class="allergen-badge" title="Contains: '+escapeHtml(p.allergens)+'">'+escapeHtml(allergens)+'</span>';
     }
     var imgHtml = p.image_url ? '<img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.style.display=\'none\'">' : '';
-    return '<div class="product-card" onclick="qa(\''+p.product_name.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(p.availability)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + (badges ? '<div class="product-badges">'+badges+'</div>' : '') +'</div></div>';
+    return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(p.availability)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + (badges ? '<div class="product-badges">'+badges+'</div>' : '') +'</div></div>';
   }).join("");
 
   updateKnownNames();
@@ -639,6 +709,111 @@ function filterCat(cat){
 }
 
 function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+// === Purchase Flow ===
+function getProduct(sku){for(var i=0;i<products.length;i++){if(products[i].sku===sku)return products[i]}return null}
+
+function openDetail(sku){
+  var p = getProduct(sku); if(!p) return;
+  dEmpty.style.display = "none"; dContent.style.display = "block";
+  var stockClass = p.availability.toLowerCase().replace(/\s+/g,'-');
+  if(stockClass.indexOf("in-stock")>-1) stockClass = "in-stock";
+  var price = p.price_eur;
+  var priceStr = price >= 1000 ? "&euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
+  var badges = "";
+  if(p.nutriscore_grade){var ns=p.nutriscore_grade.toLowerCase();badges+='<span class="off-badge nutriscore-'+ns+'">Nutri-Score '+ns.toUpperCase()+'</span>'}
+  if(p.nova_group){badges+='<span class="off-badge nova-'+p.nova_group+'">NOVA '+p.nova_group+'</span>'}
+  if(p.ecoscore_grade){var es=p.ecoscore_grade.toLowerCase();if(es!=="unknown")badges+='<span class="off-badge nutriscore-'+es+'">Eco-'+es.toUpperCase()+'</span>'}
+  var hasVegan=p.ingredients_analysis_tags&&p.ingredients_analysis_tags.indexOf("en:vegan")>-1;
+  var hasVegetarian=p.ingredients_analysis_tags&&p.ingredients_analysis_tags.indexOf("en:vegetarian")>-1;
+  var isOrganic=p.labels_tags&&p.labels_tags.indexOf("en:organic")>-1;
+  if(hasVegan)badges+='<span class="diet-badge">Vegan</span>';else if(hasVegetarian)badges+='<span class="diet-badge">Vegetarian</span>';
+  if(isOrganic)badges+='<span class="diet-badge">Organic</span>';
+  if(p.allergens){var allergens=p.allergens.split(",").slice(0,3).map(function(a){return a.trim()}).join(", ");if(allergens)badges+='<span class="allergen-badge">Contains: '+escapeHtml(allergens)+'</span>'}
+  var imgHtml=p.image_url?'<div class="detail-img-wrap"><img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" onerror="this.style.display=\'none\'"></div>':'';
+  var inBasket = basket[sku];
+  var qty = inBasket ? inBasket.qty : 1;
+  dContent.innerHTML = '<div class="detail-view">'+
+    '<div class="detail-back" onclick="activeCategory=\'\';renderProducts(products)"><span class="detail-back-arrow">&#8592;</span> Back to pantry</div>'+
+    imgHtml+
+    '<div class="detail-body">'+
+      '<div class="detail-category">'+escapeHtml(p.category)+'</div>'+
+      '<div class="detail-name">'+escapeHtml(p.product_name)+'</div>'+
+      '<div class="detail-desc">'+escapeHtml(p.description||"")+'</div>'+
+      '<div class="detail-meta"><span class="detail-price">'+priceStr+'</span><span class="detail-unit">/ '+escapeHtml(p.unit)+'</span><span class="detail-stock '+stockClass+'">'+escapeHtml(p.availability)+'</span></div>'+
+      (p.special_offer?'<div class="detail-offer">&#127873; '+escapeHtml(p.special_offer)+'</div>':'')+
+      (badges?'<div class="detail-section"><div class="detail-section-label">Food Facts</div><div class="product-badges">'+badges+'</div></div>':'')+
+      (p.stock_this_week?'<div class="detail-section"><div class="detail-section-label">Stock This Week</div><span style="font-size:0.8rem;color:var(--text)">'+p.stock_this_week+' units available</span></div>':'')+
+      '<div class="detail-section-label">Quantity</div>'+
+      '<div class="qty-selector"><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c>1)v.textContent=c-1">-</button><span class="qty-val" id="detailQty">'+qty+'</span><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c<10)v.textContent=c+1">+</button></div>'+
+      '<button class="add-basket-btn'+(inBasket?' added':'')+'" id="addBasketBtn" onclick="addToBasket(\''+sku+'\')">'+(inBasket?'&#10003; Added — Tap to update':'Add to Basket — '+priceStr)+'</button>'+
+      (inBasket?'<div class="added-confirm"><span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = &euro;'+(price*qty).toFixed(2)+')</div>':'')+
+    '</div>'+
+  '</div>';
+}
+
+function addToBasket(sku){
+  var p = getProduct(sku); if(!p) return;
+  var qtyEl = document.getElementById("detailQty");
+  var qty = qtyEl ? parseInt(qtyEl.textContent) : 1;
+  if(qty<1) qty=1;
+  basket[sku] = {product:p, qty:qty};
+  updateBasketIndicator();
+  // Update button state
+  var btn = document.getElementById("addBasketBtn");
+  if(btn){btn.textContent="✓ Added — Tap to update";btn.classList.add("added")}
+  // Update or add confirmation line
+  var existing = document.querySelector(".added-confirm");
+  var price = p.price_eur;
+  var priceStr = price >= 1000 ? "&euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
+  var total = price * qty;
+  var totalStr = total >= 1000 ? "&euro;"+total.toLocaleString() : "&euro;"+total.toFixed(2);
+  if(existing){existing.innerHTML='<span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = '+totalStr+')'}
+  else{var body=document.querySelector(".detail-body");if(body)body.insertAdjacentHTML("beforeend",'<div class="added-confirm"><span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = '+totalStr+')</div>')}
+}
+
+function updateBasketIndicator(){
+  var count=0; Object.keys(basket).forEach(function(k){count+=basket[k].qty});
+  document.getElementById("basketCount").textContent = count;
+}
+
+function toggleBasket(){
+  // Don't open basket during onboarding or on detail view
+  if(isOnboarding()) return;
+  var existing = document.getElementById("basketDrawer");
+  if(existing){existing.remove();return}
+  var disc=document.getElementById("discovery");
+  var items=Object.keys(basket);
+  var drawer=document.createElement("div"); drawer.id="basketDrawer"; drawer.className="basket-drawer";
+  if(!items.length){
+    drawer.innerHTML='<div class="basket-drawer-header"><h4>&#128722; Your Basket</h4><span class="basket-close" onclick="document.getElementById(\'basketDrawer\').remove()">&#10005;</span></div><div class="basket-empty-msg">Your basket is empty. Click a product to start shopping!</div>';
+  }else{
+    var total=0;
+    var itemsHtml=items.map(function(k){
+      var b=basket[k]; var p=b.product;
+      var itemTotal=p.price_eur*b.qty;
+      total+=itemTotal;
+      var pStr=p.price_eur>=1000?"&euro;"+p.price_eur.toLocaleString():"&euro;"+p.price_eur.toFixed(2);
+      return'<div class="basket-item"><div class="basket-item-info"><div class="basket-item-name">'+escapeHtml(p.product_name)+'</div><div class="basket-item-price">'+pStr+' / '+escapeHtml(p.unit)+'</div></div><div class="basket-item-qty">x'+b.qty+'</div><button class="basket-item-remove" onclick="removeFromBasket(\''+k+'\')">&#10005;</button></div>';
+    }).join("");
+    var tStr=total>=1000?"&euro;"+total.toLocaleString():"&euro;"+total.toFixed(2);
+    drawer.innerHTML='<div class="basket-drawer-header"><h4>&#128722; Your Basket ('+items.length+' item'+(items.length>1?'s':'')+')</h4><span class="basket-close" onclick="document.getElementById(\'basketDrawer\').remove()">&#10005;</span></div>'+itemsHtml+'<div class="basket-total"><span class="basket-total-label">Total</span><span class="basket-total-price">'+tStr+'</span></div><button class="basket-checkout" onclick="checkout()">Proceed to Checkout</button>';
+  }
+  disc.appendChild(drawer);
+  drawer.scrollIntoView({behavior:"smooth"});
+}
+
+function removeFromBasket(sku){
+  delete basket[sku]; updateBasketIndicator(); toggleBasket(); toggleBasket();
+}
+
+function checkout(){
+  var items=Object.keys(basket); if(!items.length) return;
+  var total=0; items.forEach(function(k){total+=basket[k].product.price_eur*basket[k].qty});
+  var tStr=total>=1000?"&euro;"+total.toLocaleString():"&euro;"+total.toFixed(2);
+  addMsg("You're about to order "+items.length+" item"+(items.length>1?'s':'')+" for "+tStr+". <strong>In a real deployment, this would connect to a payment gateway and order management system.</strong> For now, Ember has noted your selection!",'bot');
+  document.getElementById("basketDrawer").remove();
+}
 
 // === LLM ===
 var EMBER_VOICE = "You are Ember, a friendly, knowledgeable AI shop assistant at Emerald Pantry, an online Irish grocery and specialty food retailer. You live for good food: you know ingredients, pairings, cooking tips, and the stories behind artisan products. You're warm, curious, genuinely excited to chat about food and cooking. Irish flavour: use 'grand','deadly','class','sound','craic' like seasoning. Keep it 2-5 sentences unless sharing a recipe or story. No em dashes. No markdown. Just talk like a person. IMPORTANT: When discussing products, always mention their actual price and availability if given in context. Do NOT correct prices - the prices in the product data are the correct store prices, even if they seem unusual.";
