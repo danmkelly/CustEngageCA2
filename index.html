@@ -201,7 +201,7 @@ body{display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family
 /* End detail view */
 
 /* Open Food Facts section on product cards */
-.off-section{margin-top:8px;padding:8px 0 0;border-top:1px solid var(--border)}
+.off-section{margin-top:8px;padding:8px;border-radius:6px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)}
 .off-section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
 .off-section-label{font-size:0.53rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)}
 .off-section-link{font-size:0.48rem;color:var(--text-dim);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
@@ -536,9 +536,9 @@ function loadProducts(){
     if(!loadedCatalogue || !productGrid || !dContent) return;
     renderProducts(prods);
     products = prods;
-    // Enrich with OFF data in background if we got basic catalogue
-    if(API_PROXY && prods.length > 0 && !prods[0].nutriscore_grade){
-      fetchCatalogueEnriched("","");
+    // Enrich with OFF data in background
+    if(prods.length > 0 && !prods[0].nutriscore_grade){
+      try{ fetchCatalogueEnriched("",""); }catch(e){}
     }
   }).catch(function(e){
     if(dContent) dContent.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
@@ -675,7 +675,7 @@ async function fetchCatalogue(q,cat){
 var CATALOGUE_URL = "https://docs.google.com/spreadsheets/d/1fY7974AdL4rrO2gnCxcCBUFWWSkVhOi9euJI7lNjo2Q/export?format=csv";
 
 async function fetchCatalogueEnriched(q,cat){
-  if(!API_PROXY) return [];
+  if(!API_PROXY) return []; // Needs worker for OFF enrichment
   var endpoint = API_PROXY+"/api/enriched-catalogue";
   var params = [];
   if(q) params.push("q="+encodeURIComponent(q));
