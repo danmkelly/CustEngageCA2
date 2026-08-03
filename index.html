@@ -1194,6 +1194,7 @@ function humanContact(){
 }
 
 async function send(){
+  try {
   var txt = chatInput.value.trim(); if(!txt) return;
   addMsg(txt,"user"); chatInput.value = "";
 
@@ -1290,6 +1291,7 @@ async function send(){
   if(foundProds.length>0||(LLM_KEY||API_PROXY)){
     setTimeout(function(){if(!document.querySelector(".msg.bot:last-child .chat-sugg")||!document.querySelector(".msg.bot:last-child .chat-sugg").textContent.match(/human/i))addSugg(["Keep shopping","Human"])},3000);
   }
+  } catch(e){ hideTyping(); }
 }
 
 function detectPreFilter(txt){
