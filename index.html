@@ -824,14 +824,10 @@ function renderProducts(prods,searchTerm){
 
 function prodByCat(prods){
   var base = allProducts.length > 0 ? allProducts : prods;
-  var filteredAll = applyFiltersAndSort(base);
-  var filteredCurrent = applyFiltersAndSort(prods);
   var cats = {};
-  base.forEach(function(p){
-    var matches = applyFiltersAndSort([p]).length > 0;
-    cats[p.category] = (cats[p.category]||0) + (matches?1:0);
-  });
-  catChips.innerHTML = '<span class="cat-chip'+(activeCategory===""?" active":"")+'" onclick="filterCat(\'\')">All ('+filteredAll.length+')</span>' +
+  base.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; });
+  var total = base.length;
+  catChips.innerHTML = '<span class="cat-chip'+(activeCategory===""?" active":"")+'" onclick="filterCat(\'\')">All ('+total+')</span>' +
     Object.keys(cats).sort().map(function(c){
       return '<span class="cat-chip'+(activeCategory===c?" active":"")+'" onclick="filterCat(\''+c+'\')">'+(categoryLabels[c]||c)+' ('+cats[c]+')</span>';
     }).join("");
@@ -840,10 +836,12 @@ function prodByCat(prods){
 function filterCat(cat){
   activeCategory = cat;
   updateFilterUI();
-  // Always filter from allProducts so Clear and category pills work on full catalogue
-  var base = allProducts.length > 0 ? allProducts : products;
-  renderProducts(base);
-  echoFilterToChat();
+  if(allProducts.length === 0){
+    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); echoFilterToChat(); });
+  } else {
+    renderProducts(allProducts);
+    echoFilterToChat();
+  }
 }
 
 function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
@@ -852,22 +850,32 @@ function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
 function toggleFilter(key){
   if(activeFilters[key]){delete activeFilters[key]}else{activeFilters[key]=true}
   updateFilterUI();
-  var base = allProducts.length > 0 ? allProducts : products;
-  renderProducts(base);
-  echoFilterToChat();
+  if(allProducts.length === 0){
+    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); echoFilterToChat(); });
+  } else {
+    renderProducts(allProducts);
+    echoFilterToChat();
+  }
 }
 
 function setSort(value){
   activeSort = value;
-  var base = allProducts.length > 0 ? allProducts : products;
-  renderProducts(base);
+  if(allProducts.length === 0){
+    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); });
+  } else {
+    renderProducts(allProducts);
+  }
 }
 
 function clearAllFilters(){
-  activeFilters = {}; activeSort = "";
+  activeFilters = {}; activeSort = ""; activeCategory = "";
   updateFilterUI();
-  activeCategory = ""; prodByCat(allProducts);
-  renderProducts(allProducts);
+  if(allProducts.length === 0){
+    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); });
+  } else {
+    prodByCat(allProducts);
+    renderProducts(allProducts);
+  }
   addMsg("Filters cleared — showing the full pantry.",'bot');
 }
 
