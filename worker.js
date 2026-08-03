@@ -7,6 +7,7 @@
  * Set secrets: npx wrangler secret put LLM_KEY
  */
 var CATALOGUE_URL = "https://docs.google.com/spreadsheets/d/1fY7974AdL4rrO2gnCxcCBUFWWSkVhOi9euJI7lNjo2Q/export?format=csv";
+var OFF_URL = "https://world.openfoodfacts.org/api/v2/product/";
 
 export default {
   async fetch(request, env, ctx) {
@@ -36,6 +37,8 @@ export default {
         });
       } else if (url.pathname === "/api/catalogue") {
         response = await getCatalogue(env, url);
+      } else if (url.pathname === "/api/enriched-catalogue") {
+        response = await getEnrichedCatalogue(env, url, ctx);
       } else {
         return new Response("Not found", { status: 404, headers });
       }
@@ -94,6 +97,110 @@ async function getCatalogue(env, url) {
       "Cache-Control": "no-cache, no-store, must-revalidate",
     },
   });
+}
+
+async function getEnrichedCatalogue(env, url, ctx) {
+  // Step 1: Fetch fresh catalogue from Google Sheets (no cache for live price/stock)
+  var resp = await fetch(CATALOGUE_URL + "&t=" + Date.now());
+  if (!resp.ok) {
+    return new Response(JSON.stringify({ error: "Failed to fetch catalogue" }), {
+      status: 502,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  var csv = await resp.text();
+  var products = parseCSV(csv);
+
+  // Step 2: Batch-enrich with OpenFoodFacts data (all barcodes in parallel)
+  // OFF nutritional data cached 1 hour; Google Sheet price/stock always live
+  var offCache = caches.default;
+  var enrichmentFutures = products.map(function(p) {
+    return enrichProduct(p, offCache);
+  });
+  var enrichedProducts = await Promise.all(enrichmentFutures);
+
+  // Step 3: Apply search/category filters
+  var search = (url.searchParams.get("q") || "").toLowerCase().trim();
+  if (search) {
+    enrichedProducts = enrichedProducts.filter(function(p) {
+      return p.product_name.toLowerCase().indexOf(search) > -1
+        || p.category.toLowerCase().indexOf(search) > -1
+        || (p.description && p.description.toLowerCase().indexOf(search) > -1);
+    });
+  }
+
+  var category = (url.searchParams.get("category") || "").toLowerCase().trim();
+  if (category) {
+    enrichedProducts = enrichedProducts.filter(function(p) {
+      return p.category.toLowerCase() === category;
+    });
+  }
+
+  return new Response(JSON.stringify({
+    count: enrichedProducts.length,
+    products: enrichedProducts,
+    updated: new Date().toISOString(),
+    source: "emerald-pantry + openfoodfacts",
+  }), {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+    },
+  });
+}
+
+async function enrichProduct(product, offCache) {
+  var barcode = product.barcode;
+  if (!barcode || barcode.length < 8) return product;
+
+  // Try OFF cache first (1-hour TTL for nutritional data)
+  var cacheKey = "https://cache.off/" + barcode;
+  var cacheReq = new Request(cacheKey, { method: "GET" });
+  var cached = await offCache.match(cacheReq);
+  if (cached) {
+    var cachedData = await cached.json();
+    return Object.assign({}, product, cachedData);
+  }
+
+  // Fetch from OFF API
+  try {
+    var offResp = await fetch(OFF_URL + barcode + ".json");
+    if (!offResp.ok) return product;
+    var offData = await offResp.json();
+    if (offData.status !== 1 || !offData.product) return product;
+
+    var enrichment = extractOffFields(offData.product);
+
+    // Cache for 1 hour
+    var cacheResp = new Response(JSON.stringify(enrichment), {
+      headers: { "Cache-Control": "public, max-age=3600" },
+    });
+    // Use ctx if available, otherwise skip caching
+    if (typeof ctx !== "undefined" && ctx && ctx.waitUntil) {
+      ctx.waitUntil(offCache.put(cacheReq, cacheResp));
+    }
+
+    return Object.assign({}, product, enrichment);
+  } catch (e) {
+    return product;
+  }
+}
+
+function extractOffFields(p) {
+  return {
+    nutriscore_grade: p.nutriscore_grade || null,
+    nova_group: p.nova_group || null,
+    ecoscore_grade: p.ecoscore_grade || null,
+    allergens: p.allergens || "",
+    image_url: p.image_front_small_url || p.image_url || "",
+    ingredients_analysis_tags: p.ingredients_analysis_tags || [],
+    labels_tags: p.labels_tags || [],
+    nutrient_levels: p.nutrient_levels || {},
+    origins: p.origins || "",
+    brands: p.brands || "",
+    categories_off: (p.categories_tags || []).filter(function(t) { return t.indexOf("en:") === 0; }).slice(0, 3),
+  };
 }
 
 function parseCSV(csv) {
