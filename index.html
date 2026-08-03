@@ -822,13 +822,17 @@ function renderProducts(prods,searchTerm){
 }
 
 function prodByCat(prods){
-  var base = allProducts.length > 0 ? allProducts : prods;
-  var cats = {};
-  base.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; });
-  var total = base.length;
+  var cats = {}; var total = 0;
+  if(allProducts.length > 0){
+    allProducts.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; total++; });
+  } else if(prods && prods.length){
+    prods.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; total++; });
+  }
+  var ordered = ["bakery","dairy","drinks","snacks","store-cupboard"];
   catChips.innerHTML = '<span class="cat-chip'+(activeCategory===""?" active":"")+'" onclick="filterCat(\'\')">All ('+total+')</span>' +
-    Object.keys(cats).sort().map(function(c){
-      return '<span class="cat-chip'+(activeCategory===c?" active":"")+'" onclick="filterCat(\''+c+'\')">'+(categoryLabels[c]||c)+' ('+cats[c]+')</span>';
+    ordered.map(function(c){
+      var count = cats[c] || 0;
+      return '<span class="cat-chip'+(activeCategory===c?" active":"")+'" onclick="filterCat(\''+c+'\')">'+(categoryLabels[c]||c)+' ('+count+')</span>';
     }).join("");
 }
 
