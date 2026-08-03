@@ -419,6 +419,7 @@ var activeFilters = {};
 var activeSort = "";
 var knownProductNames = [];
 var basket = {};
+var allProducts = [];
 
 // === Memory ===
 function loadMemory(){
@@ -695,6 +696,8 @@ function parseCSVLineClient(line){
 // === Render products ===
 function renderProducts(prods,searchTerm){
   products = prods;
+  // Keep allProducts as the full catalogue when it's a complete load (no search term)
+  if(!searchTerm || searchTerm === "") allProducts = prods.slice();
   document.getElementById("loadingSpinner").classList.remove("active");
   var filtered = applyFiltersAndSort(prods);
   // Update result count
@@ -810,8 +813,8 @@ function setSort(value){
 function clearAllFilters(){
   activeFilters = {}; activeSort = "";
   updateFilterUI();
-  activeCategory = ""; prodByCat(products);
-  renderProducts(products);
+  activeCategory = ""; prodByCat(allProducts);
+  renderProducts(allProducts);
   addMsg("Filters cleared — showing the full pantry.",'bot');
 }
 
