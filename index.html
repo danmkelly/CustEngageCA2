@@ -551,8 +551,8 @@ function loadProducts(){
   }, 3000);
   fetchCatalogue("","").then(function(prods){
     clearTimeout(loadTimeout);
+    allProducts = prods.slice();
     renderProducts(prods);
-    products = prods; allProducts = prods.slice();
     if(prods.length > 0 && !prods[0].nutriscore_grade){
       try{ fetchCatalogueEnriched("",""); }catch(e){}
     }
@@ -706,10 +706,8 @@ async function fetchCatalogueEnriched(q,cat){
     var enriched = d.products || [];
     if(enriched.length > 0){
       allProducts = enriched.slice();
-      // Only re-render if no active filters (avoid overwriting user's filtered view)
-      if(Object.keys(activeFilters).length === 0 && !activeCategory && !activeSort){
-        products = enriched;
-        if(productGrid && dContent) renderProducts(enriched);
+      if(Object.keys(activeFilters).length === 0 && !activeCategory && !activeSort && productGrid && dContent){
+        renderProducts(enriched);
       }
     }
     return enriched;
@@ -747,23 +745,24 @@ function parseCSVLineClient(line){
 
 // === Render products ===
 function renderProducts(prods,searchTerm){
-  products = prods;
-  if(!searchTerm || searchTerm === "") allProducts = prods.slice();
+  // Never shrink allProducts - it's the canonical full catalogue
+  if(allProducts.length === 0 && (!searchTerm || searchTerm === "")) allProducts = prods.slice();
+  // Use allProducts as the filter base when available, otherwise use prods
+  var base = allProducts.length > 0 ? allProducts : prods;
   document.getElementById("loadingSpinner").classList.remove("active");
-  var filtered = applyFiltersAndSort(prods);
-  // Update result count
+  var filtered = applyFiltersAndSort(base);
+  products = filtered;
   var rc = document.getElementById("resultCount");
-  if(rc) rc.textContent = filtered.length + " of " + prods.length + " products";
+  if(rc) rc.textContent = filtered.length + " of " + base.length + " products";
   if(!filtered.length){
-    dEmpty.style.display = "none"; dContent.style.display = "block";
-    productGrid.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#128270;</div><h4>No products match</h4><p>Try adjusting your filters or clearing them to see all '+prods.length+' products.</p><button class="clear-filters-btn" onclick="clearAllFilters()">Clear all filters</button></div></div>';
+    dContent.style.display = "block";
+    productGrid.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#128270;</div><h4>No products match</h4><p>Try adjusting your filters or clearing them to see all '+base.length+' products.</p><button class="clear-filters-btn" onclick="clearAllFilters()">Clear all filters</button></div></div>';
     return;
   }
-  dEmpty.style.display = "none"; dContent.style.display = "block";
-
-  prodByCat(prods);
+  dContent.style.display = "block";
+  prodByCat(base);
   updateFilterUI();
-
+  // Build grid from filtered results
   productGrid.innerHTML = filtered.map(function(p){
     var stockClass = p.availability.toLowerCase().replace(/\s+/g,'-');
     var stockLabel = p.availability;
@@ -836,12 +835,8 @@ function prodByCat(prods){
 function filterCat(cat){
   activeCategory = cat;
   updateFilterUI();
-  if(allProducts.length === 0){
-    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); echoFilterToChat(); });
-  } else {
-    renderProducts(allProducts);
-    echoFilterToChat();
-  }
+  renderProducts(allProducts);
+  echoFilterToChat();
 }
 
 function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
@@ -850,32 +845,19 @@ function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
 function toggleFilter(key){
   if(activeFilters[key]){delete activeFilters[key]}else{activeFilters[key]=true}
   updateFilterUI();
-  if(allProducts.length === 0){
-    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); echoFilterToChat(); });
-  } else {
-    renderProducts(allProducts);
-    echoFilterToChat();
-  }
+  renderProducts(allProducts);
+  echoFilterToChat();
 }
 
 function setSort(value){
   activeSort = value;
-  if(allProducts.length === 0){
-    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); });
-  } else {
-    renderProducts(allProducts);
-  }
+  renderProducts(allProducts);
 }
 
 function clearAllFilters(){
   activeFilters = {}; activeSort = ""; activeCategory = "";
   updateFilterUI();
-  if(allProducts.length === 0){
-    fetchCatalogue("","").then(function(p){ allProducts = p.slice(); products = p; renderProducts(p); });
-  } else {
-    prodByCat(allProducts);
-    renderProducts(allProducts);
-  }
+  renderProducts(allProducts);
   addMsg("Filters cleared — showing the full pantry.",'bot');
 }
 
@@ -952,12 +934,9 @@ function backToPantry(){
   dContent.innerHTML = '<div class="filter-bar" id="filterBar"><div class="filter-row"><span class="filter-label">Category</span><div class="cat-chips" id="catChips"></div><span class="filter-pill" data-filter="inStock" onclick="toggleFilter(\'inStock\')">In Stock</span><span class="filter-pill" data-filter="offer" onclick="toggleFilter(\'offer\')">On Offer</span><span class="filter-clear muted" id="filterClear" onclick="clearAllFilters()">Clear all</span></div><div class="filter-row"><span class="filter-label">Diet</span><span class="filter-pill" data-filter="vegan" onclick="toggleFilter(\'vegan\')">Vegan</span><span class="filter-pill" data-filter="vegetarian" onclick="toggleFilter(\'vegetarian\')">Vegetarian</span><span class="filter-pill" data-filter="organic" onclick="toggleFilter(\'organic\')">Organic</span><span class="filter-pill" data-filter="glutenFree" onclick="toggleFilter(\'glutenFree\')">Gluten-Free</span><span class="filter-pill" data-filter="dairyFree" onclick="toggleFilter(\'dairyFree\')">Dairy-Free</span></div><div class="filter-row"><span class="filter-label">Nutri-Score</span><span class="filter-pill nutriscore-a" data-filter="nutriA" onclick="toggleFilter(\'nutriA\')">A</span><span class="filter-pill nutriscore-b" data-filter="nutriB" onclick="toggleFilter(\'nutriB\')">B</span><span class="filter-pill nutriscore-c" data-filter="nutriC" onclick="toggleFilter(\'nutriC\')">C</span><span class="filter-pill nutriscore-d" data-filter="nutriD" onclick="toggleFilter(\'nutriD\')">D</span><span class="filter-pill nutriscore-e" data-filter="nutriE" onclick="toggleFilter(\'nutriE\')">E</span><span class="filter-divider"></span><span class="filter-pill nutri-none" data-filter="nutriNone" onclick="toggleFilter(\'nutriNone\')">None</span><span class="filter-divider"></span><span class="filter-label">Sort</span><select class="sort-select" id="sortSelect" onchange="setSort(this.value)"><option value="">Default</option><option value="priceAsc">Price ↑</option><option value="priceDesc">Price ↓</option><option value="name">Name A-Z</option><option value="nutriBest">Nutri-Score Best</option><option value="proteinDesc">Protein ↑</option><option value="sugarAsc">Sugar ↓</option><option value="saltAsc">Salt ↓</option><option value="kcalAsc">Energy ↓</option></select></div></div><div class="panel-section product-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#129367;</span><h4>Products</h4><span id="resultCount" style="font-size:0.58rem;color:var(--text-dim);margin-left:auto"></span></div><div class="product-grid" id="productGrid"></div></div>';
   productGrid = document.getElementById("productGrid");
   catChips = document.getElementById("catChips");
-  dEmpty.style.display = "none"; dContent.style.display = "block";
-  activeFilters = {};
-  activeSort = "";
+  dContent.style.display = "block";
   updateFilterUI();
-  activeCategory = "";
-  renderProducts(products);
+  renderProducts(allProducts);
   addMsg("Back to the pantry! What else catches your eye?",'bot');
 }
 
