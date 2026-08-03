@@ -713,6 +713,15 @@ function filterCat(cat){
 function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 
 // === Purchase Flow ===
+function backToPantry(){
+  dContent.innerHTML = '<div class="panel-section cat-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#127991;</span><h4>Filter by Category</h4></div><div class="cat-chips" id="catChips"></div></div><div class="panel-section product-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#129367;</span><h4>Products</h4></div><div class="product-grid" id="productGrid"></div></div>';
+  productGrid = document.getElementById("productGrid");
+  catChips = document.getElementById("catChips");
+  dEmpty.style.display = "none"; dContent.style.display = "block";
+  activeCategory = "";
+  renderProducts(products);
+}
+
 function getProduct(sku){for(var i=0;i<products.length;i++){if(products[i].sku===sku)return products[i]}return null}
 
 function openDetail(sku){
@@ -736,7 +745,7 @@ function openDetail(sku){
   var inBasket = basket[sku];
   var qty = inBasket ? inBasket.qty : 1;
   dContent.innerHTML = '<div class="detail-view">'+
-    '<div class="detail-back" onclick="activeCategory=\'\';renderProducts(products)"><span class="detail-back-arrow">&#8592;</span> Back to pantry</div>'+
+    '<div class="detail-back" onclick="backToPantry()"><span class="detail-back-arrow">&#8592;</span> Back to pantry</div>'+
     imgHtml+
     '<div class="detail-body">'+
       '<div class="detail-category">'+escapeHtml(p.category)+'</div>'+
@@ -749,7 +758,7 @@ function openDetail(sku){
       '<div class="detail-section-label">Quantity</div>'+
       '<div class="qty-selector"><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c>1)v.textContent=c-1">-</button><span class="qty-val" id="detailQty">'+qty+'</span><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c<10)v.textContent=c+1">+</button></div>'+
       '<button class="add-basket-btn'+(inBasket?' added':'')+'" id="addBasketBtn" onclick="addToBasket(\''+sku+'\')">'+(inBasket?'&#10003; Added — Tap to update':'Add to Basket — '+priceStr)+'</button>'+
-      '<button class="back-pantry-btn" onclick="activeCategory=\'\';renderProducts(products)">&#8592; Back to Pantry</button>'+
+      '<button class="back-pantry-btn" onclick="backToPantry()">&#8592; Back to Pantry</button>'+
       (inBasket?'<div class="added-confirm"><span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = &euro;'+(price*qty).toFixed(2)+')</div>':'')+
     '</div>'+
   '</div>';
