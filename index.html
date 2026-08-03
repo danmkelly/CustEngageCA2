@@ -465,7 +465,7 @@ function rememberMe(){
   document.getElementById("emberLabel").textContent = "Your pantry guide · AI-powered";
   updateMemoryButtons();
   updateOnboardingLock();
-  addMsg("Grand! I'll remember you from now on. What should I call you?",'bot');
+  addMsg("Grand! I'll remember you from now on. <strong>Enter your name in the box below</strong>!",'bot');
 }
 function updateMemoryButtons(){
   var clr = document.getElementById("clearMemBtn"), rem = document.getElementById("rememberBtn");
@@ -1197,7 +1197,7 @@ async function send(){
   // Consent handling
   if(expectingConsent&&!emberMemory.consent){
     var t = txt.toLowerCase().trim();
-    if(/^(yes|yeah|yep|sure|ok|okay|grand|sound|go on)$/i.test(t)){emberMemory.consent="yes";expectingConsent=false;saveMemory();expectingName=true;onboardingStep=3;hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("Class! I'll remember you. What should I call you?",'bot');return}
+    if(/^(yes|yeah|yep|sure|ok|okay|grand|sound|go on)$/i.test(t)){emberMemory.consent="yes";expectingConsent=false;saveMemory();expectingName=true;onboardingStep=3;hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("Class! I'll remember you. <strong>Enter your name in the box below</strong> and I'll get to know you.",'bot');return}
     if(/^(no|nope|nah|no thanks)$/i.test(t)){emberMemory.consent="no";expectingConsent=false;expectingName=false;onboardingStep=4;saveMemory();hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("No worries, I won't store anything about you. What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks"]);lastEmberAsked=true;return}
     if(t==="human"){expectingConsent=false;onboardingStep=4;hideTyping();updateOnboardingLock();showHumanContact();return}
     hideTyping();addMsg("Just a simple <strong>yes</strong> or <strong>no</strong> -- would you like me to remember you between visits? Everything stays on your device.",'bot');addSugg(["Yes","No"]);return;
