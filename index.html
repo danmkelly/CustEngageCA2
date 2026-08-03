@@ -410,6 +410,11 @@ var loadedCatalogue = false;
 function loadProducts(){
   loadedCatalogue = true;
   document.getElementById("discovery").innerHTML = '<div class="loading-spinner active" id="loadingSpinner"><div class="spinner"></div><p>Loading the pantry...</p></div><div class="d-empty" id="dEmpty" style="display:none"><div class="d-empty-inner"><div class="d-empty-icon">&#129367;</div><h3>Your Pantry Discovery</h3><p>Chat with Ember about what you\'re looking for. Products will appear here as they\'re found.</p></div></div><div id="dContent" style="display:none"><div class="panel-section cat-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#127991;</span><h4>Filter by Category</h4></div><div class="cat-chips" id="catChips"></div></div><div class="panel-section product-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#129367;</span><h4>Products</h4></div><div class="product-grid" id="productGrid"></div></div></div>';
+  // Re-bind DOM references since innerHTML destroyed the originals
+  dEmpty = document.getElementById("dEmpty");
+  dContent = document.getElementById("dContent");
+  productGrid = document.getElementById("productGrid");
+  catChips = document.getElementById("catChips");
   fetchCatalogue("","").then(function(prods){renderProducts(prods);products=prods});
 }
 function rememberSearch(s){if(!s)return;emberMemory.recentSearches.unshift(s);if(emberMemory.recentSearches.length>10)emberMemory.recentSearches.pop();emberMemory.totalSearches++;saveMemory()}
