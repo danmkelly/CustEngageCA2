@@ -198,6 +198,16 @@ body{display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family
 .added-confirm-icon{font-size:0.9rem}
 /* End detail view */
 
+/* Open Food Facts section on product cards */
+.off-section{margin-top:8px;padding:8px 0 0;border-top:1px solid var(--border)}
+.off-section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.off-section-label{font-size:0.53rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)}
+.off-section-link{font-size:0.48rem;color:var(--text-dim);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.off-section-link:hover{color:var(--accent2)}
+.off-no-data{font-size:0.55rem;color:var(--text-dim);font-style:italic}
+.off-section .product-badges{margin-top:0}
+.rep-image-tag{position:absolute;bottom:4px;right:6px;font-size:0.42rem;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.45);padding:1px 4px;border-radius:3px;pointer-events:none;z-index:1}
+
 /* Category filter chips */
 .cat-section{padding:0 16px 10px}
 .cat-chips{display:flex;flex-wrap:wrap;gap:4px}
@@ -669,35 +679,47 @@ function renderProducts(prods,searchTerm){
     }
     var price = p.price_eur;
     var priceStr = price >= 1000 ? "&#128064; &euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
-    var badges = "";
+    // Build Open Food Facts section
+    var offBadges = "";
+    var hasOffData = false;
     if(p.nutriscore_grade){
       var ns = p.nutriscore_grade.toLowerCase();
-      badges += '<span class="off-badge nutriscore-'+ns+'">Nutri-Score '+ns.toUpperCase()+'</span>';
+      offBadges += '<span class="off-badge nutriscore-'+ns+'">Nutri-Score '+ns.toUpperCase()+'</span>';
+      hasOffData = true;
     }
     if(p.nova_group){
-      badges += '<span class="off-badge nova-'+p.nova_group+'">NOVA '+p.nova_group+'</span>';
+      offBadges += '<span class="off-badge nova-'+p.nova_group+'">NOVA '+p.nova_group+'</span>';
+      hasOffData = true;
     }
     if(p.ecoscore_grade){
       var es = p.ecoscore_grade.toLowerCase();
-      if(es !== "unknown") badges += '<span class="off-badge nutriscore-'+es+'">Eco-'+es.toUpperCase()+'</span>';
+      if(es !== "unknown"){ offBadges += '<span class="off-badge nutriscore-'+es+'">Eco-'+es.toUpperCase()+'</span>'; hasOffData = true; }
     }
     var hasVegan = p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:vegan") > -1;
     var hasVegetarian = p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:vegetarian") > -1;
     var isOrganic = p.labels_tags && p.labels_tags.indexOf("en:organic") > -1;
-    if(hasVegan) badges += '<span class="diet-badge">Vegan</span>';
-    else if(hasVegetarian) badges += '<span class="diet-badge">Vegetarian</span>';
-    if(isOrganic) badges += '<span class="diet-badge">Organic</span>';
+    if(hasVegan){ offBadges += '<span class="diet-badge">Vegan</span>'; hasOffData = true; }
+    else if(hasVegetarian){ offBadges += '<span class="diet-badge">Vegetarian</span>'; hasOffData = true; }
+    if(isOrganic){ offBadges += '<span class="diet-badge">Organic</span>'; hasOffData = true; }
     if(p.allergens){
       var allergens = p.allergens.split(",").slice(0,2).map(function(a){return a.trim()}).join(", ");
-      if(allergens) badges += '<span class="allergen-badge" title="Contains: '+escapeHtml(p.allergens)+'">'+escapeHtml(allergens)+'</span>';
+      if(allergens){ offBadges += '<span class="allergen-badge" title="Contains: '+escapeHtml(p.allergens)+'">'+escapeHtml(allergens)+'</span>'; hasOffData = true; }
     }
+    var offSection = "";
+    var offUrl = p.barcode ? "https://world.openfoodfacts.org/product/"+escapeHtml(p.barcode) : "";
+    if(hasOffData){
+      offSection = '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank" onclick="event.stopPropagation()" title="View on Open Food Facts">view record &#8599;</a>':'')+'</div><div class="product-badges">'+offBadges+'</div></div>';
+    } else {
+      offSection = '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank" onclick="event.stopPropagation()" title="View on Open Food Facts">view record &#8599;</a>':'')+'</div><div class="off-no-data">No facts available for this product</div></div>';
+    }
+    // Product image with representative tag for placeholders
     var catIcon = categoryIcons[p.category] || "&#129367;";
     var catColour = categoryColours[p.category] || "#163322";
+    var isPlaceholder = !p.image_url;
     var imgHtml = p.image_url
-      ? '<img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" style="position:relative;z-index:0">'
-      : '';
-    imgHtml += '<div class="off-img" style="display:'+(p.image_url?'none':'flex')+';align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08);position:relative;'+(p.image_url?'position:absolute;top:0;left:0;':'')+'">'+catIcon+'</div>';
-    return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + (badges ? '<div class="product-badges">'+badges+'</div>' : '') +'</div></div>';
+      ? '<div style="position:relative"><img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="off-img" style="display:none;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08);position:absolute;top:0;left:0;width:100%;height:100%">'+catIcon+'</div></div>'
+      : '<div style="position:relative"><div class="off-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div><span class="rep-image-tag">representative image</span></div>';
+    return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + offSection +'</div></div>';
   }).join("");
 
   updateKnownNames();
@@ -747,20 +769,29 @@ function openDetail(sku){
   var price = p.price_eur;
   var priceStr = price >= 1000 ? "&euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
   var badges = "";
-  if(p.nutriscore_grade){var ns=p.nutriscore_grade.toLowerCase();badges+='<span class="off-badge nutriscore-'+ns+'">Nutri-Score '+ns.toUpperCase()+'</span>'}
-  if(p.nova_group){badges+='<span class="off-badge nova-'+p.nova_group+'">NOVA '+p.nova_group+'</span>'}
-  if(p.ecoscore_grade){var es=p.ecoscore_grade.toLowerCase();if(es!=="unknown")badges+='<span class="off-badge nutriscore-'+es+'">Eco-'+es.toUpperCase()+'</span>'}
+  var hasOffData = false;
+  if(p.nutriscore_grade){var ns=p.nutriscore_grade.toLowerCase();badges+='<span class="off-badge nutriscore-'+ns+'">Nutri-Score '+ns.toUpperCase()+'</span>';hasOffData=true}
+  if(p.nova_group){badges+='<span class="off-badge nova-'+p.nova_group+'">NOVA '+p.nova_group+'</span>';hasOffData=true}
+  if(p.ecoscore_grade){var es=p.ecoscore_grade.toLowerCase();if(es!=="unknown"){badges+='<span class="off-badge nutriscore-'+es+'">Eco-'+es.toUpperCase()+'</span>';hasOffData=true}}
   var hasVegan=p.ingredients_analysis_tags&&p.ingredients_analysis_tags.indexOf("en:vegan")>-1;
   var hasVegetarian=p.ingredients_analysis_tags&&p.ingredients_analysis_tags.indexOf("en:vegetarian")>-1;
   var isOrganic=p.labels_tags&&p.labels_tags.indexOf("en:organic")>-1;
-  if(hasVegan)badges+='<span class="diet-badge">Vegan</span>';else if(hasVegetarian)badges+='<span class="diet-badge">Vegetarian</span>';
-  if(isOrganic)badges+='<span class="diet-badge">Organic</span>';
-  if(p.allergens){var allergens=p.allergens.split(",").slice(0,3).map(function(a){return a.trim()}).join(", ");if(allergens)badges+='<span class="allergen-badge">Contains: '+escapeHtml(allergens)+'</span>'}
+  if(hasVegan){badges+='<span class="diet-badge">Vegan</span>';hasOffData=true}else if(hasVegetarian){badges+='<span class="diet-badge">Vegetarian</span>';hasOffData=true}
+  if(isOrganic){badges+='<span class="diet-badge">Organic</span>';hasOffData=true}
+  if(p.allergens){var allergens=p.allergens.split(",").slice(0,3).map(function(a){return a.trim()}).join(", ");if(allergens){badges+='<span class="allergen-badge">Contains: '+escapeHtml(allergens)+'</span>';hasOffData=true}}
+  var offUrl = p.barcode ? "https://world.openfoodfacts.org/product/"+escapeHtml(p.barcode) : "";
+  var offSection = "";
+  if(hasOffData){
+    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank">view record &#8599;</a>':'')+'</div><div class="product-badges">'+badges+'</div></div>';
+  } else {
+    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank">view record &#8599;</a>':'')+'</div><div class="off-no-data">No facts available for this product</div></div>';
+  }
   var catIcon = categoryIcons[p.category] || "&#129367;";
   var catColour = categoryColours[p.category] || "#163322";
+  var isPlaceholder = !p.image_url;
   var imgHtml = p.image_url
-    ? '<div class="detail-img-wrap"><img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" onerror="this.style.display=\'none\'" style="position:relative;z-index:0"><div style="display:none;align-items:center;justify-content:center;height:150px;font-size:3rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div></div>'
-    : '<div class="detail-img-wrap" style="display:flex;align-items:center;justify-content:center;height:150px;font-size:3rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div>';
+    ? '<div class="detail-img-wrap" style="position:relative"><img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" onerror="this.style.display=\'none\'" style="position:relative;z-index:0"><div style="display:none;align-items:center;justify-content:center;height:150px;font-size:3rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div></div>'
+    : '<div class="detail-img-wrap" style="position:relative;display:flex;align-items:center;justify-content:center;height:150px;font-size:3rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'<span class="rep-image-tag" style="font-size:0.55rem;bottom:6px;right:8px;padding:2px 6px;border-radius:4px">representative image</span></div>';
   var inBasket = basket[sku];
   var qty = inBasket ? inBasket.qty : 1;
   dContent.innerHTML = '<div class="detail-view">'+
@@ -772,7 +803,7 @@ function openDetail(sku){
       '<div class="detail-desc">'+escapeHtml(p.description||"")+'</div>'+
       '<div class="detail-meta"><span class="detail-price">'+priceStr+'</span><span class="detail-unit">/ '+escapeHtml(p.unit)+'</span><span class="detail-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span></div>'+
       (p.special_offer?'<div class="detail-offer">&#127873; '+escapeHtml(p.special_offer)+'</div>':'')+
-      (badges?'<div class="detail-section"><div class="detail-section-label">Food Facts</div><div class="product-badges">'+badges+'</div></div>':'')+
+      offSection+
       (p.stock_this_week !== undefined && p.stock_this_week !== "" ? '<div class="detail-section"><div class="detail-section-label">Stock This Week</div><span style="font-size:0.8rem;color:'+(parseInt(p.stock_this_week)>0?'var(--text)':'#C44D4D')+'">'+p.stock_this_week+' units '+(parseInt(p.stock_this_week)>0?'available':'— currently sold out')+'</span></div>':'')+
       '<div class="detail-section-label">Quantity</div>'+
       '<div class="qty-selector"><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c>1)v.textContent=c-1">-</button><span class="qty-val" id="detailQty">'+qty+'</span><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c<10)v.textContent=c+1">+</button></div>'+
