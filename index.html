@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Emerald Pantry - Chat with Ember</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1190,15 +1193,6 @@ function humanContact(){
 }
 
 async function send(){
-  // Diagnostic: log when send is called during name step
-  if(onboardingStep === 3){
-    if(document.getElementById("diag")) document.getElementById("diag").remove();
-    var diag = document.createElement("div"); diag.id="diag";
-    diag.style.cssText = "position:fixed;top:10px;right:10px;background:#D4A84B;color:#000;padding:10px 16px;border-radius:8px;z-index:9999;font:bold 14px sans-serif";
-    diag.textContent = "send() called, expectingName="+expectingName+" userName="+emberMemory.userName+" txt="+(chatInput.value||"(empty)");
-    document.body.appendChild(diag);
-    setTimeout(function(){ diag.remove(); }, 5000);
-  }
   var txt = chatInput.value.trim(); if(!txt) return;
   addMsg(txt,"user"); chatInput.value = "";
 
