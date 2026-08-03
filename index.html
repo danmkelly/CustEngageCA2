@@ -492,7 +492,7 @@ function updateOnboardingLock(){
   send.disabled = lockInput;
   if(mic) mic.disabled = lockInput;
   // Clear placeholder for name step
-  if(onboardingStep === 3){ input.placeholder = "Enter your name..."; setTimeout(function(){ input.focus(); }, 100); }
+  if(onboardingStep === 3){ hideTyping(); input.placeholder = "Enter your name..."; setTimeout(function(){ input.focus(); }, 100); }
 
   if(ramp){
     if(inOnboarding){ramp.classList.add("onboarding-active");document.getElementById("humanRampText").innerHTML='Skip setup — <span class="human-ramp-cta">talk to a human</span> instead'}
@@ -584,8 +584,8 @@ function addSugg(arr){
   chatMsgs.appendChild(d); sc();
 }
 function showTyping(){var d=document.createElement("div");d.className="msg bot";d.innerHTML='<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';d.id="t";chatMsgs.appendChild(d);sc()}
-function hideTyping(){var e=document.getElementById("t");if(e)e.remove()}
-function qa(t){chatInput.value=t;send()}
+function hideTyping(){var e=document.getElementById("t");if(e)e.remove();var all=document.querySelectorAll("#t");all.forEach(function(el){el.remove()})}
+function qa(t){hideTyping();chatInput.value=t;send()}
 
 function enrichLinks(html){
   if(!knownProductNames.length||html.indexOf("chat-link")>-1) return html;
