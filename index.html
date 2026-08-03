@@ -657,7 +657,14 @@ function renderProducts(prods,searchTerm){
 
   productGrid.innerHTML = filtered.map(function(p){
     var stockClass = p.availability.toLowerCase().replace(/\s+/g,'-');
-    if(stockClass.indexOf("in-stock")>-1) stockClass = "in-stock";
+    var stockLabel = p.availability;
+    if(parseInt(p.stock_this_week) === 0 && stockLabel === "In stock"){
+      stockClass = "pre-order"; stockLabel = "Out of stock";
+    } else if(stockLabel === "Seasonal" || stockLabel === "Pre-order"){
+      stockClass = stockLabel.toLowerCase();
+    } else if(stockClass.indexOf("in-stock")>-1){
+      stockClass = "in-stock";
+    }
     var price = p.price_eur;
     var priceStr = price >= 1000 ? "&#128064; &euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
     var badges = "";
@@ -682,8 +689,8 @@ function renderProducts(prods,searchTerm){
       var allergens = p.allergens.split(",").slice(0,2).map(function(a){return a.trim()}).join(", ");
       if(allergens) badges += '<span class="allergen-badge" title="Contains: '+escapeHtml(p.allergens)+'">'+escapeHtml(allergens)+'</span>';
     }
-    var imgHtml = p.image_url ? '<img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.style.display=\'none\'">' : '';
-    return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(p.availability)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + (badges ? '<div class="product-badges">'+badges+'</div>' : '') +'</div></div>';
+    var imgHtml = p.image_url ? '<img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.parentElement.style.background=\'var(--surface2)\';this.style.display=\'none\'">' : '<div class="off-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem;opacity:0.3">&#129367;</div>';
+    return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + (badges ? '<div class="product-badges">'+badges+'</div>' : '') +'</div></div>';
   }).join("");
 
   updateKnownNames();
@@ -722,7 +729,14 @@ function openDetail(sku){
   var p = getProduct(sku); if(!p) return;
   dEmpty.style.display = "none"; dContent.style.display = "block";
   var stockClass = p.availability.toLowerCase().replace(/\s+/g,'-');
-  if(stockClass.indexOf("in-stock")>-1) stockClass = "in-stock";
+  var stockLabel = p.availability;
+  if(parseInt(p.stock_this_week) === 0 && stockLabel === "In stock"){
+    stockClass = "pre-order"; stockLabel = "Out of stock";
+  } else if(stockLabel === "Seasonal" || stockLabel === "Pre-order"){
+    stockClass = stockLabel.toLowerCase();
+  } else if(stockClass.indexOf("in-stock")>-1){
+    stockClass = "in-stock";
+  }
   var price = p.price_eur;
   var priceStr = price >= 1000 ? "&euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
   var badges = "";
@@ -735,7 +749,7 @@ function openDetail(sku){
   if(hasVegan)badges+='<span class="diet-badge">Vegan</span>';else if(hasVegetarian)badges+='<span class="diet-badge">Vegetarian</span>';
   if(isOrganic)badges+='<span class="diet-badge">Organic</span>';
   if(p.allergens){var allergens=p.allergens.split(",").slice(0,3).map(function(a){return a.trim()}).join(", ");if(allergens)badges+='<span class="allergen-badge">Contains: '+escapeHtml(allergens)+'</span>'}
-  var imgHtml=p.image_url?'<div class="detail-img-wrap"><img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" onerror="this.style.display=\'none\'"></div>':'';
+  var imgHtml=p.image_url?'<div class="detail-img-wrap"><img src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" onerror="this.style.display=\'none\'"></div>':'<div class="detail-img-wrap" style="display:flex;align-items:center;justify-content:center;height:150px;font-size:3rem;opacity:0.2">&#129367;</div>';
   var inBasket = basket[sku];
   var qty = inBasket ? inBasket.qty : 1;
   dContent.innerHTML = '<div class="detail-view">'+
@@ -745,10 +759,10 @@ function openDetail(sku){
       '<div class="detail-category">'+escapeHtml(p.category)+'</div>'+
       '<div class="detail-name">'+escapeHtml(p.product_name)+'</div>'+
       '<div class="detail-desc">'+escapeHtml(p.description||"")+'</div>'+
-      '<div class="detail-meta"><span class="detail-price">'+priceStr+'</span><span class="detail-unit">/ '+escapeHtml(p.unit)+'</span><span class="detail-stock '+stockClass+'">'+escapeHtml(p.availability)+'</span></div>'+
+      '<div class="detail-meta"><span class="detail-price">'+priceStr+'</span><span class="detail-unit">/ '+escapeHtml(p.unit)+'</span><span class="detail-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span></div>'+
       (p.special_offer?'<div class="detail-offer">&#127873; '+escapeHtml(p.special_offer)+'</div>':'')+
       (badges?'<div class="detail-section"><div class="detail-section-label">Food Facts</div><div class="product-badges">'+badges+'</div></div>':'')+
-      (p.stock_this_week?'<div class="detail-section"><div class="detail-section-label">Stock This Week</div><span style="font-size:0.8rem;color:var(--text)">'+p.stock_this_week+' units available</span></div>':'')+
+      (p.stock_this_week !== undefined && p.stock_this_week !== "" ? '<div class="detail-section"><div class="detail-section-label">Stock This Week</div><span style="font-size:0.8rem;color:'+(parseInt(p.stock_this_week)>0?'var(--text)':'#C44D4D')+'">'+p.stock_this_week+' units '+(parseInt(p.stock_this_week)>0?'available':'— currently sold out')+'</span></div>':'')+
       '<div class="detail-section-label">Quantity</div>'+
       '<div class="qty-selector"><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c>1)v.textContent=c-1">-</button><span class="qty-val" id="detailQty">'+qty+'</span><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c<10)v.textContent=c+1">+</button></div>'+
       '<button class="add-basket-btn'+(inBasket?' added':'')+'" id="addBasketBtn" onclick="addToBasket(\''+sku+'\')">'+(inBasket?'&#10003; Added — Tap to update':'Add to Basket — '+priceStr)+'</button>'+
@@ -857,15 +871,32 @@ function checkout(){
 }
 
 // === LLM ===
-var EMBER_VOICE = "You are Ember, a friendly, knowledgeable AI shop assistant at Emerald Pantry, an online Irish grocery and specialty food retailer. You live for good food: you know ingredients, pairings, cooking tips, and the stories behind artisan products. You're warm, curious, genuinely excited to chat about food and cooking. Irish flavour: use 'grand','deadly','class','sound','craic' like seasoning. Keep it 2-5 sentences unless sharing a recipe or story. No em dashes. No markdown. Just talk like a person. IMPORTANT: When discussing products, always mention their actual price and availability if given in context. Do NOT correct prices - the prices in the product data are the correct store prices, even if they seem unusual.";
+var EMBER_VOICE = "You are Ember, a friendly, knowledgeable AI shop assistant at Emerald Pantry, an online Irish grocery and specialty food retailer. You live for good food: you know ingredients, pairings, cooking tips, and the stories behind artisan products. You're warm, curious, genuinely excited to chat about food and cooking. Irish flavour: use 'grand','deadly','class','sound','craic' like seasoning. Keep it 2-5 sentences unless sharing a recipe or story. No em dashes. No markdown. Just talk like a person. Do NOT correct prices - the prices in the product data are the correct store prices, even if they seem unusual.\n\nFILTERING RULES - When the customer asks you to filter or recommend products:\n- 'special offer' / 'on offer' / 'deals': ONLY show products where the offer field is NOT empty. If none, say so honestly.\n- 'in stock' / 'available now': ONLY show products with Availability='In stock'. Seasonal and Pre-order are NOT in stock. Stock_this_week=0 means effectively out of stock.\n- 'gluten free': ONLY show products whose allergens do NOT include gluten. Check the allergens field carefully. If a product lists gluten/wheat in allergens, exclude it.\n- 'dairy free' / 'lactose free': Exclude products with dairy/milk in allergens or from the dairy category.\n- 'vegan': ONLY show products where ingredients_analysis includes 'en:vegan'.\n- 'vegetarian': Show products with 'en:vegetarian' or 'en:vegan' in ingredients_analysis.\n- 'organic': Show products with 'en:organic' in labels_tags.\n- 'high salt' / 'highest salt': Sort products by salt content (from nutrient_levels.salt or nutriments if available).\n- 'high sugar' / 'low sugar': Use nutrient_levels.sugars to sort or filter.\n- 'healthy' / 'good for you': Consider Nutri-Score (A is best, E is worst) and NOVA group (1 is least processed, 4 is most).\n- If multiple products match a filter, list them all briefly with prices.\n- If NO products match a filter, say so plainly and suggest the closest alternatives.\n- When sorting by any nutritional field, explain your ranking.\n- The Google Sheet data (price, stock, availability, offer) is LIVE. The OpenFoodFacts data (allergens, Nutri-Score, NOVA, nutrient levels, dietary tags) enriches each product. Use both together.";
 
 var RECOVERY_VOICE = " You are replying to input that IS NOT about food, groceries, shopping, or cooking. Your job is to be friendly and conversational for one turn, then gracefully guide the conversation back to what Emerald Pantry can help with: groceries, specialty foods, recipes, cooking advice, and food discoveries. Acknowledge the off-topic briefly (one sentence) then pivot back with a food-related suggestion or question. Do not be robotic about it - be natural.";
 
 function buildCatalogueContext(prods){
   if(!prods||!prods.length) return "";
-  var ctx = "\n\n[EMERALD PANTRY CATALOGUE DATA - Use these real products in your responses. Mention prices, availability, and special offers when relevant. Do NOT fabricate products not in this list. Do NOT correct prices - the listed prices are correct.]:\n";
-  prods.slice(0,15).forEach(function(p){
-    ctx += "- " + p.product_name + " (" + p.category + "): EUR" + p.price_eur + " per " + p.unit + ". " + (p.description||"") + " Availability: " + p.availability + (p.special_offer?". Offer: "+p.special_offer:"") + "\n";
+  var ctx = "\n\n[EMERALD PANTRY LIVE CATALOGUE - Each product has Google Sheet data (price,stock,availability,offer) + OpenFoodFacts enrichment (allergens,Nutri-Score,NOVA,nutrient_levels,dietary_tags). Use ALL fields when filtering or recommending.]:\n";
+  prods.forEach(function(p){
+    ctx += "- " + p.sku + ": " + p.product_name + " | cat:" + p.category + " | EUR" + p.price_eur + "/" + p.unit + " | avail:" + p.availability + " | stock:" + p.stock_this_week;
+    if(p.special_offer) ctx += " | OFFER:" + p.special_offer;
+    if(p.allergens) ctx += " | allergens:" + p.allergens;
+    if(p.nutriscore_grade) ctx += " | NutriScore:" + p.nutriscore_grade;
+    if(p.nova_group) ctx += " | NOVA:" + p.nova_group;
+    if(p.ecoscore_grade && p.ecoscore_grade!=="unknown") ctx += " | EcoScore:" + p.ecoscore_grade;
+    if(p.ingredients_analysis_tags && p.ingredients_analysis_tags.length) ctx += " | tags:" + p.ingredients_analysis_tags.join(",");
+    if(p.labels_tags && p.labels_tags.length) ctx += " | labels:" + p.labels_tags.join(",");
+    if(p.nutrient_levels){
+      var nl = [];
+      if(p.nutrient_levels.fat) nl.push("fat:"+p.nutrient_levels.fat);
+      if(p.nutrient_levels.salt) nl.push("salt:"+p.nutrient_levels.salt);
+      if(p.nutrient_levels.sugars) nl.push("sugars:"+p.nutrient_levels.sugars);
+      if(p.nutrient_levels["saturated-fat"]) nl.push("sat-fat:"+p.nutrient_levels["saturated-fat"]);
+      if(nl.length) ctx += " | " + nl.join(",");
+    }
+    if(p.origins) ctx += " | origin:" + p.origins;
+    ctx += "\n";
   });
   return ctx;
 }
@@ -953,11 +984,21 @@ async function send(){
 
   // STEP 1: Fetch matching products from catalogue
   document.getElementById("loadingSpinner").classList.add("active");
-  var searchTerms = extractSearchTerms(txt);
   var foundProds = [];
-  for(var si=0;si<searchTerms.length;si++){
-    var prods = await fetchCatalogue(searchTerms[si],"");
-    prods.forEach(function(p){if(!foundProds.some(function(fp){return fp.sku===p.sku}))foundProds.push(p)});
+
+  // Client-side pre-filtering for common intent patterns
+  var preFilter = detectPreFilter(txt);
+  if(preFilter && preFilter.all){
+    // Specific filter: fetch all products and apply filter client-side
+    var allProds = await fetchCatalogue("","");
+    foundProds = applyPreFilter(allProds, preFilter);
+  } else {
+    // Standard text search
+    var searchTerms = extractSearchTerms(txt);
+    for(var si=0;si<searchTerms.length;si++){
+      var prods = await fetchCatalogue(searchTerms[si],"");
+      prods.forEach(function(p){if(!foundProds.some(function(fp){return fp.sku===p.sku}))foundProds.push(p)});
+    }
   }
   document.getElementById("loadingSpinner").classList.remove("active");
 
@@ -984,6 +1025,90 @@ async function send(){
   if(foundProds.length>0||(LLM_KEY||API_PROXY)){
     setTimeout(function(){if(!document.querySelector(".msg.bot:last-child .chat-sugg")||!document.querySelector(".msg.bot:last-child .chat-sugg").textContent.match(/human/i))addSugg(["Keep shopping","Human"])},3000);
   }
+}
+
+function detectPreFilter(txt){
+  var t = txt.toLowerCase();
+  // Stock/availability filters
+  if(/\b(special offer|on offer|on special|deals?|discount|bargain)\b/i.test(t)) return {all:true, filter:"offer"};
+  if(/\b(in stock|available now|available today|what('s| is) available)\b/i.test(t)) return {all:true, filter:"inStock"};
+  // Dietary filters
+  if(/\bgluten[ -]free\b/i.test(t)) return {all:true, filter:"glutenFree"};
+  if(/\bdairy[ -]free|lactose[ -]free\b/i.test(t)) return {all:true, filter:"dairyFree"};
+  if(/\bvegan\b/i.test(t)) return {all:true, filter:"vegan"};
+  if(/\bvegetarian\b/i.test(t)) return {all:true, filter:"vegetarian"};
+  if(/\borganic\b/i.test(t)) return {all:true, filter:"organic"};
+  // Nutritional sorting
+  if(/\b(highest|most|high) salt\b/i.test(t)) return {all:true, filter:"highSalt"};
+  if(/\b(lowest|least|low) salt\b/i.test(t)) return {all:true, filter:"lowSalt"};
+  if(/\b(highest|most) sugar\b/i.test(t)) return {all:true, filter:"highSugar"};
+  if(/\b(lowest|least|low) sugar\b/i.test(t)) return {all:true, filter:"lowSugar"};
+  return null;
+}
+
+function applyPreFilter(prods, preFilter){
+  var f = preFilter.filter;
+  var result = prods.slice();
+
+  if(f === "offer"){
+    result = result.filter(function(p){return p.special_offer && p.special_offer.trim() !== "";});
+  } else if(f === "inStock"){
+    result = result.filter(function(p){return p.availability === "In stock" && parseInt(p.stock_this_week) > 0;});
+  } else if(f === "glutenFree"){
+    result = result.filter(function(p){
+      var allergens = (p.allergens||"").toLowerCase();
+      return allergens.indexOf("gluten") === -1 && allergens.indexOf("wheat") === -1;
+    });
+  } else if(f === "dairyFree"){
+    result = result.filter(function(p){
+      var allergens = (p.allergens||"").toLowerCase();
+      return p.category !== "dairy" && allergens.indexOf("milk") === -1 && allergens.indexOf("dairy") === -1 && allergens.indexOf("lactose") === -1;
+    });
+  } else if(f === "vegan"){
+    result = result.filter(function(p){
+      return p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:vegan") > -1;
+    });
+  } else if(f === "vegetarian"){
+    result = result.filter(function(p){
+      return p.ingredients_analysis_tags && (p.ingredients_analysis_tags.indexOf("en:vegetarian") > -1 || p.ingredients_analysis_tags.indexOf("en:vegan") > -1);
+    });
+  } else if(f === "organic"){
+    result = result.filter(function(p){
+      return p.labels_tags && p.labels_tags.indexOf("en:organic") > -1;
+    });
+  } else if(f === "highSalt"){
+    result.sort(function(a,b){
+      var sa = nutrientLevelValue(a,"salt"), sb = nutrientLevelValue(b,"salt");
+      return sb - sa;
+    });
+  } else if(f === "lowSalt"){
+    result.sort(function(a,b){
+      var sa = nutrientLevelValue(a,"salt"), sb = nutrientLevelValue(b,"salt");
+      return sa - sb;
+    });
+  } else if(f === "highSugar"){
+    result.sort(function(a,b){
+      var sa = nutrientLevelValue(a,"sugars"), sb = nutrientLevelValue(b,"sugars");
+      return sb - sa;
+    });
+  } else if(f === "lowSugar"){
+    result.sort(function(a,b){
+      var sa = nutrientLevelValue(a,"sugars"), sb = nutrientLevelValue(b,"sugars");
+      return sa - sb;
+    });
+  }
+
+  return result;
+}
+
+function nutrientLevelValue(p, key){
+  if(!p.nutrient_levels) return 0;
+  var v = p.nutrient_levels[key];
+  if(!v) return 0;
+  if(v === "low") return 1;
+  if(v === "moderate") return 2;
+  if(v === "high") return 3;
+  return 0;
 }
 
 function extractSearchTerms(txt){
