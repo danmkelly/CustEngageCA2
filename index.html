@@ -748,7 +748,6 @@ function parseCSVLineClient(line){
 // === Render products ===
 function renderProducts(prods,searchTerm){
   products = prods;
-  // Keep allProducts as the full catalogue when it's a complete load (no search term)
   if(!searchTerm || searchTerm === "") allProducts = prods.slice();
   document.getElementById("loadingSpinner").classList.remove("active");
   var filtered = applyFiltersAndSort(prods);
@@ -824,17 +823,15 @@ function renderProducts(prods,searchTerm){
 }
 
 function prodByCat(prods){
-  // Show counts after applying all non-category filters, so category counts reflect the current filter state
-  var base = activeCategory ? prods : prods;
-  var filtered = applyFiltersAndSort(prods);
-  // Count per category within the current non-category filter context
+  var base = allProducts.length > 0 ? allProducts : prods;
+  var filteredAll = applyFiltersAndSort(base);
+  var filteredCurrent = applyFiltersAndSort(prods);
   var cats = {};
-  var ctx = activeCategory ? filtered : applyFiltersAndSort(prods); // products matching non-cat filters
-  prods.forEach(function(p){
-    var matchesOtherFilters = applyFiltersAndSort([p]).length > 0;
-    cats[p.category] = (cats[p.category]||0) + (matchesOtherFilters ? 1 : 0);
+  base.forEach(function(p){
+    var matches = applyFiltersAndSort([p]).length > 0;
+    cats[p.category] = (cats[p.category]||0) + (matches?1:0);
   });
-  catChips.innerHTML = '<span class="cat-chip'+(activeCategory===""?" active":"")+'" onclick="filterCat(\'\')">All ('+filtered.length+')</span>' +
+  catChips.innerHTML = '<span class="cat-chip'+(activeCategory===""?" active":"")+'" onclick="filterCat(\'\')">All ('+filteredAll.length+')</span>' +
     Object.keys(cats).sort().map(function(c){
       return '<span class="cat-chip'+(activeCategory===c?" active":"")+'" onclick="filterCat(\''+c+'\')">'+(categoryLabels[c]||c)+' ('+cats[c]+')</span>';
     }).join("");
@@ -843,7 +840,9 @@ function prodByCat(prods){
 function filterCat(cat){
   activeCategory = cat;
   updateFilterUI();
-  renderProducts(products);
+  // Always filter from allProducts so Clear and category pills work on full catalogue
+  var base = allProducts.length > 0 ? allProducts : products;
+  renderProducts(base);
   echoFilterToChat();
 }
 
@@ -853,13 +852,15 @@ function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
 function toggleFilter(key){
   if(activeFilters[key]){delete activeFilters[key]}else{activeFilters[key]=true}
   updateFilterUI();
-  renderProducts(products);
+  var base = allProducts.length > 0 ? allProducts : products;
+  renderProducts(base);
   echoFilterToChat();
 }
 
 function setSort(value){
   activeSort = value;
-  renderProducts(products);
+  var base = allProducts.length > 0 ? allProducts : products;
+  renderProducts(base);
 }
 
 function clearAllFilters(){
