@@ -687,9 +687,13 @@ async function fetchCatalogueEnriched(q,cat){
     if(!r.ok) return [];
     var d = await r.json();
     var enriched = d.products || [];
-    if(enriched.length > 0 && productGrid && dContent){
-      products = enriched; allProducts = enriched.slice();
-      renderProducts(enriched);
+    if(enriched.length > 0){
+      allProducts = enriched.slice();
+      // Only re-render if no active filters (avoid overwriting user's filtered view)
+      if(Object.keys(activeFilters).length === 0 && !activeCategory && !activeSort){
+        products = enriched;
+        if(productGrid && dContent) renderProducts(enriched);
+      }
     }
     return enriched;
   } catch(e){ return []; }
