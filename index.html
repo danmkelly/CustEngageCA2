@@ -794,43 +794,73 @@ function updateBasketIndicator(){
 }
 
 function toggleBasket(){
-  // Don't open basket during onboarding or on detail view
   if(isOnboarding()) return;
-  var existing = document.getElementById("basketDrawer");
-  if(existing){existing.remove();return}
-  var disc=document.getElementById("discovery");
-  var items=Object.keys(basket);
-  var drawer=document.createElement("div"); drawer.id="basketDrawer"; drawer.className="basket-drawer";
+  // If basket overlay is already showing, close it and go back to pantry
+  var existing = document.getElementById("basketOverlay");
+  if(existing){backToPantry();return}
+  renderBasketView();
+}
+
+function renderBasketView(){
+  dEmpty.style.display = "none"; dContent.style.display = "block";
+  var items = Object.keys(basket);
   if(!items.length){
-    drawer.innerHTML='<div class="basket-drawer-header"><h4>&#128722; Your Basket</h4><span class="basket-close" onclick="document.getElementById(\'basketDrawer\').remove()">&#10005;</span></div><div class="basket-empty-msg">Your basket is empty. Click a product to start shopping!</div>';
-  }else{
-    var total=0;
-    var itemsHtml=items.map(function(k){
-      var b=basket[k]; var p=b.product;
-      var itemTotal=p.price_eur*b.qty;
-      total+=itemTotal;
-      var pStr=p.price_eur>=1000?"&euro;"+p.price_eur.toLocaleString():"&euro;"+p.price_eur.toFixed(2);
-      return'<div class="basket-item"><div class="basket-item-info"><div class="basket-item-name">'+escapeHtml(p.product_name)+'</div><div class="basket-item-price">'+pStr+' / '+escapeHtml(p.unit)+'</div></div><div class="basket-item-qty">x'+b.qty+'</div><button class="basket-item-remove" onclick="removeFromBasket(\''+k+'\')">&#10005;</button></div>';
-    }).join("");
-    var tStr=total>=1000?"&euro;"+total.toLocaleString():"&euro;"+total.toFixed(2);
-    drawer.innerHTML='<div class="basket-drawer-header"><h4>&#128722; Your Basket ('+items.length+' item'+(items.length>1?'s':'')+')</h4><span class="basket-close" onclick="document.getElementById(\'basketDrawer\').remove()">&#10005;</span></div>'+itemsHtml+'<div class="basket-total"><span class="basket-total-label">Total</span><span class="basket-total-price">'+tStr+'</span></div><button class="basket-checkout" onclick="checkout()">Proceed to Checkout</button>';
+    dContent.innerHTML = '<div class="detail-view">'+
+      '<div class="detail-back" onclick="backToPantry()"><span class="detail-back-arrow">&#8592;</span> Back to pantry</div>'+
+      '<div class="basket-empty-msg" style="flex:1;display:flex;align-items:center;justify-content:center"><div style="text-align:center"><div style="font-size:2.5rem;margin-bottom:12px;opacity:0.4">&#128722;</div><h3 style="font-size:0.9rem;font-weight:600;color:var(--text-dim);margin-bottom:6px">Your Basket is Empty</h3><p style="font-size:0.74rem;color:var(--text-dim);line-height:1.5">Click a product in the pantry to start shopping!</p></div></div>'+
+      '<button class="back-pantry-btn" style="margin:0 20px 20px;width:auto" onclick="backToPantry()">&#8592; Back to Pantry</button>'+
+    '</div>';
+    return;
   }
-  disc.appendChild(drawer);
-  drawer.scrollIntoView({behavior:"smooth"});
+  var total = 0;
+  var itemsHtml = items.map(function(k){
+    var b = basket[k]; var p = b.product;
+    var itemTotal = p.price_eur * b.qty;
+    total += itemTotal;
+    var pStr = p.price_eur>=1000 ? "&euro;"+p.price_eur.toLocaleString() : "&euro;"+p.price_eur.toFixed(2);
+    var itStr = itemTotal>=1000 ? "&euro;"+itemTotal.toLocaleString() : "&euro;"+itemTotal.toFixed(2);
+    return '<div class="basket-item"><div class="basket-item-info"><div class="basket-item-name">'+escapeHtml(p.product_name)+'</div><div class="basket-item-price">'+pStr+' / '+escapeHtml(p.unit)+'</div></div><div class="basket-item-qty">x'+b.qty+' = '+itStr+'</div><button class="basket-item-remove" onclick="removeFromBasket(\''+k+'\')">&#10005;</button></div>';
+  }).join("");
+  var tStr = total>=1000 ? "&euro;"+total.toLocaleString() : "&euro;"+total.toFixed(2);
+  dContent.innerHTML = '<div class="detail-view" id="basketOverlay">'+
+    '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">'+
+      '<h4 style="font-size:0.85rem;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.5px">&#128722; Your Basket ('+items.length+' item'+(items.length>1?'s':'')+')</h4>'+
+      '<span style="font-size:1rem;cursor:pointer;color:var(--text-dim);padding:2px 6px" onclick="backToPantry()">&#10005;</span>'+
+    '</div>'+
+    '<div style="flex:1;overflow-y:auto">'+itemsHtml+'</div>'+
+    '<div class="basket-total" style="border-top:2px solid var(--border)"><span class="basket-total-label">Total</span><span class="basket-total-price">'+tStr+'</span></div>'+
+    '<div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:10px">'+
+      '<button class="add-basket-btn" onclick="checkout()">Proceed to Checkout</button>'+
+      '<button class="back-pantry-btn" onclick="backToPantry()">&#8592; Continue Shopping</button>'+
+    '</div>'+
+  '</div>';
 }
 
 function removeFromBasket(sku){
   var p = getProduct(sku); var name = p ? p.product_name : sku;
-  delete basket[sku]; updateBasketIndicator(); toggleBasket(); toggleBasket();
+  delete basket[sku]; updateBasketIndicator();
   addMsg("Removed <strong>"+escapeHtml(name)+"</strong> from your basket.",'bot');
+  renderBasketView();
 }
 
 function checkout(){
-  var items=Object.keys(basket); if(!items.length) return;
-  var total=0; items.forEach(function(k){total+=basket[k].product.price_eur*basket[k].qty});
-  var tStr=total>=1000?"&euro;"+total.toLocaleString():"&euro;"+total.toFixed(2);
-  addMsg("You're about to order "+items.length+" item"+(items.length>1?'s':'')+" for "+tStr+". <strong>In a real deployment, this would connect to a payment gateway and order management system.</strong> For now, Ember has noted your selection!",'bot');
-  document.getElementById("basketDrawer").remove();
+  var items = Object.keys(basket); if(!items.length) return;
+  var total = 0; items.forEach(function(k){total+=basket[k].product.price_eur*basket[k].qty});
+  var tStr = total>=1000 ? "&euro;"+total.toLocaleString() : "&euro;"+total.toFixed(2);
+  var orderId = "EP-" + Date.now().toString(36).toUpperCase();
+  // Show checkout confirmation in the panel
+  dContent.innerHTML = '<div class="detail-view">'+
+    '<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;text-align:center">'+
+      '<div>'+
+        '<div style="font-size:3rem;margin-bottom:12px">&#9989;</div>'+
+        '<h3 style="font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:6px">Order Confirmed!</h3>'+
+        '<p style="font-size:0.8rem;color:var(--text-dim);line-height:1.6;margin-bottom:20px">Order <strong style="color:var(--accent2)">'+orderId+'</strong><br>'+items.length+' item'+(items.length>1?'s':'')+' &middot; '+tStr+'<br><br><span style="font-size:0.68rem">In a live deployment, this connects to payment processing and order fulfillment.</span></p>'+
+      '</div>'+
+    '</div>'+
+    '<button class="add-basket-btn" style="margin:0 20px 20px;width:auto" onclick="basket={};updateBasketIndicator();backToPantry();addMsg(\'All done! Your order is placed. Keep browsing the pantry!\',\'bot\')">&#8592; Back to Pantry</button>'+
+  '</div>';
+  addMsg("&#9989; Order <strong>"+orderId+"</strong> confirmed! "+items.length+" item"+(items.length>1?'s':'')+" for "+tStr+". <strong>In a real deployment, this would connect to a payment gateway and order management system.</strong>",'bot');
+  basket = {}; updateBasketIndicator();
 }
 
 // === LLM ===
