@@ -709,7 +709,7 @@ async function fetchCatalogueEnriched(q,cat){
     if(enriched.length > 0){
       allProducts = enriched.slice();
       if(Object.keys(activeFilters).length === 0 && !activeCategory && !activeSort && productGrid && dContent){
-        renderProducts(enriched);
+        doRender();
       }
     }
     return enriched;
@@ -747,90 +747,15 @@ function parseCSVLineClient(line){
 
 // === Render products ===
 function renderProducts(prods,searchTerm){
-  // Use the passed prods as the base set, filters apply on top
-  var base = prods;
-  // Only update allProducts when loading the full catalogue
   if(!searchTerm || searchTerm === "") allProducts = prods.slice();
-  var spinner = document.getElementById("loadingSpinner");
-  if(spinner) spinner.classList.remove("active");
-  var filtered = applyFiltersAndSort(base);
-  products = filtered;
-  var rc = document.getElementById("resultCount");
-  if(rc) rc.textContent = filtered.length + " of " + base.length + " products";
-  if(!filtered.length){
-    dContent.style.display = "block";
-    productGrid.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#128270;</div><h4>No products match</h4><p>Try adjusting your filters or clearing them to see all '+base.length+' products.</p><button class="clear-filters-btn" onclick="clearAllFilters()">Clear all filters</button></div></div>';
-    return;
-  }
-  dContent.style.display = "block";
-  prodByCat(base);
-  updateFilterUI();
-  // Build grid from filtered results
-  productGrid.innerHTML = filtered.map(function(p){
-    var stockClass = p.availability.toLowerCase().replace(/\s+/g,'-');
-    var stockLabel = p.availability;
-    if(parseInt(p.stock_this_week) === 0 && stockLabel === "In stock"){
-      stockClass = "pre-order"; stockLabel = "Out of stock";
-    } else if(stockLabel === "Seasonal" || stockLabel === "Pre-order"){
-      stockClass = stockLabel.toLowerCase();
-    } else if(stockClass.indexOf("in-stock")>-1){
-      stockClass = "in-stock";
-    }
-    var price = p.price_eur;
-    var priceStr = price >= 1000 ? "&#128064; &euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
-    // Build Open Food Facts section
-    var offBadges = "";
-    var hasOffData = false;
-    if(p.nutriscore_grade){
-      var ns = p.nutriscore_grade.toLowerCase();
-      offBadges += '<span class="off-badge nutriscore-'+ns+'">Nutri-Score '+ns.toUpperCase()+'</span>';
-      hasOffData = true;
-    }
-    if(p.nova_group){
-      offBadges += '<span class="off-badge nova-'+p.nova_group+'">NOVA '+p.nova_group+'</span>';
-      hasOffData = true;
-    }
-    if(p.ecoscore_grade){
-      var es = p.ecoscore_grade.toLowerCase();
-      if(es !== "unknown"){ offBadges += '<span class="off-badge nutriscore-'+es+'">Eco-'+es.toUpperCase()+'</span>'; hasOffData = true; }
-    }
-    var hasVegan = p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:vegan") > -1;
-    var hasVegetarian = p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:vegetarian") > -1;
-    var isOrganic = p.labels_tags && p.labels_tags.indexOf("en:organic") > -1;
-    if(hasVegan){ offBadges += '<span class="diet-badge">Vegan</span>'; hasOffData = true; }
-    else if(hasVegetarian){ offBadges += '<span class="diet-badge">Vegetarian</span>'; hasOffData = true; }
-    if(isOrganic){ offBadges += '<span class="diet-badge">Organic</span>'; hasOffData = true; }
-    if(p.allergens){
-      var allergens = p.allergens.split(",").slice(0,2).map(function(a){return a.trim()}).join(", ");
-      if(allergens){ offBadges += '<span class="allergen-badge" title="Contains: '+escapeHtml(p.allergens)+'">'+escapeHtml(allergens)+'</span>'; hasOffData = true; }
-    }
-    var offSection = "";
-    var offUrl = p.barcode ? "https://world.openfoodfacts.org/product/"+escapeHtml(p.barcode) : "";
-  if(hasOffData){
-    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank">view record &#8599;</a>':'')+'</div><div class="product-badges">'+badges+'</div></div>';
-  } else {
-    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span></div><div class="off-no-data">No facts available for this product</div></div>';
-  }
-    // Product image with representative tag for placeholders
-    var catIcon = categoryIcons[p.category] || "&#129367;";
-    var catColour = categoryColours[p.category] || "#163322";
-    var isPlaceholder = !p.image_url;
-    var imgHtml = p.image_url
-      ? '<div style="position:relative"><img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="off-img" style="display:none;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08);position:absolute;top:0;left:0;width:100%;height:100%">'+catIcon+'</div></div>'
-      : '<div style="position:relative"><div class="off-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div><span class="rep-image-tag">representative image</span></div>';
-    return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + offSection +'</div></div>';
-  }).join("");
-
-  updateKnownNames();
+  if(searchTerm && searchTerm !== "" && allProducts.length > 0 && prods.length < allProducts.length){
+    var tmp = allProducts; allProducts = prods; doRender(); allProducts = tmp;
+  } else { doRender(); }
 }
-
 function prodByCat(prods){
   var cats = {}; var total = 0;
-  if(allProducts.length > 0){
-    allProducts.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; total++; });
-  } else if(prods && prods.length){
-    prods.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; total++; });
-  }
+  var source = allProducts.length > 0 ? allProducts : (prods || []);
+  source.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; total++; });
   var ordered = ["bakery","dairy","drinks","snacks","store-cupboard"];
   var h = '';
   h += '<span class="cat-chip'+(activeCategory===""?" active":"")+'" data-cat="">All ('+total+')</span>';
@@ -839,43 +764,94 @@ function prodByCat(prods){
     h += '<span class="cat-chip'+(activeCategory===c?" active":"")+'" data-cat="'+c+'">'+(categoryLabels[c]||c)+' ('+count+')</span>';
   });
   catChips.innerHTML = h;
+  // Bind each chip directly - no delegation
+  var chips = catChips.querySelectorAll(".cat-chip");
+  for(var i = 0; i < chips.length; i++){
+    (function(chip){
+      chip.onclick = function(){
+        var cat = chip.getAttribute("data-cat") || "";
+        if(cat === activeCategory && cat !== ""){ cat = ""; } // toggle off if already active
+        activeCategory = cat;
+        // Highlight
+        var all = catChips.querySelectorAll(".cat-chip");
+        for(var j = 0; j < all.length; j++){ all[j].classList.remove("active"); }
+        var sel = cat === "" ? '.cat-chip[data-cat=""]' : '.cat-chip[data-cat="'+cat+'"]';
+        var tgt = catChips.querySelector(sel);
+        if(tgt) tgt.classList.add("active");
+        updateFilterUI();
+        doRender();
+        if(cat){ addMsg("Showing: <strong>"+(categoryLabels[cat]||cat)+"</strong>",'bot'); }
+      };
+    })(chips[i]);
+  }
+}
+
+// Single render entry point
+function doRender(){
+  var base = allProducts.length > 0 ? allProducts : products;
+  var filtered = applyFiltersAndSort(base);
+  var rc = document.getElementById("resultCount");
+  if(rc) rc.textContent = filtered.length + " of " + base.length + " products";
+  if(!filtered.length){
+    if(dContent) dContent.style.display = "block";
+    if(productGrid) productGrid.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#128270;</div><h4>No products match</h4><p>Try adjusting your filters or clearing them to see all '+base.length+' products.</p><button class="clear-filters-btn" onclick="clearAllFilters()">Clear all filters</button></div></div>';
+    return;
+  }
+  if(dContent) dContent.style.display = "block";
+  if(productGrid) productGrid.innerHTML = filtered.map(function(p){
+    var stockClass = p.availability.toLowerCase().replace(/\s+/g,'-');
+    var stockLabel = p.availability;
+    if(parseInt(p.stock_this_week) === 0 && stockLabel === "In stock"){ stockClass = "pre-order"; stockLabel = "Out of stock"; }
+    else if(stockLabel === "Seasonal" || stockLabel === "Pre-order"){ stockClass = stockLabel.toLowerCase(); }
+    else if(stockClass.indexOf("in-stock")>-1){ stockClass = "in-stock"; }
+    var price = p.price_eur;
+    var priceStr = price >= 1000 ? "&#128064; &euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
+    var offBadges = ""; var hasOffData = false;
+    if(p.nutriscore_grade){ var ns = p.nutriscore_grade.toLowerCase(); offBadges += '<span class="off-badge nutriscore-'+ns+'">Nutri-Score '+ns.toUpperCase()+'</span>'; hasOffData = true; }
+    if(p.nova_group){ offBadges += '<span class="off-badge nova-'+p.nova_group+'">NOVA '+p.nova_group+'</span>'; hasOffData = true; }
+    if(p.ecoscore_grade){ var es = p.ecoscore_grade.toLowerCase(); if(es !== "unknown"){ offBadges += '<span class="off-badge nutriscore-'+es+'">Eco-'+es.toUpperCase()+'</span>'; hasOffData = true; } }
+    var hasVegan = p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:vegan") > -1;
+    var hasVegetarian = p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:vegetarian") > -1;
+    var isOrganic = p.labels_tags && p.labels_tags.indexOf("en:organic") > -1;
+    if(hasVegan){ offBadges += '<span class="diet-badge">Vegan</span>'; hasOffData = true; }
+    else if(hasVegetarian){ offBadges += '<span class="diet-badge">Vegetarian</span>'; hasOffData = true; }
+    if(isOrganic){ offBadges += '<span class="diet-badge">Organic</span>'; hasOffData = true; }
+    if(p.allergens){ var allergens = p.allergens.split(",").slice(0,2).map(function(a){return a.trim()}).join(", "); if(allergens){ offBadges += '<span class="allergen-badge" title="Contains: '+escapeHtml(p.allergens)+'">'+escapeHtml(allergens)+'</span>'; hasOffData = true; } }
+    var offUrl = p.barcode ? "https://world.openfoodfacts.org/product/"+escapeHtml(p.barcode) : "";
+    var offSection = hasOffData ? '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank" onclick="event.stopPropagation()">view record &#8599;</a>':'')+'</div><div class="product-badges">'+offBadges+'</div></div>' : '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span></div><div class="off-no-data">No facts available for this product</div></div>';
+    var catIcon = categoryIcons[p.category] || "&#129367;"; var catColour = categoryColours[p.category] || "#163322";
+    var imgHtml = p.image_url ? '<div style="position:relative"><img class="off-img" src="'+escapeHtml(p.image_url)+'" alt="'+escapeHtml(p.product_name)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="off-img" style="display:none;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08);position:absolute;top:0;left:0;width:100%;height:100%">'+catIcon+'</div></div>' : '<div style="position:relative"><div class="off-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,'+catColour+'22,'+catColour+'08)">'+catIcon+'</div><span class="rep-image-tag">representative image</span></div>';
+    return '<div class="product-card" onclick="openDetail(\''+p.sku.replace(/'/g,"\\'")+'\')">'+imgHtml+'<div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(stockLabel)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') + offSection +'</div></div>';
+  }).join("");
+  prodByCat(base);
 }
 
 function filterCat(cat){
   activeCategory = cat;
-  // Highlight chip via data-cat
-  document.querySelectorAll(".cat-chip").forEach(function(el){ el.classList.remove("active"); });
-  var sel = cat === "" ? '.cat-chip[data-cat=""]' : '.cat-chip[data-cat="' + cat + '"]';
-  var target = document.querySelector(sel);
-  if(target) target.classList.add("active");
-  updateFilterUI();
-  renderProducts(allProducts);
-  if(cat){
-    addMsg("Showing: <strong>"+(categoryLabels[cat]||cat)+"</strong> ("+applyFiltersAndSort(allProducts).length+" items)",'bot');
-  }
+  doRender();
+  if(cat){ addMsg("Showing: <strong>"+(categoryLabels[cat]||cat)+"</strong>",'bot'); }
 }
 
-function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-
-// === Filtering & Sorting ===
 function toggleFilter(key){
   if(activeFilters[key]){delete activeFilters[key]}else{activeFilters[key]=true}
   updateFilterUI();
-  renderProducts(allProducts);
-  echoFilterToChat();
+  doRender();
+  if(Object.keys(activeFilters).length){ addMsg("Filter toggled",'bot'); }
 }
 
 function setSort(value){
   activeSort = value;
-  renderProducts(allProducts);
+  doRender();
 }
 
 function clearAllFilters(){
   activeFilters = {}; activeSort = ""; activeCategory = "";
   updateFilterUI();
-  renderProducts(allProducts);
-  echoFilterToChat();
+  doRender();
+  addMsg("Filters cleared — showing the full pantry.",'bot');
 }
+
+function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 
 // Wire up filter bar event handlers (called after DOM rebuild)
 function wireFilterBar(){
@@ -976,7 +952,7 @@ function backToPantry(){
   dContent.style.display = "block";
   wireFilterBar();
   updateFilterUI();
-  renderProducts(allProducts);
+  doRender();
   addMsg("Back to the pantry! What else catches your eye?",'bot');
 }
 
