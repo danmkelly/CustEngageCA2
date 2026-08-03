@@ -13,10 +13,10 @@
   --bubble-user:#2D8B4E;--radius:10px;--radius-sm:6px;
   --font:'Inter',system-ui,-apple-system,sans-serif;
 }
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden}
-.app{display:grid;grid-template-columns:400px 1fr;height:calc(100vh - 64px)}
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text)}
+.app{display:grid;grid-template-columns:400px 1fr;flex:1;min-height:0}
 .app-brand{
-  height:64px;display:flex;align-items:center;gap:14px;
+  height:68px;display:flex;align-items:center;gap:14px;flex-shrink:0;
   background:linear-gradient(180deg,#0F2A1A 0%,#0A1F12 100%);border-bottom:3px solid var(--accent);
   padding:0 24px;position:relative;overflow:hidden;
 }
