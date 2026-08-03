@@ -1183,7 +1183,7 @@ function humanContact(){
 
 async function send(){
   var txt = chatInput.value.trim(); if(!txt) return;
-  addMsg(txt,"user"); chatInput.value = ""; showTyping();
+  addMsg(txt,"user"); chatInput.value = "";
 
   if(txt==="CLS"){hideTyping();clearMemory();return}
 
@@ -1230,6 +1230,7 @@ async function send(){
   if(txt.toLowerCase()==="human"){hideTyping();showHumanContact();return}
 
   // STEP 1: Fetch matching products from catalogue
+  showTyping();
   document.getElementById("loadingSpinner").classList.add("active");
   var foundProds = [];
 
@@ -1249,6 +1250,7 @@ async function send(){
     }
   }
   document.getElementById("loadingSpinner").classList.remove("active");
+  hideTyping();
 
   if(foundProds.length>0){
     renderProducts(foundProds,txt);
@@ -1258,6 +1260,7 @@ async function send(){
   // STEP 2: LLM response
   var offTopic = isOffTopic(txt) && foundProds.length===0;
   if(LLM_KEY||API_PROXY){
+    showTyping();
     var llmReply = await chatLLM(txt,foundProds,offTopic);
     hideTyping();
     if(llmReply){addMsg(llmReply,"bot");emberAskedQ(llmReply)}
