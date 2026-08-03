@@ -747,10 +747,10 @@ function parseCSVLineClient(line){
 
 // === Render products ===
 function renderProducts(prods,searchTerm){
-  // Never shrink allProducts - it's the canonical full catalogue
-  if(allProducts.length === 0 && (!searchTerm || searchTerm === "")) allProducts = prods.slice();
-  // Use allProducts as the filter base when available, otherwise use prods
-  var base = allProducts.length > 0 ? allProducts : prods;
+  // Use the passed prods as the base set, filters apply on top
+  var base = prods;
+  // Only update allProducts when loading the full catalogue
+  if(!searchTerm || searchTerm === "") allProducts = prods.slice();
   var spinner = document.getElementById("loadingSpinner");
   if(spinner) spinner.classList.remove("active");
   var filtered = applyFiltersAndSort(base);
