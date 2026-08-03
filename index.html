@@ -140,6 +140,29 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .cat-chip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .cat-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
+/* Input locked state during onboarding */
+.chat-input:disabled{background:#0A1F12;border-color:#1F402A;color:rgba(232,240,228,0.3);cursor:not-allowed}
+.chat-input:disabled::placeholder{color:rgba(122,154,130,0.3)}
+.chat-send:disabled{background:#1F402A;cursor:not-allowed;transform:none}
+.chat-send:disabled:hover{background:#1F402A;transform:none}
+.chat-mic:disabled{opacity:0.3;cursor:not-allowed}
+.chat-mic:disabled:hover{color:var(--text-dim);border-color:var(--border)}
+
+/* Onboarding lock overlay on discovery panel */
+.discovery-locked{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;text-align:center;background:var(--surface)}
+.discovery-locked-inner{max-width:280px}
+.discovery-lock-icon{font-size:2.5rem;margin-bottom:12px;opacity:0.4}
+.discovery-locked h3{font-size:0.85rem;font-weight:600;margin-bottom:6px;color:var(--text-dim)}
+.discovery-locked p{font-size:0.72rem;color:var(--text-dim);line-height:1.5}
+.discovery-locked-steps{display:flex;flex-direction:column;gap:6px;margin-top:16px;text-align:left}
+.discovery-locked-step{font-size:0.66rem;color:var(--text-dim);display:flex;align-items:center;gap:8px;padding:4px 0}
+.discovery-locked-step .step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+.discovery-locked-step.done .step-dot{background:var(--accent)}
+.discovery-locked-step.active .step-dot{background:var(--accent2);box-shadow:0 0 6px rgba(212,168,75,0.6);animation:pulse-dot 1.2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 4px rgba(212,168,75,0.4)}50%{box-shadow:0 0 10px rgba(212,168,75,0.8)}}
+.discovery-locked-step.done{color:rgba(122,154,130,0.5)}
+.discovery-locked-step.done .step-check{color:var(--accent);font-size:0.55rem}
+
 /* Footer */
 .foot{padding:10px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;font-size:0.6rem;color:var(--text-dim);flex-shrink:0}
 .foot a{color:var(--text-dim);text-decoration:none}
@@ -303,15 +326,24 @@ function clearMemory(){
   localStorage.removeItem("ember_memory");
   emberMemory = {visits:0,lastVisit:"",recentSearches:[],totalSearches:0,userName:"",consent:""};
   expectingName = false;
+  expectingConsent = false;
+  expectingHumanBot = true;
+  loadedCatalogue = false;
   addMsg("All clear! I've forgotten everything about you. Fresh start.",'bot');
   document.getElementById("emberLabel").textContent = "Your pantry guide · AI-powered";
   updateMemoryButtons();
+  updateOnboardingLock();
+  setTimeout(function(){
+    addMsg("Are you here to chat with me or would you prefer a real human?",'bot');
+    addSugg(["Bot","Human"]);
+  },800);
 }
 function rememberMe(){
-  emberMemory.consent = "yes"; saveMemory(); expectingName = true;
+  emberMemory.consent = "yes"; saveMemory(); expectingName = true; expectingConsent = false; expectingHumanBot = false;
   document.getElementById("emberLabel").textContent = "Your pantry guide · AI-powered";
-  addMsg("Grand! I'll remember you from now on. What should I call you?",'bot');
   updateMemoryButtons();
+  updateOnboardingLock();
+  addMsg("Grand! I'll remember you from now on. What should I call you?",'bot');
 }
 function updateMemoryButtons(){
   var clr = document.getElementById("clearMemBtn"), rem = document.getElementById("rememberBtn");
@@ -319,6 +351,66 @@ function updateMemoryButtons(){
   if(emberMemory.consent === "yes"){clr.style.display="";rem.style.display="none"}
   else if(emberMemory.consent === "no"){clr.style.display="none";rem.style.display=""}
   else{clr.style.display="none";rem.style.display="none"}
+}
+
+function isOnboarding(){
+  return expectingHumanBot || expectingConsent || expectingName;
+}
+
+function updateOnboardingLock(){
+  var inOnboarding = isOnboarding();
+  var input = document.getElementById("chatInput");
+  var send = document.getElementById("chatSend");
+  var mic = document.getElementById("chatMic");
+
+  // Lock/unlock input
+  input.disabled = inOnboarding;
+  send.disabled = inOnboarding;
+  if(mic) mic.disabled = inOnboarding;
+
+  if(inOnboarding){
+    input.placeholder = "Use the buttons above to continue...";
+    // Show locked discovery state
+    renderOnboardingLock();
+  } else {
+    input.placeholder = "Ask Ember about our pantry...";
+    // Load catalogue now that onboarding is done
+    if(!loadedCatalogue) loadProducts();
+  }
+}
+
+var onboardingStep = null;
+function renderOnboardingLock(){
+  var disc = document.getElementById("discovery");
+  // Build step indicators
+  var steps = [];
+  // Step 1: Bot/Human choice
+  var step1Done = !expectingHumanBot && (expectingConsent || expectingName || emberMemory.consent === "no" || (emberMemory.consent === "yes" && emberMemory.userName));
+  var step1Active = expectingHumanBot;
+  steps.push({label:"Choose Bot or Human",done:step1Done,active:step1Active});
+  // Step 2: Consent
+  var step2Done = !expectingConsent && (expectingName || emberMemory.consent === "no" || (emberMemory.consent === "yes" && emberMemory.userName));
+  var step2Active = expectingConsent;
+  steps.push({label:"Choose to be remembered",done:step2Done,active:step2Active});
+  // Step 3: Name
+  var step3Done = !expectingName && emberMemory.consent !== "" && (emberMemory.consent === "no" || emberMemory.userName);
+  var step3Active = expectingName;
+  if(emberMemory.consent !== "no") steps.push({label:"Tell Ember your name",done:step3Done,active:step3Active});
+
+  var stepsHtml = steps.map(function(s){
+    var cls = s.active ? "active" : (s.done ? "done" : "");
+    var check = s.done ? ' <span class="step-check">&#10003;</span>' : '';
+    return '<div class="discovery-locked-step '+cls+'"><span class="step-dot"></span>'+s.label+check+'</div>';
+  }).join("");
+
+  disc.innerHTML = '<div class="discovery-locked"><div class="discovery-locked-inner"><div class="discovery-lock-icon">&#128274;</div><h3>Setting things up</h3><p>Chat with Ember in the left panel to get started. Your pantry will unlock in a moment.</p><div class="discovery-locked-steps">'+stepsHtml+'</div></div></div>';
+}
+
+var loadedCatalogue = false;
+function loadProducts(){
+  loadedCatalogue = true;
+  document.getElementById("discovery").innerHTML = '<div class="loading-spinner active" id="loadingSpinner"><div class="spinner"></div><p>Loading the pantry...</p></div><div class="d-empty" id="dEmpty" style="display:none"><div class="d-empty-inner"><div class="d-empty-icon">&#129367;</div><h3>Your Pantry Discovery</h3><p>Chat with Ember about what you\'re looking for. Products will appear here as they\'re found.</p></div></div><div id="dContent" style="display:none"><div class="panel-section cat-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#127991;</span><h4>Filter by Category</h4></div><div class="cat-chips" id="catChips"></div></div><div class="panel-section product-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#129367;</span><h4>Products</h4></div><div class="product-grid" id="productGrid"></div></div></div>';
+  fetchCatalogue("","").then(function(prods){renderProducts(prods);products=prods});
 }
 function rememberSearch(s){if(!s)return;emberMemory.recentSearches.unshift(s);if(emberMemory.recentSearches.length>10)emberMemory.recentSearches.pop();emberMemory.totalSearches++;saveMemory()}
 function getMemoryPreamble(){
@@ -594,17 +686,17 @@ async function send(){
   // Human/Bot gate
   if(expectingHumanBot){
     var hb = txt.toLowerCase().trim();
-    if(hb==="human"){expectingHumanBot=false;hideTyping();showHumanContact();return}
-    if(/^(bot|ember|chatbot)$/i.test(hb)){expectingHumanBot=false;expectingConsent=true;hideTyping();addMsg("Sound! Before we dive in, would you like me to remember your name and what we chat about for next time? Everything stays on your device, never sent anywhere. Just say <strong>yes</strong> or <strong>no</strong>.",'bot');addSugg(["Yes","No"]);return}
+    if(hb==="human"){expectingHumanBot=false;hideTyping();showHumanContact();updateOnboardingLock();return}
+    if(/^(bot|ember|chatbot)$/i.test(hb)){expectingHumanBot=false;expectingConsent=true;hideTyping();updateOnboardingLock();addMsg("Sound! Before we dive in, would you like me to remember your name and what we chat about for next time? Everything stays on your device, never sent anywhere. Just say <strong>yes</strong> or <strong>no</strong>.",'bot');addSugg(["Yes","No"]);return}
     hideTyping();addMsg("Just tap <strong>Human</strong> to speak to our team, or <strong>Bot</strong> to chat with me!",'bot');addSugg(["Human","Bot"]);return;
   }
 
   // Consent handling
   if(expectingConsent&&!emberMemory.consent){
     var t = txt.toLowerCase().trim();
-    if(/^(yes|yeah|yep|sure|ok|okay|grand|sound|go on)$/i.test(t)){emberMemory.consent="yes";expectingConsent=false;saveMemory();expectingName=true;hideTyping();updateMemoryButtons();addMsg("Class! I'll remember you. What should I call you?",'bot');return}
-    if(/^(no|nope|nah|no thanks)$/i.test(t)){emberMemory.consent="no";expectingConsent=false;expectingName=false;saveMemory();hideTyping();updateMemoryButtons();addMsg("No worries, I won't store anything about you. What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks"]);lastEmberAsked=true;return}
-    if(t==="human"){expectingConsent=false;hideTyping();showHumanContact();return}
+    if(/^(yes|yeah|yep|sure|ok|okay|grand|sound|go on)$/i.test(t)){emberMemory.consent="yes";expectingConsent=false;saveMemory();expectingName=true;hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("Class! I'll remember you. What should I call you?",'bot');return}
+    if(/^(no|nope|nah|no thanks)$/i.test(t)){emberMemory.consent="no";expectingConsent=false;expectingName=false;saveMemory();hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("No worries, I won't store anything about you. What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks"]);lastEmberAsked=true;return}
+    if(t==="human"){expectingConsent=false;hideTyping();updateOnboardingLock();showHumanContact();return}
     hideTyping();addMsg("Just a simple <strong>yes</strong> or <strong>no</strong> -- would you like me to remember you between visits? Everything stays on your device.",'bot');addSugg(["Yes","No"]);return;
   }
 
@@ -612,9 +704,9 @@ async function send(){
   if(expectingName&&!emberMemory.userName){
     var name = txt.replace(/^(i'm|i am|my name is|call me|it's|name's|the name's|people call me)\s+/i,"").replace(/[.!?,]$/,"").trim();
     var nl = name.toLowerCase();
-    if(nl==="human"){expectingName=false;hideTyping();showHumanContact();return}
+    if(nl==="human"){expectingName=false;hideTyping();updateOnboardingLock();showHumanContact();return}
     if(/^(bot|ember|chatbot|yes|no|nope|nah)$/i.test(nl)){hideTyping();addMsg("That doesn't sound like a name! What should I call you?",'bot');return}
-    if(name&&name.split(/\s+/).length<=3&&name.length>=2){emberMemory.userName=name;expectingName=false;saveMemory();document.getElementById("emberLabel").textContent="Your pantry guide · knows "+name;hideTyping();addMsg("Lovely to meet you, <strong>"+escapeHtml(name)+"</strong>! What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Dinner ideas"]);lastEmberAsked=true;return}
+    if(name&&name.split(/\s+/).length<=3&&name.length>=2){emberMemory.userName=name;expectingName=false;saveMemory();document.getElementById("emberLabel").textContent="Your pantry guide · knows "+name;hideTyping();updateOnboardingLock();addMsg("Lovely to meet you, <strong>"+escapeHtml(name)+"</strong>! What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Dinner ideas"]);lastEmberAsked=true;return}
   }
 
   // Gibberish detection
@@ -698,8 +790,15 @@ chatInput.addEventListener("keydown",function(e){if(e.key==="Enter")send()});
   loadMemory();
   if(emberMemory.userName) l.textContent = "Your pantry guide · knows "+emberMemory.userName;
 
-  // Load initial catalogue in background
-  fetchCatalogue("","").then(function(prods){renderProducts(prods);products=prods});
+  // Determine onboarding state
+  var needsOnboarding = emberMemory.consent === ""; // First visit, no decision yet
+  if(!needsOnboarding){
+    // Returning user or already declined: no onboarding lock
+    expectingHumanBot = false;
+    expectingConsent = false;
+    expectingName = false;
+  }
+  updateOnboardingLock();
 
   if(emberMemory.consent==="yes"&&emberMemory.userName){
     addMsg("Welcome back, <strong>"+escapeHtml(emberMemory.userName)+"</strong>! Great to see you again.",'bot');
@@ -710,7 +809,7 @@ chatInput.addEventListener("keydown",function(e){if(e.key==="Enter")send()});
     setTimeout(function(){addMsg("What are you looking for today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Human"]);lastEmberAsked=true},1000);
   }else{
     addMsg("Hey! I'm <strong>Ember</strong>, an AI chatbot powered by DeepSeek. I'm your guide here at Emerald Pantry. I can help you find products, suggest ingredients, share cooking ideas, and explore our catalogue.",'bot');
-    setTimeout(function(){expectingHumanBot=true;addMsg("Are you here to chat with me or would you prefer a real human?",'bot');addSugg(["Bot","Human"])},1200);
+    setTimeout(function(){expectingHumanBot=true;updateOnboardingLock();addMsg("Are you here to chat with me or would you prefer a real human?",'bot');addSugg(["Bot","Human"])},1200);
   }
 })();
 </script>
