@@ -541,6 +541,7 @@ function loadProducts(){
   dContent = document.getElementById("dContent");
   productGrid = document.getElementById("productGrid");
   catChips = document.getElementById("catChips");
+  wireFilterBar();
   // Show the panel immediately with a loading state, then fill with data
   dContent.style.display = "block";
   document.getElementById("loadingSpinner").classList.add("active");
@@ -849,6 +850,10 @@ function prodByCat(prods){
 
 function filterCat(cat){
   activeCategory = cat;
+  // Always update chip highlights
+  document.querySelectorAll(".cat-chip").forEach(function(el,i){
+    if(i === 0){ el.className = "cat-chip" + (cat === "" ? " active" : ""); }
+  });
   updateFilterUI();
   renderProducts(allProducts);
   echoFilterToChat();
@@ -873,7 +878,21 @@ function clearAllFilters(){
   activeFilters = {}; activeSort = ""; activeCategory = "";
   updateFilterUI();
   renderProducts(allProducts);
-  addMsg("Filters cleared — showing the full pantry.",'bot');
+  echoFilterToChat();
+}
+
+// Wire up filter bar event handlers (called after DOM rebuild)
+function wireFilterBar(){
+  document.querySelectorAll(".filter-pill[data-filter]").forEach(function(el){
+    el.onclick = function(){
+      var key = this.getAttribute("data-filter");
+      toggleFilter(key);
+    };
+  });
+  var fc = document.getElementById("filterClear");
+  if(fc) fc.onclick = clearAllFilters;
+  var ss = document.getElementById("sortSelect");
+  if(ss) ss.onchange = function(){ setSort(this.value); };
 }
 
 function updateFilterUI(){
@@ -950,6 +969,7 @@ function backToPantry(){
   productGrid = document.getElementById("productGrid");
   catChips = document.getElementById("catChips");
   dContent.style.display = "block";
+  wireFilterBar();
   updateFilterUI();
   renderProducts(allProducts);
   addMsg("Back to the pantry! What else catches your eye?",'bot');
