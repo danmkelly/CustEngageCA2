@@ -750,11 +750,11 @@ function renderProducts(prods,searchTerm){
     }
     var offSection = "";
     var offUrl = p.barcode ? "https://world.openfoodfacts.org/product/"+escapeHtml(p.barcode) : "";
-    if(hasOffData){
-      offSection = '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank" onclick="event.stopPropagation()" title="View on Open Food Facts">view record &#8599;</a>':'')+'</div><div class="product-badges">'+offBadges+'</div></div>';
-    } else {
-      offSection = '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank" onclick="event.stopPropagation()" title="View on Open Food Facts">view record &#8599;</a>':'')+'</div><div class="off-no-data">No facts available for this product</div></div>';
-    }
+  if(hasOffData){
+    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank">view record &#8599;</a>':'')+'</div><div class="product-badges">'+badges+'</div></div>';
+  } else {
+    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span></div><div class="off-no-data">No facts available for this product</div></div>';
+  }
     // Product image with representative tag for placeholders
     var catIcon = categoryIcons[p.category] || "&#129367;";
     var catColour = categoryColours[p.category] || "#163322";
@@ -922,13 +922,13 @@ function openDetail(sku){
   if(hasVegan){badges+='<span class="diet-badge">Vegan</span>';hasOffData=true}else if(hasVegetarian){badges+='<span class="diet-badge">Vegetarian</span>';hasOffData=true}
   if(isOrganic){badges+='<span class="diet-badge">Organic</span>';hasOffData=true}
   if(p.allergens){var allergens=p.allergens.split(",").slice(0,3).map(function(a){return a.trim()}).join(", ");if(allergens){badges+='<span class="allergen-badge">Contains: '+escapeHtml(allergens)+'</span>';hasOffData=true}}
-  var offUrl = p.barcode ? "https://world.openfoodfacts.org/product/"+escapeHtml(p.barcode) : "";
-  var offSection = "";
-  if(hasOffData){
-    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank">view record &#8599;</a>':'')+'</div><div class="product-badges">'+badges+'</div></div>';
-  } else {
-    offSection = '<div class="detail-section"><div class="off-section-hdr"><span class="detail-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank">view record &#8599;</a>':'')+'</div><div class="off-no-data">No facts available for this product</div></div>';
-  }
+    var offUrl = p.barcode ? "https://world.openfoodfacts.org/product/"+escapeHtml(p.barcode) : "";
+    var offSection = "";
+    if(hasOffData){
+      offSection = '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span>'+(offUrl?'<a class="off-section-link" href="'+offUrl+'" target="_blank" onclick="event.stopPropagation()" title="View on Open Food Facts">view record &#8599;</a>':'')+'</div><div class="product-badges">'+offBadges+'</div></div>';
+    } else {
+      offSection = '<div class="off-section"><div class="off-section-hdr"><span class="off-section-label">Open Food Facts</span></div><div class="off-no-data">No facts available for this product</div></div>';
+    }
   var catIcon = categoryIcons[p.category] || "&#129367;";
   var catColour = categoryColours[p.category] || "#163322";
   var isPlaceholder = !p.image_url;
