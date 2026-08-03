@@ -720,6 +720,7 @@ function backToPantry(){
   dEmpty.style.display = "none"; dContent.style.display = "block";
   activeCategory = "";
   renderProducts(products);
+  addMsg("Back to the pantry! What else catches your eye?",'bot');
 }
 
 function getProduct(sku){for(var i=0;i<products.length;i++){if(products[i].sku===sku)return products[i]}return null}
@@ -762,6 +763,8 @@ function openDetail(sku){
       (inBasket?'<div class="added-confirm"><span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = &euro;'+(price*qty).toFixed(2)+')</div>':'')+
     '</div>'+
   '</div>';
+  var shortDesc = p.description ? p.description.slice(0,80)+(p.description.length>80?'...':'') : '';
+  addMsg("Taking a closer look at <strong>"+escapeHtml(p.product_name)+"</strong> — "+priceStr+" / "+escapeHtml(p.unit)+". "+(shortDesc||"")+" What do you think?",'bot');
 }
 
 function addToBasket(sku){
@@ -782,6 +785,7 @@ function addToBasket(sku){
   var totalStr = total >= 1000 ? "&euro;"+total.toLocaleString() : "&euro;"+total.toFixed(2);
   if(existing){existing.innerHTML='<span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = '+totalStr+')'}
   else{var body=document.querySelector(".detail-body");if(body)body.insertAdjacentHTML("beforeend",'<div class="added-confirm"><span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = '+totalStr+')</div>')}
+  addMsg("Added <strong>"+qty+" x "+escapeHtml(p.product_name)+"</strong> to your basket — "+totalStr+". Keep shopping or tap the basket icon at the top to review!",'bot');
 }
 
 function updateBasketIndicator(){
@@ -816,7 +820,9 @@ function toggleBasket(){
 }
 
 function removeFromBasket(sku){
+  var p = getProduct(sku); var name = p ? p.product_name : sku;
   delete basket[sku]; updateBasketIndicator(); toggleBasket(); toggleBasket();
+  addMsg("Removed <strong>"+escapeHtml(name)+"</strong> from your basket.",'bot');
 }
 
 function checkout(){
