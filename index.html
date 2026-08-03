@@ -533,13 +533,17 @@ function loadProducts(){
   productGrid = document.getElementById("productGrid");
   catChips = document.getElementById("catChips");
   fetchCatalogue("","").then(function(prods){
-    // Only render if the DOM is still valid (not replaced by another load)
     if(!loadedCatalogue || !productGrid || !dContent) return;
     renderProducts(prods);
     products = prods;
   }).catch(function(e){
-    // Fallback: show error state
-    if(dContent) dContent.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
+    // Fetch failed - wait and retry once
+    setTimeout(function(){
+      if(!loadedCatalogue || !dContent) return;
+      fetchCatalogue("","").then(function(prods){renderProducts(prods);products=prods}).catch(function(e2){
+        if(dContent) dContent.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
+      });
+    },2000);
   });
 }
 function rememberSearch(s){if(!s)return;emberMemory.recentSearches.unshift(s);if(emberMemory.recentSearches.length>10)emberMemory.recentSearches.pop();emberMemory.totalSearches++;saveMemory()}
