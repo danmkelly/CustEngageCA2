@@ -164,6 +164,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .add-basket-btn:hover{background:#24763F;box-shadow:0 4px 16px rgba(45,139,78,0.4)}
 .add-basket-btn:disabled{background:var(--border);color:var(--text-dim);cursor:not-allowed;box-shadow:none}
 .add-basket-btn.added{background:var(--accent2);animation:popIn 0.3s ease}
+.back-pantry-btn{width:100%;padding:14px;margin-top:10px;border:1px solid rgba(212,168,75,0.3);border-radius:10px;background:transparent;color:var(--accent2);font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:0.3px}
+.back-pantry-btn:hover{background:rgba(212,168,75,0.1);border-color:var(--accent2)}
 @keyframes popIn{0%{transform:scale(0.95)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
 
 /* Basket indicator in brand bar */
@@ -747,6 +749,7 @@ function openDetail(sku){
       '<div class="detail-section-label">Quantity</div>'+
       '<div class="qty-selector"><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c>1)v.textContent=c-1">-</button><span class="qty-val" id="detailQty">'+qty+'</span><button class="qty-btn" onclick="var v=document.getElementById(\'detailQty\');var c=parseInt(v.textContent);if(c<10)v.textContent=c+1">+</button></div>'+
       '<button class="add-basket-btn'+(inBasket?' added':'')+'" id="addBasketBtn" onclick="addToBasket(\''+sku+'\')">'+(inBasket?'&#10003; Added — Tap to update':'Add to Basket — '+priceStr)+'</button>'+
+      '<button class="back-pantry-btn" onclick="activeCategory=\'\';renderProducts(products)">&#8592; Back to Pantry</button>'+
       (inBasket?'<div class="added-confirm"><span class="added-confirm-icon">&#10003;</span> In your basket ('+qty+' x '+priceStr+' = &euro;'+(price*qty).toFixed(2)+')</div>':'')+
     '</div>'+
   '</div>';
