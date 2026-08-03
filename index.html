@@ -536,14 +536,12 @@ function loadProducts(){
     if(!loadedCatalogue || !productGrid || !dContent) return;
     renderProducts(prods);
     products = prods;
+    // Enrich with OFF data in background if we got basic catalogue
+    if(API_PROXY && prods.length > 0 && !prods[0].nutriscore_grade){
+      fetchCatalogueEnriched("","");
+    }
   }).catch(function(e){
-    // Fetch failed - wait and retry once
-    setTimeout(function(){
-      if(!loadedCatalogue || !dContent) return;
-      fetchCatalogue("","").then(function(prods){renderProducts(prods);products=prods}).catch(function(e2){
-        if(dContent) dContent.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
-      });
-    },2000);
+    if(dContent) dContent.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
   });
 }
 function rememberSearch(s){if(!s)return;emberMemory.recentSearches.unshift(s);if(emberMemory.recentSearches.length>10)emberMemory.recentSearches.pop();emberMemory.totalSearches++;saveMemory()}
@@ -655,8 +653,7 @@ function speakMsg(btn){
 
 // === Catalogue API ===
 async function fetchCatalogue(q,cat){
-  // Use enriched catalogue (OpenFoodFacts) when proxy is available, else fall back to raw CSV
-  var endpoint = API_PROXY ? API_PROXY+"/api/enriched-catalogue" : CATALOGUE_URL;
+  var endpoint = API_PROXY ? API_PROXY+"/api/catalogue" : CATALOGUE_URL;
   var params = [];
   if(q) params.push("q="+encodeURIComponent(q));
   if(cat) params.push("category="+encodeURIComponent(cat));
@@ -664,7 +661,7 @@ async function fetchCatalogue(q,cat){
   var u = endpoint + "?" + params.join("&");
 
   if(!API_PROXY){
-    var r = await fetch(u.replace("/api/enriched-catalogue", "").replace("?","?format=csv&"), {cache: "no-store"});
+    var r = await fetch(u.replace("/api/catalogue", "").replace("?","?format=csv&"), {cache: "no-store"});
     if(!r.ok) return [];
     var csv = await r.text();
     return parseCSVClient(csv);
@@ -676,6 +673,27 @@ async function fetchCatalogue(q,cat){
 }
 
 var CATALOGUE_URL = "https://docs.google.com/spreadsheets/d/1fY7974AdL4rrO2gnCxcCBUFWWSkVhOi9euJI7lNjo2Q/export?format=csv";
+
+async function fetchCatalogueEnriched(q,cat){
+  if(!API_PROXY) return [];
+  var endpoint = API_PROXY+"/api/enriched-catalogue";
+  var params = [];
+  if(q) params.push("q="+encodeURIComponent(q));
+  if(cat) params.push("category="+encodeURIComponent(cat));
+  params.push("_t=" + Date.now());
+  var u = endpoint + "?" + params.join("&");
+  try {
+    var r = await fetch(u, {cache: "no-store"});
+    if(!r.ok) return [];
+    var d = await r.json();
+    var enriched = d.products || [];
+    if(enriched.length > 0 && productGrid && dContent){
+      products = enriched; allProducts = enriched.slice();
+      renderProducts(enriched);
+    }
+    return enriched;
+  } catch(e){ return []; }
+}
 
 function parseCSVClient(csv){
   var lines = csv.trim().split("\n");
