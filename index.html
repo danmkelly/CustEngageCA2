@@ -486,9 +486,11 @@ function updateOnboardingLock(){
   var mic = document.getElementById("chatMic");
   var ramp = document.querySelector(".chat-human-ramp");
 
-  input.disabled = inOnboarding;
-  send.disabled = inOnboarding;
-  if(mic) mic.disabled = inOnboarding;
+  // Only disable input during button-only steps (Bot/Human, Yes/No consent). Enable for name entry.
+  var lockInput = inOnboarding && onboardingStep !== 3;
+  input.disabled = lockInput;
+  send.disabled = lockInput;
+  if(mic) mic.disabled = lockInput;
 
   if(ramp){
     if(inOnboarding){ramp.classList.add("onboarding-active");document.getElementById("humanRampText").innerHTML='Skip setup — <span class="human-ramp-cta">talk to a human</span> instead'}
