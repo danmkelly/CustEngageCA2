@@ -1138,6 +1138,19 @@ async function chatLLM(msg,prods,forceOffTopic){
 function emberAskedQ(reply){lastEmberAsked=/[?]/.test(reply)||/\b(what|which|when|where|who|how|do you|have you|are you|would you|fancy|prefer|into|like)\b/i.test(reply)}
 
 // === Main send ===
+function showHumanContact(){
+  addMsg("Of course! Here's how to reach the real humans at Emerald Pantry:",'bot');
+  addMsg("<strong>Emerald Pantry</strong><br>Dublin, Ireland<br><br><strong>Email:</strong> <a href='mailto:hello@emeraldpantry.ie' style='color:var(--accent2)'>hello@emeraldpantry.ie</a><br><br><strong>Phone:</strong> +353 1 555 1234<br><br><strong>Opening hours:</strong><br>Mon-Sat: 09:00 - 18:00<br>Sun: 11:00 - 16:00<br><br><strong>Web orders:</strong> Open 24/7",'bot');
+  addMsg("We'd love to hear from you! Anything else I can help with in the meantime?",'bot');
+  addSugg(["Keep shopping","Bakery","Special offers"]);
+}
+
+function humanContact(){
+  expectingHumanBot = false; expectingConsent = false; expectingName = false; onboardingStep = 4;
+  updateOnboardingLock();
+  showHumanContact();
+}
+
 async function send(){
   var txt = chatInput.value.trim(); if(!txt) return;
   addMsg(txt,"user"); chatInput.value = ""; showTyping();
@@ -1183,20 +1196,6 @@ async function send(){
 
   function cCount(s){var m=s.match(/[^aeiou]/g);return m?m.length:0}
   function vCount(s){var m=s.match(/[aeiou]/g);return m?m.length:0}
-
-  function showHumanContact(){
-    addMsg("Of course! Here's how to reach the real humans at Emerald Pantry:",'bot');
-    addMsg("<strong>Emerald Pantry</strong><br>Dublin, Ireland<br><br><strong>Email:</strong> <a href='mailto:hello@emeraldpantry.ie' style='color:var(--accent2)'>hello@emeraldpantry.ie</a><br><br><strong>Phone:</strong> +353 1 555 1234<br><br><strong>Opening hours:</strong><br>Mon-Sat: 09:00 - 18:00<br>Sun: 11:00 - 16:00<br><br><strong>Web orders:</strong> Open 24/7",'bot');
-    addMsg("We'd love to hear from you! Anything else I can help with in the meantime?",'bot');
-    addSugg(["Keep shopping","Bakery","Special offers"]);
-  }
-
-  function humanContact(){
-    // Clear any onboarding state so the panel unlocks
-    expectingHumanBot = false; expectingConsent = false; expectingName = false; onboardingStep = 4;
-    updateOnboardingLock();
-    showHumanContact();
-  }
 
   if(txt.toLowerCase()==="human"){hideTyping();showHumanContact();return}
 
