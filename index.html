@@ -486,13 +486,17 @@ function updateOnboardingLock(){
   var mic = document.getElementById("chatMic");
   var ramp = document.querySelector(".chat-human-ramp");
 
-  // Only disable input during button-only steps (Bot/Human, Yes/No consent). Enable for name entry.
-  var lockInput = inOnboarding && onboardingStep !== 3;
-  input.disabled = lockInput;
-  send.disabled = lockInput;
-  if(mic) mic.disabled = lockInput;
-  // Clear placeholder for name step
-  if(onboardingStep === 3){ hideTyping(); input.placeholder = "Enter your name..."; setTimeout(function(){ input.focus(); }, 100); }
+  // Always enable input during name entry, disable for button-only steps
+  if(onboardingStep === 3){
+    input.disabled = false; send.disabled = false; if(mic) mic.disabled = false;
+    input.placeholder = "Enter your name...";
+  } else if(inOnboarding){
+    input.disabled = true; send.disabled = true; if(mic) mic.disabled = true;
+    input.placeholder = "Use the buttons above to continue...";
+  } else {
+    input.disabled = false; send.disabled = false; if(mic) mic.disabled = false;
+    input.placeholder = "Ask Ember about our pantry...";
+  }
 
   if(ramp){
     if(inOnboarding){ramp.classList.add("onboarding-active");document.getElementById("humanRampText").innerHTML='Skip setup — <span class="human-ramp-cta">talk to a human</span> instead'}
@@ -500,12 +504,8 @@ function updateOnboardingLock(){
   }
 
   if(inOnboarding){
-    input.placeholder = "Use the buttons above to continue...";
-    // Show locked discovery state
     renderOnboardingLock();
   } else {
-    input.placeholder = "Ask Ember about our pantry...";
-    // Load catalogue now that onboarding is done
     if(!loadedCatalogue) loadProducts();
   }
 }
