@@ -524,7 +524,7 @@ function renderOnboardingLock(){
     return '<div class="discovery-locked-step '+cls+'"><span class="step-dot"></span>'+s.label+check+'</div>';
   }).join("");
 
-  disc.innerHTML = '<div class="discovery-locked"><div class="discovery-locked-inner"><div class="discovery-lock-icon">&#128274;</div><h3>Setting things up</h3><p>Chat with Ember in the left panel to get started. Your pantry will unlock in a moment.</p><div class="discovery-locked-steps">'+stepsHtml+'</div></div></div>';
+  disc.innerHTML = '<div class="discovery-locked"><div class="discovery-locked-inner"><div class="discovery-lock-icon">&#128274;</div><h3>Setting things up</h3><p>Chat with Ember in the left panel to get started. Your pantry will unlock in a moment.</p><div class="discovery-locked-steps">'+stepsHtml+'</div><div style="font-size:0.5rem;color:var(--text-dim);margin-top:12px;opacity:0.5">step:'+onboardingStep+' hb:'+expectingHumanBot+' c:'+expectingConsent+' n:'+expectingName+' in:'+(document.getElementById("chatInput").disabled?"DISABLED":"enabled")+'</div></div></div>';
 }
 
 var loadedCatalogue = false;
