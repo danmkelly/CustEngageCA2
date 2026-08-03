@@ -544,7 +544,8 @@ function loadProducts(){
   wireFilterBar();
   // Show the panel immediately with a loading state, then fill with data
   dContent.style.display = "block";
-  document.getElementById("loadingSpinner").classList.add("active");
+  var spinner4 = document.getElementById("loadingSpinner");
+  if(spinner4) spinner4.classList.add("active");
   productGrid.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.76rem">Loading products...</div>';
   clearTimeout(loadTimeout);
   loadTimeout = setTimeout(function(){
@@ -750,7 +751,8 @@ function renderProducts(prods,searchTerm){
   if(allProducts.length === 0 && (!searchTerm || searchTerm === "")) allProducts = prods.slice();
   // Use allProducts as the filter base when available, otherwise use prods
   var base = allProducts.length > 0 ? allProducts : prods;
-  document.getElementById("loadingSpinner").classList.remove("active");
+  var spinner = document.getElementById("loadingSpinner");
+  if(spinner) spinner.classList.remove("active");
   var filtered = applyFiltersAndSort(base);
   products = filtered;
   var rc = document.getElementById("resultCount");
@@ -1274,7 +1276,8 @@ async function send(){
 
   // STEP 1: Fetch matching products from catalogue
   showTyping();
-  document.getElementById("loadingSpinner").classList.add("active");
+  var spinner2 = document.getElementById("loadingSpinner");
+  if(spinner2) spinner2.classList.add("active");
   var foundProds = [];
 
   // Client-side pre-filtering for common intent patterns
@@ -1292,7 +1295,8 @@ async function send(){
       prods.forEach(function(p){if(!foundProds.some(function(fp){return fp.sku===p.sku}))foundProds.push(p)});
     }
   }
-  document.getElementById("loadingSpinner").classList.remove("active");
+  var spinner3 = document.getElementById("loadingSpinner");
+  if(spinner3) spinner3.classList.remove("active");
   hideTyping();
 
   if(foundProds.length>0){
