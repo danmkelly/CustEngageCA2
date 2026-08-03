@@ -541,22 +541,24 @@ function loadProducts(){
   dContent = document.getElementById("dContent");
   productGrid = document.getElementById("productGrid");
   catChips = document.getElementById("catChips");
+  // Show the panel immediately with a loading state, then fill with data
+  dContent.style.display = "block";
+  document.getElementById("loadingSpinner").classList.add("active");
+  productGrid.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.76rem">Loading products...</div>';
+  clearTimeout(loadTimeout);
   loadTimeout = setTimeout(function(){
-    if(!products || !products.length){ fetchCatalogue("","").then(function(p){if(p.length){renderProducts(p);products=p}}); }
-    if(dContent) dContent.style.display = "block";
+    if(!products || !products.length){ fetchCatalogue("","").then(function(p){if(p.length){renderProducts(p);products=p;allProducts=p.slice()}}); }
   }, 3000);
   fetchCatalogue("","").then(function(prods){
     clearTimeout(loadTimeout);
-    if(!loadedCatalogue || !productGrid || !dContent) return;
     renderProducts(prods);
-    products = prods;
+    products = prods; allProducts = prods.slice();
     if(prods.length > 0 && !prods[0].nutriscore_grade){
       try{ fetchCatalogueEnriched("",""); }catch(e){}
     }
   }).catch(function(e){
     clearTimeout(loadTimeout);
-    if(dContent) dContent.style.display = "block";
-    if(productGrid) productGrid.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
+    productGrid.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Try refreshing the page.</p></div></div>';
   });
 }
 function rememberSearch(s){if(!s)return;emberMemory.recentSearches.unshift(s);if(emberMemory.recentSearches.length>10)emberMemory.recentSearches.pop();emberMemory.totalSearches++;saveMemory()}
