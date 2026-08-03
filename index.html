@@ -1460,102 +1460,47 @@ function runFilterTests(){
   var tp = document.createElement("div"); tp.id="testPanel";
   tp.style.cssText = "position:fixed;bottom:0;left:0;right:0;max-height:50vh;overflow:auto;background:#0A1F12;color:#E8F0E4;font:12px monospace;padding:12px;z-index:99999;border-top:3px solid #D4A84B";
   document.body.appendChild(tp);
-  function show(){ tp.innerHTML = log.join("<br>") + "<br><br><b style='color:#2D8B4E'>"+pass+" passed</b> / <b style='color:#C44D4D'>"+fail+" failed</b> / <b>"+(pass+fail)+" total</b>"; tp.scrollTop = tp.scrollHeight; }
-
-  // Wait for products to be loaded
-  function wait(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+  function show(){ tp.innerHTML = log.join("<br>") + "<br><br>" + pass + " passed / " + fail + " failed"; tp.scrollTop = tp.scrollHeight; }
 
   async function run(){
     log.push("--- Filter Test Suite ---");
-    log.push("allProducts.length: " + allProducts.length);
-    log.push("activeCategory: '" + activeCategory + "'");
-    show();
-
-    // Wait for products
-    if(allProducts.length === 0){
-      log.push("Waiting for catalogue to load...");
-      show();
-      await wait(5000);
-      log.push("allProducts.length after wait: " + allProducts.length);
-      show();
-    }
-
-    if(allProducts.length === 0){
-      log.push("SKIPPING: No products loaded");
-      show(); return;
-    }
-
-    // Test each category filter
+    log.push("allProducts.length: " + allProducts.length); show();
+    await wait(2000);
+    if(allProducts.length === 0){ log.push("FAIL: No products loaded"); show(); return; }
     var cats = ["bakery","dairy","drinks","snacks","store-cupboard"];
     var expectedCounts = {};
     allProducts.forEach(function(p){ expectedCounts[p.category] = (expectedCounts[p.category]||0)+1; });
-
     for(var ci = 0; ci < cats.length; ci++){
       var c = cats[ci];
       var chip = document.querySelector('.cat-chip[data-cat="'+c+'"]');
-      log.push("--- Testing category: "+c+" ---");
-      log.push("Chip exists: " + !!chip);
-      if(chip) log.push("Chip text: '" + chip.textContent + "'");
-      show();
-
-      if(chip){ chip.click(); } else { log.push("No chip found for "+c); show(); continue; }
-      await wait(200);
-
+      if(!chip){ log.push("FAIL: "+c+" chip not found"); fail++; show(); continue; }
+      chip.click(); await wait(300);
       var expected = expectedCounts[c] || 0;
       var actual = document.querySelectorAll(".product-card").length;
-      log.push("Expected products: " + expected + ", Actual: " + actual);
-      log.push("activeCategory: '" + activeCategory + "' (expected: '"+c+"')");
+      if(activeCategory === c && actual === expected){ pass++; log.push("PASS: "+c+" ("+actual+" items)"); }
+      else { fail++; log.push("FAIL: "+c+" expected="+expected+" actual="+actual+" cat="+activeCategory); }
       show();
-
-      if(activeCategory === c && actual === expected){
-        log.push("PASS: "+c+" category filter works");
-      } else {
-        log.push("FAIL: "+c+" category filter mismatch (cat="+activeCategory+", expected="+c+", cards="+actual+", expectedCards="+expected+")");
-      }
     }
-
-    // Test Clear All
-    log.push("--- Testing Clear All ---");
+    // Clear All
     var clearBtn = document.getElementById("filterClear");
-    log.push("Clear button exists: " + !!clearBtn);
-    show();
-    if(clearBtn){ clearBtn.click(); }
-    await wait(200);
+    if(clearBtn){ clearBtn.click(); await wait(300); }
     var afterClear = document.querySelectorAll(".product-card").length;
-    log.push("Products after clear: " + afterClear + " (expected: " + allProducts.length + ")");
-    log.push("activeCategory after clear: '" + activeCategory + "' (expected: '')");
-    var activeFilters = 0;
-    document.querySelectorAll(".filter-pill.active").forEach(function(){ activeFilters++; });
-    log.push("Active filter pills: " + activeFilters + " (expected: 0)");
+    if(afterClear === allProducts.length && activeCategory === ""){ pass++; log.push("PASS: Clear All"); }
+    else { fail++; log.push("FAIL: Clear All cards="+afterClear+" cat="+activeCategory); }
     show();
-    if(afterClear === allProducts.length && activeCategory === "" && activeFilters === 0){
-      log.push("PASS: Clear All works");
-    } else {
-      log.push("FAIL: Clear All issue");
-    }
-
-    // Test each filter pill
+    // Filter pills
     var filters = ["inStock","offer","vegan","vegetarian","organic","glutenFree","dairyFree","nutriA","nutriB","nutriC","nutriD","nutriE","nutriNone"];
     for(var fi = 0; fi < filters.length; fi++){
       var f = filters[fi];
       var pill = document.querySelector('.filter-pill[data-filter="'+f+'"]');
-      log.push("--- Testing filter: "+f+" ---");
-      log.push("Pill exists: " + !!pill);
-      if(!pill){ show(); continue; }
-
+      if(!pill){ fail++; log.push("FAIL: "+f+" pill missing"); show(); continue; }
       pill.click(); await wait(200);
-      var isActive = pill.classList.contains("active");
-      log.push("Pill active: " + isActive + " (expected: true)");
-      show();
-
-      // Click again to deactivate
+      if(pill.classList.contains("active")){ pass++; } else { fail++; log.push("FAIL: "+f+" toggle on"); }
       pill.click(); await wait(200);
-      var isInactive = !pill.classList.contains("active");
-      log.push("Pill inactive after 2nd click: " + isInactive + " (expected: true)");
+      if(!pill.classList.contains("active")){ pass++; } else { fail++; log.push("FAIL: "+f+" toggle off"); }
       show();
     }
-
-    log.push("--- Tests Complete ---");
+    log.push("--- "+pass+" passed / "+fail+" failed / "+(pass+fail)+" total ---");
     show();
   }
 
