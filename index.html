@@ -836,7 +836,6 @@ function toggleFilter(key){
   if(activeFilters[key]){delete activeFilters[key]}else{activeFilters[key]=true}
   updateFilterUI();
   doRender();
-  if(Object.keys(activeFilters).length){ addMsg("Filter toggled",'bot'); }
 }
 
 function setSort(value){
@@ -863,17 +862,17 @@ function wireFilterBar(){
       filterCat(el.getAttribute("data-cat") || "");
     };
   }
-  // Filter pill clicks
+  // Filter pill clicks - remove inline handlers first, then bind once
   document.querySelectorAll(".filter-pill[data-filter]").forEach(function(el){
+    el.removeAttribute("onclick");
     el.onclick = function(){
-      var key = this.getAttribute("data-filter");
-      toggleFilter(key);
+      toggleFilter(this.getAttribute("data-filter"));
     };
   });
   var fc = document.getElementById("filterClear");
-  if(fc) fc.onclick = clearAllFilters;
+  if(fc){ fc.removeAttribute("onclick"); fc.onclick = clearAllFilters; }
   var ss = document.getElementById("sortSelect");
-  if(ss) ss.onchange = function(){ setSort(this.value); };
+  if(ss){ ss.removeAttribute("onchange"); ss.onchange = function(){ setSort(this.value); }; }
 }
 
 function updateFilterUI(){
