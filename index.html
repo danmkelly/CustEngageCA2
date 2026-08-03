@@ -832,33 +832,27 @@ function prodByCat(prods){
     prods.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; total++; });
   }
   var ordered = ["bakery","dairy","drinks","snacks","store-cupboard"];
-  catChips.innerHTML = '';
-  // All chip
-  var allChip = document.createElement("span");
-  allChip.className = "cat-chip" + (activeCategory === "" ? " active" : "");
-  allChip.textContent = "All (" + total + ")";
-  allChip.onclick = function(){ filterCat(""); };
-  catChips.appendChild(allChip);
-  // Category chips
+  var h = '';
+  h += '<span class="cat-chip'+(activeCategory===""?" active":"")+'" data-cat="">All ('+total+')</span>';
   ordered.forEach(function(c){
     var count = cats[c] || 0;
-    var chip = document.createElement("span");
-    chip.className = "cat-chip" + (activeCategory === c ? " active" : "");
-    chip.textContent = (categoryLabels[c]||c) + " (" + count + ")";
-    chip.onclick = function(){ filterCat(c); };
-    catChips.appendChild(chip);
+    h += '<span class="cat-chip'+(activeCategory===c?" active":"")+'" data-cat="'+c+'">'+(categoryLabels[c]||c)+' ('+count+')</span>';
   });
+  catChips.innerHTML = h;
 }
 
 function filterCat(cat){
   activeCategory = cat;
-  // Always update chip highlights
-  document.querySelectorAll(".cat-chip").forEach(function(el,i){
-    if(i === 0){ el.className = "cat-chip" + (cat === "" ? " active" : ""); }
-  });
+  // Highlight chip via data-cat
+  document.querySelectorAll(".cat-chip").forEach(function(el){ el.classList.remove("active"); });
+  var sel = cat === "" ? '.cat-chip[data-cat=""]' : '.cat-chip[data-cat="' + cat + '"]';
+  var target = document.querySelector(sel);
+  if(target) target.classList.add("active");
   updateFilterUI();
   renderProducts(allProducts);
-  echoFilterToChat();
+  if(cat){
+    addMsg("Showing: <strong>"+(categoryLabels[cat]||cat)+"</strong> ("+applyFiltersAndSort(allProducts).length+" items)",'bot');
+  }
 }
 
 function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
@@ -885,6 +879,15 @@ function clearAllFilters(){
 
 // Wire up filter bar event handlers (called after DOM rebuild)
 function wireFilterBar(){
+  // Category chip delegated click
+  if(catChips){
+    catChips.onclick = function(e){
+      var el = e.target.closest(".cat-chip");
+      if(!el) return;
+      filterCat(el.getAttribute("data-cat") || "");
+    };
+  }
+  // Filter pill clicks
   document.querySelectorAll(".filter-pill[data-filter]").forEach(function(el){
     el.onclick = function(){
       var key = this.getAttribute("data-filter");
