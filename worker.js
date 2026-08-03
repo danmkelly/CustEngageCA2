@@ -188,6 +188,7 @@ async function enrichProduct(product, offCache) {
 }
 
 function extractOffFields(p) {
+  var n = p.nutriments || {};
   return {
     nutriscore_grade: p.nutriscore_grade || null,
     nova_group: p.nova_group || null,
@@ -199,7 +200,20 @@ function extractOffFields(p) {
     nutrient_levels: p.nutrient_levels || {},
     origins: p.origins || "",
     brands: p.brands || "",
-    categories_off: (p.categories_tags || []).filter(function(t) { return t.indexOf("en:") === 0; }).slice(0, 3),
+    categories_off: (p.categories_tags || []).filter(function(t) { return t.indexOf("en:") === 0; }),
+    pnns_groups_1: p.pnns_groups_1 || null,
+    pnns_groups_2: p.pnns_groups_2 || null,
+    // Nutritional values per 100g for conversational queries
+    nutriments: {
+      energy_kcal: n["energy-kcal_100g"] || n["energy-kcal"] || null,
+      proteins: n["proteins_100g"] || n["proteins"] || null,
+      carbohydrates: n["carbohydrates_100g"] || n["carbohydrates"] || null,
+      fat: n["fat_100g"] || n["fat"] || null,
+      saturated_fat: n["saturated-fat_100g"] || n["saturated-fat"] || null,
+      fiber: n["fiber_100g"] || n["fiber"] || null,
+      sugars: n["sugars_100g"] || n["sugars"] || null,
+      salt: n["salt_100g"] || n["salt"] || null,
+    },
   };
 }
 

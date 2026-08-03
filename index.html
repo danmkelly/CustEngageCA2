@@ -871,15 +871,16 @@ function checkout(){
 }
 
 // === LLM ===
-var EMBER_VOICE = "You are Ember, a friendly, knowledgeable AI shop assistant at Emerald Pantry, an online Irish grocery and specialty food retailer. You live for good food: you know ingredients, pairings, cooking tips, and the stories behind artisan products. You're warm, curious, genuinely excited to chat about food and cooking. Irish flavour: use 'grand','deadly','class','sound','craic' like seasoning. Keep it 2-5 sentences unless sharing a recipe or story. No em dashes. No markdown. Just talk like a person. Do NOT correct prices - the prices in the product data are the correct store prices, even if they seem unusual.\n\nFILTERING RULES - When the customer asks you to filter or recommend products:\n- 'special offer' / 'on offer' / 'deals': ONLY show products where the offer field is NOT empty. If none, say so honestly.\n- 'in stock' / 'available now': ONLY show products with Availability='In stock'. Seasonal and Pre-order are NOT in stock. Stock_this_week=0 means effectively out of stock.\n- 'gluten free': ONLY show products whose allergens do NOT include gluten. Check the allergens field carefully. If a product lists gluten/wheat in allergens, exclude it.\n- 'dairy free' / 'lactose free': Exclude products with dairy/milk in allergens or from the dairy category.\n- 'vegan': ONLY show products where ingredients_analysis includes 'en:vegan'.\n- 'vegetarian': Show products with 'en:vegetarian' or 'en:vegan' in ingredients_analysis.\n- 'organic': Show products with 'en:organic' in labels_tags.\n- 'high salt' / 'highest salt': Sort products by salt content (from nutrient_levels.salt or nutriments if available).\n- 'high sugar' / 'low sugar': Use nutrient_levels.sugars to sort or filter.\n- 'healthy' / 'good for you': Consider Nutri-Score (A is best, E is worst) and NOVA group (1 is least processed, 4 is most).\n- If multiple products match a filter, list them all briefly with prices.\n- If NO products match a filter, say so plainly and suggest the closest alternatives.\n- When sorting by any nutritional field, explain your ranking.\n- The Google Sheet data (price, stock, availability, offer) is LIVE. The OpenFoodFacts data (allergens, Nutri-Score, NOVA, nutrient levels, dietary tags) enriches each product. Use both together.";
+var EMBER_VOICE = "You are Ember, a friendly, knowledgeable AI shop assistant at Emerald Pantry, an online Irish grocery and specialty food retailer. You are a food enthusiast who knows every product in the shop. You suggest meals, pairings, and discoveries like a great shop assistant would. Irish flavour: use 'grand','deadly','class','sound','craic' as seasoning. Keep responses 2-5 sentences unless listing products or sharing ideas. No em dashes. No markdown. Do NOT correct prices from the catalogue data.\n\nYOUR CAPABILITIES - you have rich data on every product:\n- Sheet data: name, category, price, unit size, availability, stock level, special offers, product descriptions.\n- OFF data: allergens, Nutri-Score (A-E), NOVA processing group (1-4), Eco-Score, ingredient analysis tags (vegan, vegetarian, palm-oil-free etc.), nutrient levels per 100g (energy, protein, carbs, fat, saturated fat, fiber, sugars, salt), food categories hierarchy, organic labels, origin country.\n\nHOW TO ANSWER - use the full richness of this data:\n- 'breakfast ideas': Look at bakery, dairy, drinks, store-cupboard. Bread + butter + jam + tea = a spread. Porridge + honey. Scones + tea. Cold brew coffee. Be creative with combinations.\n- 'quick to cook/prepare': Consider ready-to-eat items (biscuits, crisps, cheese, cold brew), things that just need heating (ragu sauce, noodles, rashers), or no-cook items (butter, jam, chutney, almonds). Reference the description for preparation hints.\n- 'high protein': Check nutriments.proteins. Sort by protein content. Cheese, eggs, almonds, beef ragu, peanut noodles typically rank high. Mention the protein per 100g.\n- 'healthy' / 'good for you': Prioritise Nutri-Score A-B, NOVA 1-2, high fiber, lower sugar/saturated fat. Suggest combinations.\n- 'dinner ideas': Ragu + sourdough baguette. Noodle kit + cold brew. Cheese + chutney + crackers. Rashers + eggs + bread. Suggest pairings across categories.\n- 'snacks': Everything in the snacks category plus biscuits, scones, almonds, crisps. Also suggest drink pairings.\n- 'gift' / 'hamper': Premium items, things with interesting origin stories, visually appealing combinations. Whiskey marmalade, craft gin, single origin coffee, farmhouse cheddar, handmade shortbread.\n- 'Irish' / 'local': Highlight Irish origin products, West Cork, bog myrtle, buttermilk scones, soda bread.\n- 'baking': Butter, buttermilk, eggs, flour (if we had it), jam, scones. Suggest what someone could bake with our products.\n- 'pairings': Cheese + chutney + crackers. Tea + biscuits + shortbread. Coffee + dark chocolate digestives. Ginger beer + Thai noodles. Gin + elderflower cordial. Be creative.\n- 'low sugar' / 'low fat' / 'low salt': Filter by nutrient levels. Mention the product and why it qualifies.\n- 'special diet' (vegan, vegetarian, organic, gluten-free, dairy-free): Apply the explicit filtering rules below.\n- 'seasonal': Elderflower cordial and spiced apple chutney are marked Seasonal. Describe them with seasonal enthusiasm.\n\nFILTERING RULES:\n- 'special offer' / 'deals': ONLY products with a non-empty special_offer field.\n- 'in stock': ONLY products with Availability='In stock' AND stock_this_week > 0. Seasonal and Pre-order are NOT in stock.\n- Dietary filters (gluten-free, dairy-free, vegan, vegetarian, organic): Apply the specific rules previously given. Check allergens carefully for gluten/wheat/dairy/milk.\n- When sorting by any nutritional value, explain your ranking and mention the specific numbers.\n- If no products match, say so honestly and suggest the closest alternatives.\n- Always include price and unit size when naming products.";
 
-var RECOVERY_VOICE = " You are replying to input that IS NOT about food, groceries, shopping, or cooking. Your job is to be friendly and conversational for one turn, then gracefully guide the conversation back to what Emerald Pantry can help with: groceries, specialty foods, recipes, cooking advice, and food discoveries. Acknowledge the off-topic briefly (one sentence) then pivot back with a food-related suggestion or question. Do not be robotic about it - be natural.";
+var RECOVERY_VOICE = " You are replying to input that IS NOT about food, groceries, shopping, or cooking. Your job is to be friendly and conversational for one turn, then gracefully guide the conversation back to what Emerald Pantry can help with. Acknowledge briefly (one sentence) then pivot with a food-related suggestion or question. Be natural, not robotic.";
 
 function buildCatalogueContext(prods){
   if(!prods||!prods.length) return "";
-  var ctx = "\n\n[EMERALD PANTRY LIVE CATALOGUE - Each product has Google Sheet data (price,stock,availability,offer) + OpenFoodFacts enrichment (allergens,Nutri-Score,NOVA,nutrient_levels,dietary_tags). Use ALL fields when filtering or recommending.]:\n";
+  var ctx = "\n\n[EMERALD PANTRY LIVE CATALOGUE - "+prods.length+" products. Use Sheet fields (price,stock,availability,offer,description) + OFF enrichment (allergens,NutriScore,NOVA,EcoScore,categories,labels,nutriments,origins) together when answering.]:\n";
   prods.forEach(function(p){
-    ctx += "- " + p.sku + ": " + p.product_name + " | cat:" + p.category + " | EUR" + p.price_eur + "/" + p.unit + " | avail:" + p.availability + " | stock:" + p.stock_this_week;
+    ctx += "- " + p.sku + " | " + p.product_name + " | cat:" + p.category + " | EUR" + p.price_eur + "/" + p.unit + " | avail:" + p.availability + " | stock:" + p.stock_this_week;
+    if(p.description) ctx += " | desc:" + p.description.slice(0,100);
     if(p.special_offer) ctx += " | OFFER:" + p.special_offer;
     if(p.allergens) ctx += " | allergens:" + p.allergens;
     if(p.nutriscore_grade) ctx += " | NutriScore:" + p.nutriscore_grade;
@@ -887,15 +888,24 @@ function buildCatalogueContext(prods){
     if(p.ecoscore_grade && p.ecoscore_grade!=="unknown") ctx += " | EcoScore:" + p.ecoscore_grade;
     if(p.ingredients_analysis_tags && p.ingredients_analysis_tags.length) ctx += " | tags:" + p.ingredients_analysis_tags.join(",");
     if(p.labels_tags && p.labels_tags.length) ctx += " | labels:" + p.labels_tags.join(",");
-    if(p.nutrient_levels){
-      var nl = [];
-      if(p.nutrient_levels.fat) nl.push("fat:"+p.nutrient_levels.fat);
-      if(p.nutrient_levels.salt) nl.push("salt:"+p.nutrient_levels.salt);
-      if(p.nutrient_levels.sugars) nl.push("sugars:"+p.nutrient_levels.sugars);
-      if(p.nutrient_levels["saturated-fat"]) nl.push("sat-fat:"+p.nutrient_levels["saturated-fat"]);
-      if(nl.length) ctx += " | " + nl.join(",");
-    }
     if(p.origins) ctx += " | origin:" + p.origins;
+    if(p.pnns_groups_1) ctx += " | foodGroup:" + p.pnns_groups_1 + (p.pnns_groups_2?"/"+p.pnns_groups_2:"");
+    // Nutritional values
+    if(p.nutriments){
+      var n = p.nutriments;
+      var nParts = [];
+      if(n.energy_kcal != null) nParts.push("kcal:"+Math.round(n.energy_kcal));
+      if(n.proteins != null) nParts.push("protein:"+Math.round(n.proteins*10)/10+"g");
+      if(n.fiber != null) nParts.push("fiber:"+Math.round(n.fiber*10)/10+"g");
+      if(n.sugars != null) nParts.push("sugars:"+Math.round(n.sugars*10)/10+"g");
+      if(n.salt != null) nParts.push("salt:"+Math.round(n.salt*10)/10+"g");
+      if(n.fat != null) nParts.push("fat:"+Math.round(n.fat*10)/10+"g");
+      if(n.saturated_fat != null) nParts.push("satFat:"+Math.round(n.saturated_fat*10)/10+"g");
+      if(n.carbohydrates != null) nParts.push("carbs:"+Math.round(n.carbohydrates*10)/10+"g");
+      if(nParts.length) ctx += " | per100g: " + nParts.join(" ");
+    }
+    // OFF categories for food type classification
+    if(p.categories_off && p.categories_off.length) ctx += " | OFFcats:" + p.categories_off.map(function(c){return c.replace("en:","")}).join(">");
     ctx += "\n";
   });
   return ctx;
@@ -1029,20 +1039,23 @@ async function send(){
 
 function detectPreFilter(txt){
   var t = txt.toLowerCase();
-  // Stock/availability filters
   if(/\b(special offer|on offer|on special|deals?|discount|bargain)\b/i.test(t)) return {all:true, filter:"offer"};
   if(/\b(in stock|available now|available today|what('s| is) available)\b/i.test(t)) return {all:true, filter:"inStock"};
-  // Dietary filters
   if(/\bgluten[ -]free\b/i.test(t)) return {all:true, filter:"glutenFree"};
   if(/\bdairy[ -]free|lactose[ -]free\b/i.test(t)) return {all:true, filter:"dairyFree"};
   if(/\bvegan\b/i.test(t)) return {all:true, filter:"vegan"};
   if(/\bvegetarian\b/i.test(t)) return {all:true, filter:"vegetarian"};
   if(/\borganic\b/i.test(t)) return {all:true, filter:"organic"};
-  // Nutritional sorting
+  if(/\bpalm[- ]?oil[ -]free\b/i.test(t)) return {all:true, filter:"palmOilFree"};
+  if(/\b(highest|most|high) (in )?protein\b/i.test(t)) return {all:true, filter:"highProtein"};
+  if(/\blow(est)? (in )?protein\b/i.test(t)) return {all:true, filter:"lowProtein"};
+  if(/\b(highest|most|high) (in )?fiber|fibre\b/i.test(t)) return {all:true, filter:"highFiber"};
   if(/\b(highest|most|high) salt\b/i.test(t)) return {all:true, filter:"highSalt"};
   if(/\b(lowest|least|low) salt\b/i.test(t)) return {all:true, filter:"lowSalt"};
   if(/\b(highest|most) sugar\b/i.test(t)) return {all:true, filter:"highSugar"};
   if(/\b(lowest|least|low) sugar\b/i.test(t)) return {all:true, filter:"lowSugar"};
+  if(/\blow(est)? (in )?calorie|low(est)? energy\b/i.test(t)) return {all:true, filter:"lowCalorie"};
+  if(/\b(highest|most) calorie|highest energy\b/i.test(t)) return {all:true, filter:"highCalorie"};
   return null;
 }
 
@@ -1076,29 +1089,37 @@ function applyPreFilter(prods, preFilter){
     result = result.filter(function(p){
       return p.labels_tags && p.labels_tags.indexOf("en:organic") > -1;
     });
+  } else if(f === "palmOilFree"){
+    result = result.filter(function(p){
+      return p.ingredients_analysis_tags && p.ingredients_analysis_tags.indexOf("en:palm-oil-free") > -1;
+    });
+  } else if(f === "highProtein"){
+    result.sort(function(a,b){ return nutrimentVal(b,"proteins") - nutrimentVal(a,"proteins"); });
+  } else if(f === "lowProtein"){
+    result.sort(function(a,b){ return nutrimentVal(a,"proteins") - nutrimentVal(b,"proteins"); });
+  } else if(f === "highFiber"){
+    result.sort(function(a,b){ return nutrimentVal(b,"fiber") - nutrimentVal(a,"fiber"); });
   } else if(f === "highSalt"){
-    result.sort(function(a,b){
-      var sa = nutrientLevelValue(a,"salt"), sb = nutrientLevelValue(b,"salt");
-      return sb - sa;
-    });
+    result.sort(function(a,b){ var sa = nutrientLevelValue(a,"salt"), sb = nutrientLevelValue(b,"salt"); return sb - sa; });
   } else if(f === "lowSalt"){
-    result.sort(function(a,b){
-      var sa = nutrientLevelValue(a,"salt"), sb = nutrientLevelValue(b,"salt");
-      return sa - sb;
-    });
+    result.sort(function(a,b){ var sa = nutrientLevelValue(a,"salt"), sb = nutrientLevelValue(b,"salt"); return sa - sb; });
   } else if(f === "highSugar"){
-    result.sort(function(a,b){
-      var sa = nutrientLevelValue(a,"sugars"), sb = nutrientLevelValue(b,"sugars");
-      return sb - sa;
-    });
+    result.sort(function(a,b){ var sa = nutrientLevelValue(a,"sugars"), sb = nutrientLevelValue(b,"sugars"); return sb - sa; });
   } else if(f === "lowSugar"){
-    result.sort(function(a,b){
-      var sa = nutrientLevelValue(a,"sugars"), sb = nutrientLevelValue(b,"sugars");
-      return sa - sb;
-    });
+    result.sort(function(a,b){ var sa = nutrientLevelValue(a,"sugars"), sb = nutrientLevelValue(b,"sugars"); return sa - sb; });
+  } else if(f === "lowCalorie"){
+    result.sort(function(a,b){ return nutrimentVal(a,"energy_kcal") - nutrimentVal(b,"energy_kcal"); });
+  } else if(f === "highCalorie"){
+    result.sort(function(a,b){ return nutrimentVal(b,"energy_kcal") - nutrimentVal(a,"energy_kcal"); });
   }
 
   return result;
+}
+
+function nutrimentVal(p, key){
+  if(!p.nutriments) return 0;
+  var v = p.nutriments[key];
+  return (v != null) ? v : 0;
 }
 
 function nutrientLevelValue(p, key){
