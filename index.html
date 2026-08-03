@@ -597,7 +597,7 @@ function addSugg(arr){
   chatMsgs.appendChild(d); sc();
 }
 function showTyping(){var d=document.createElement("div");d.className="msg bot";d.innerHTML='<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';d.id="t";chatMsgs.appendChild(d);sc()}
-function hideTyping(){var e=document.getElementById("t");if(e)e.remove();var all=document.querySelectorAll("#t");all.forEach(function(el){el.remove()})}
+function hideTyping(){var e=document.getElementById("t");if(e)e.remove();var all=document.querySelectorAll("#t,.typing");all.forEach(function(el){el.remove()})}
 function qa(t){hideTyping();chatInput.value=t;send()}
 
 function enrichLinks(html){
@@ -1411,6 +1411,8 @@ document.getElementById("chatSend").addEventListener("click",send);
 chatInput.addEventListener("keydown",function(e){if(e.key==="Enter")send()});
 
 (function(){
+  // Clear any stale typing indicators from cached DOM state
+  hideTyping();
   var b = document.getElementById("emberBadge"), l = document.getElementById("emberLabel");
   if(API_PROXY||LLM_KEY){b.textContent="LLM Enabled";b.classList.add("live");l.textContent="Your pantry guide · AI-powered"}
   else{b.textContent="LLM Not Live";l.textContent="Your pantry guide"}
