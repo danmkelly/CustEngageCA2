@@ -1,1 +1,694 @@
-hello world!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emerald Pantry - Chat with Ember</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A1F12;--surface:#0F2A1A;--surface2:#163322;--border:#1F402A;
+  --text:#E8F0E4;--text-dim:#7A9A82;--accent:#2D8B4E;--accent-glow:rgba(45,139,78,0.3);
+  --accent2:#D4A84B;--accent3:#C49A3C;--bubble-bot:#132718;
+  --bubble-user:#2D8B4E;--radius:10px;--radius-sm:6px;
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden}
+.app{display:grid;grid-template-columns:400px 1fr;height:calc(100vh - 64px)}
+.app-brand{
+  height:64px;display:flex;align-items:center;gap:14px;
+  background:linear-gradient(180deg,#0F2A1A 0%,#0A1F12 100%);border-bottom:3px solid var(--accent);
+  padding:0 24px;position:relative;overflow:hidden;
+}
+.app-brand::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 70%,rgba(45,139,78,0.15) 0%,transparent 60%);pointer-events:none}
+.app-brand::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,168,75,0.4),transparent)}
+.brand-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#1F5C34);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;box-shadow:0 0 16px rgba(45,139,78,0.5)}
+.app-brand-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app-brand-name{font-size:1.1rem;font-weight:900;color:#D4E8D0;letter-spacing:1.5px;text-transform:uppercase;text-shadow:0 2px 12px rgba(0,0,0,0.5)}
+.app-brand-name span{color:var(--accent2);text-shadow:0 0 16px var(--accent-glow)}
+.app-brand-tagline{font-size:0.7rem;color:var(--accent2);letter-spacing:0.5px;font-weight:500}
+.app-brand-sub{font-size:0.58rem;color:rgba(212,168,75,0.6);letter-spacing:0.5px;display:flex;gap:16px}
+.brand-info-link{color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.brand-info-link:hover{color:#3DAF63}
+
+/* CHAT PANEL */
+.chat{display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg);min-height:0}
+.chat-top{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#1F5C34);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.chat-top-info{flex:1;min-width:0}
+.chat-top-info h2{font-size:0.95rem;font-weight:600;color:var(--text)}
+.chat-top-info span{font-size:0.65rem;color:var(--text-dim);display:block}
+.chat-top-right{margin-left:12px;display:flex;flex-direction:column;align-items:stretch;gap:4px;flex-shrink:0}
+.chat-top-badge{font-size:0.65rem;padding:4px 12px;border-radius:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;background:#1F402A;color:var(--text-dim);text-align:center;white-space:nowrap}
+.chat-top-badge.live{background:rgba(45,139,78,0.3);color:var(--accent)}
+.chat-clear-btn{font-size:0.6rem;padding:3px 12px;border-radius:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:transparent;color:var(--text-dim);border:1px solid var(--border);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;text-align:center}
+.chat-clear-btn:hover{color:var(--accent2);border-color:var(--accent2)}
+
+.chat-msgs{flex:1 1 0;min-height:0;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.msg{max-width:85%;line-height:1.55;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.msg-bubble{padding:12px 16px;border-radius:14px;font-size:0.86rem}
+.msg.bot .msg-bubble{background:var(--bubble-bot);color:var(--text);border-bottom-left-radius:4px}
+.msg.user .msg-bubble{background:var(--bubble-user);color:#fff;border-bottom-right-radius:4px}
+.msg-meta{font-size:0.58rem;color:var(--text-dim);margin-top:4px;padding:0 4px}
+.msg.user .msg-meta{text-align:right}
+
+.typing{display:flex;gap:4px;padding:6px 0}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--text-dim);animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+.chat-sugg{display:flex;flex-wrap:wrap;gap:6px}
+.chat-sugg-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:20px;font-size:0.76rem;cursor:pointer;transition:all .15s;font-family:inherit}
+.chat-sugg-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chat-link{color:var(--accent2);cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-weight:600}
+.chat-link:hover{color:#E0B84F}
+
+.chat-input-wrap{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--surface);flex-shrink:0}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:10px 18px;font-size:0.86rem;outline:none;color:var(--text);font-family:inherit;transition:border-color .15s}
+.chat-input::placeholder{color:var(--text-dim)}
+.chat-input:focus{border-color:var(--accent)}
+.chat-send{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.chat-send:hover{background:#24763F;transform:scale(1.05)}
+.chat-mic{width:42px;height:42px;border-radius:50%;background:var(--surface2);color:var(--text-dim);border:1px solid var(--border);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.chat-mic:hover{color:var(--text);border-color:var(--text-dim)}
+.chat-mic.listening{background:var(--accent);color:#fff;border-color:var(--accent);animation:pulse-ring 1.2s ease-in-out infinite}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 0 rgba(45,139,78,0.5)}50%{box-shadow:0 0 0 12px rgba(45,139,78,0)}}
+
+.chat-human-ramp{padding:10px 20px;text-align:center;font-size:0.76rem;color:var(--text-dim);flex-shrink:0;cursor:pointer;transition:all .2s;border-top:1px solid rgba(212,168,75,0.15);background:linear-gradient(180deg,rgba(212,168,75,0.06),rgba(212,168,75,0.02));font-weight:500}
+.chat-human-ramp:hover{color:#D4E8D0;background:rgba(212,168,75,0.12);border-top-color:rgba(212,168,75,0.3)}
+.human-ramp-icon{font-size:1rem;vertical-align:middle;margin-right:4px}
+.human-ramp-cta{color:var(--accent2);text-decoration:underline;font-weight:700}
+
+/* DISCOVERY PANEL */
+.discovery{background:var(--surface);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;position:relative}
+.discovery::-webkit-scrollbar{width:4px}
+.discovery::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.d-empty{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.d-empty-inner{max-width:280px}
+.d-empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.5}
+.d-empty h3{font-size:0.9rem;font-weight:600;margin-bottom:6px;color:var(--text-dim)}
+.d-empty p{font-size:0.76rem;color:var(--text-dim);line-height:1.5}
+
+.panel-section{padding:0}
+.panel-hdr{padding:10px 20px 6px;display:flex;align-items:center;gap:6px;position:sticky;top:0;background:var(--surface);z-index:2}
+.panel-hdr-icon{font-size:0.8rem;opacity:0.7}
+.panel-hdr h4{font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-dim)}
+
+/* Product cards grid */
+.product-section{padding:0 20px 16px;flex:1;min-height:0;overflow-y:auto}
+.product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.product-card{background:var(--surface2);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.product-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.product-card-body{padding:10px 12px}
+.product-card-name{font-size:0.75rem;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:2px}
+.product-card-category{font-size:0.6rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.product-card-desc{font-size:0.64rem;color:var(--text-dim);line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.product-card-footer{display:flex;justify-content:space-between;align-items:center}
+.product-card-price{font-size:0.82rem;font-weight:800;color:var(--accent2)}
+.product-card-unit{font-size:0.58rem;color:var(--text-dim)}
+.product-card-stock{font-size:0.58rem;padding:3px 8px;border-radius:8px;font-weight:600}
+.product-card-stock.in-stock{background:rgba(45,139,78,0.2);color:var(--accent)}
+.product-card-stock.seasonal{background:rgba(212,168,75,0.2);color:var(--accent2)}
+.product-card-stock.pre-order{background:rgba(196,77,77,0.2);color:#C44D4D}
+.product-offer{font-size:0.6rem;color:var(--accent2);font-weight:700;margin-top:4px}
+
+/* Category filter chips */
+.cat-section{padding:0 16px 10px}
+.cat-chips{display:flex;flex-wrap:wrap;gap:4px}
+.cat-chip{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 10px;border-radius:14px;font-size:0.64rem;cursor:pointer;transition:all .15s;font-family:inherit}
+.cat-chip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cat-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Footer */
+.foot{padding:10px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;font-size:0.6rem;color:var(--text-dim);flex-shrink:0}
+.foot a{color:var(--text-dim);text-decoration:none}
+.foot a:hover{color:var(--text)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:90%;max-width:420px;animation:fadeUp .25s ease}
+.modal h3{font-size:0.95rem;margin-bottom:4px;color:var(--text)}
+.modal p{font-size:0.78rem;color:var(--text-dim);line-height:1.6}
+.modal-btns{display:flex;gap:10px;margin-top:18px}
+.modal-btn{padding:10px 20px;border-radius:var(--radius-sm);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.modal-btn-submit{flex:1;background:var(--accent);color:#fff;border:none}
+.modal-btn-submit:hover{background:#24763F}
+.modal-btn-cancel{background:transparent;color:var(--text-dim);border:1px solid var(--border)}
+.modal-btn-cancel:hover{color:var(--text);border-color:var(--text-dim)}
+
+/* Loading spinner */
+.loading-spinner{display:none;padding:40px;text-align:center}
+.loading-spinner.active{display:block}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 12px;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-spinner p{font-size:0.72rem;color:var(--text-dim);margin-top:8px}
+
+@media(max-width:768px){
+  body{overflow:hidden;display:flex;flex-direction:column;height:100vh}
+  .app-brand{height:52px;padding:0 12px;gap:10px;flex-shrink:0}
+  .brand-icon{width:32px;height:32px;font-size:1.1rem}
+  .app-brand-name{font-size:0.9rem;letter-spacing:1px}
+  .app-brand-tagline{display:none}
+  .app-brand-sub{display:none}
+  .app{display:flex;flex-direction:column;flex:1 1 0;min-height:0;height:auto}
+  .chat{flex:1 1 0;min-height:0;border-right:none}
+  .chat-msgs{min-height:0}
+  .discovery{flex:1 1 0;min-height:0;position:relative;z-index:1;overflow-y:hidden;border-top:1px solid var(--border);max-height:none;border-radius:0}
+  .discovery .d-empty,.discovery #dContent{overflow-y:auto;flex:1;min-height:0}
+  .discovery #dContent{display:flex;flex-direction:column}
+  .product-grid{grid-template-columns:1fr 1fr}
+  .product-section{padding:0 14px 12px}
+  .cat-section{padding:0 12px 8px}
+  .foot{padding:8px 14px;font-size:0.55rem;gap:8px;flex-shrink:0}
+  .chat-top{padding:10px 16px}
+  .chat-msgs{padding:16px}
+  .chat-input-wrap{padding:10px 16px}
+}
+@media(max-width:500px){
+  .product-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app-brand">
+  <div class="brand-icon">&#127807;</div>
+  <div class="app-brand-text">
+    <span class="app-brand-name">Emerald <span>Pantry</span></span>
+    <span class="app-brand-tagline">Irish Grocery &amp; Specialty Foods</span>
+    <div class="app-brand-sub"><span>Online Grocery</span><span>AI-Powered Shopping</span><span class="brand-info-link" onclick="showMemInfo()">What I store</span></div>
+  </div>
+</div>
+<div class="app">
+
+  <!-- CHAT PANEL -->
+  <div class="chat">
+    <div class="chat-top">
+      <div class="chat-avatar">&#129367;</div>
+      <div class="chat-top-info">
+        <h2>Ember</h2>
+        <span id="emberLabel">Your pantry guide &middot; AI-powered</span>
+      </div>
+      <div class="chat-top-right">
+        <span class="chat-top-badge" id="emberBadge">basic</span>
+        <button class="chat-clear-btn" id="clearMemBtn" onclick="clearMemory()" style="display:none">Clear memory</button>
+        <button class="chat-clear-btn" id="rememberBtn" onclick="rememberMe()" style="display:none">Remember me</button>
+      </div>
+    </div>
+    <div class="chat-msgs" id="chatMessages"></div>
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="chatInput" placeholder="Ask Ember about our pantry..." autofocus>
+      <button class="chat-mic" id="chatMic" aria-label="Voice input" title="Talk to Ember">&#127908;</button>
+      <button class="chat-send" id="chatSend" aria-label="Send">&#8594;</button>
+    </div>
+    <div class="chat-human-ramp" onclick="document.getElementById('chatInput').value='human';document.getElementById('chatSend').click()">
+      <span class="human-ramp-icon">&#128100;</span> Prefer a real human? <span class="human-ramp-cta">Click here</span> for our contact details
+    </div>
+  </div>
+
+  <!-- DISCOVERY PANEL -->
+  <div class="discovery" id="discovery">
+    <div class="loading-spinner" id="loadingSpinner">
+      <div class="spinner"></div>
+      <p>Searching the pantry...</p>
+    </div>
+    <div class="d-empty" id="dEmpty">
+      <div class="d-empty-inner">
+        <div class="d-empty-icon">&#129367;</div>
+        <h3>Your Pantry Discovery</h3>
+        <p>Chat with Ember about what you're looking for. Products will appear here as they're found.</p>
+      </div>
+    </div>
+    <div id="dContent" style="display:none">
+      <div class="panel-section cat-section">
+        <div class="panel-hdr"><span class="panel-hdr-icon">&#127991;</span><h4>Filter by Category</h4></div>
+        <div class="cat-chips" id="catChips"></div>
+      </div>
+      <div class="panel-section product-section">
+        <div class="panel-hdr"><span class="panel-hdr-icon">&#129367;</span><h4>Products</h4></div>
+        <div class="product-grid" id="productGrid"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="foot">
+  Powered by <a href="https://deepseek.com" target="_blank">DeepSeek</a> &middot; Live catalogue from Google Sheets &middot; <a href="brief.html" style="color:var(--accent2)">Project brief</a>
+</div>
+
+<script>
+// === API Proxy ===
+var API_PROXY = ""; // Set after deploying worker, e.g. "https://emerald-pantry-proxy.your-subdomain.workers.dev"
+var LLM_KEY = "";    // Only used when API_PROXY is empty (local dev)
+var LLM_URL = "";    // Only used when API_PROXY is empty
+var LLM_MODEL = "deepseek-chat";
+
+// === State ===
+var conv = [];
+var products = [];
+var categoryNames = ["store-cupboard","bakery","dairy","drinks","snacks"];
+var categoryLabels = {"store-cupboard":"Store Cupboard","bakery":"Bakery","dairy":"Dairy","drinks":"Drinks","snacks":"Snacks"};
+var emberMemory = {visits:0,lastVisit:"",recentSearches:[],totalSearches:0,userName:"",consent:""};
+var expectingName = false;
+var expectingConsent = false;
+var expectingHumanBot = false;
+var gibberishCount = 0;
+var lastEmberAsked = false;
+var spokeLast = false;
+var activeCategory = "";
+var knownProductNames = [];
+
+// === Memory ===
+function loadMemory(){
+  try{var raw = localStorage.getItem("ember_memory"); if(raw){var p = JSON.parse(raw); emberMemory = p}}catch(e){}
+  emberMemory.consent = emberMemory.consent || "";
+  if(emberMemory.consent !== "no"){
+    emberMemory.visits = (emberMemory.visits||0) + 1;
+    emberMemory.lastVisit = new Date().toISOString();
+    emberMemory.recentSearches = emberMemory.recentSearches || [];
+    emberMemory.totalSearches = emberMemory.totalSearches || 0;
+    emberMemory.userName = emberMemory.userName || "";
+    expectingName = !emberMemory.userName;
+    if(emberMemory.consent === "yes") saveMemory();
+  } else {
+    emberMemory.visits = 0; emberMemory.userName = ""; emberMemory.recentSearches = []; emberMemory.totalSearches = 0;
+    expectingName = false;
+  }
+  updateMemoryButtons();
+}
+function saveMemory(){if(emberMemory.consent==="yes")try{localStorage.setItem("ember_memory",JSON.stringify(emberMemory))}catch(e){}}
+function clearMemory(){
+  localStorage.removeItem("ember_memory");
+  emberMemory = {visits:0,lastVisit:"",recentSearches:[],totalSearches:0,userName:"",consent:""};
+  expectingName = false;
+  addMsg("All clear! I've forgotten everything about you. Fresh start.",'bot');
+  document.getElementById("emberLabel").textContent = "Your pantry guide · AI-powered";
+  updateMemoryButtons();
+}
+function rememberMe(){
+  emberMemory.consent = "yes"; saveMemory(); expectingName = true;
+  document.getElementById("emberLabel").textContent = "Your pantry guide · AI-powered";
+  addMsg("Grand! I'll remember you from now on. What should I call you?",'bot');
+  updateMemoryButtons();
+}
+function updateMemoryButtons(){
+  var clr = document.getElementById("clearMemBtn"), rem = document.getElementById("rememberBtn");
+  if(!clr||!rem) return;
+  if(emberMemory.consent === "yes"){clr.style.display="";rem.style.display="none"}
+  else if(emberMemory.consent === "no"){clr.style.display="none";rem.style.display=""}
+  else{clr.style.display="none";rem.style.display="none"}
+}
+function rememberSearch(s){if(!s)return;emberMemory.recentSearches.unshift(s);if(emberMemory.recentSearches.length>10)emberMemory.recentSearches.pop();emberMemory.totalSearches++;saveMemory()}
+function getMemoryPreamble(){
+  var parts = [];
+  if(emberMemory.userName) parts.push("The user's name is " + emberMemory.userName + ". Address them by name now and then.");
+  if(emberMemory.visits>1) parts.push("This is their " + emberMemory.visits + ordinalSuffix(emberMemory.visits) + " visit.");
+  if(emberMemory.recentSearches&&emberMemory.recentSearches.length) parts.push("They've previously searched for: " + emberMemory.recentSearches.slice(0,5).join(", ") + ".");
+  if(parts.length) return "[Returning customer] " + parts.join(" ") + " Reference shared history naturally. If name known, use it. ";
+  return "";
+}
+function ordinalSuffix(n){var s=["th","st","nd","rd"];var v=n%100;return s[(v-20)%10]||s[v]||s[0]}
+function showMemInfo(){document.getElementById("memInfoModal").classList.add("open")}
+
+// === DOM ===
+var chatMsgs = document.getElementById("chatMessages");
+var chatInput = document.getElementById("chatInput");
+var dEmpty = document.getElementById("dEmpty");
+var dContent = document.getElementById("dContent");
+var productGrid = document.getElementById("productGrid");
+var catChips = document.getElementById("catChips");
+
+// === Helpers ===
+function sc(){chatMsgs.scrollTop = chatMsgs.scrollHeight}
+function addMsg(t,s){
+  var d = document.createElement("div"); d.className = "msg " + s;
+  var now = new Date(); var time = now.getHours().toString().padStart(2,"0") + ":" + now.getMinutes().toString().padStart(2,"0");
+  if(s==="bot") t = enrichLinks(t); else t = t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  d.innerHTML = '<div class="msg-bubble">'+t+'</div><div class="msg-meta">'+(s==="bot"?"Ember":"You")+' &middot; '+time+(s==="bot"?' <button class="msg-speak" onclick="speakMsg(this)" title="Listen" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:transparent;color:var(--text-dim);border:none;cursor:pointer;font-size:0.65rem;align-items:center;justify-content:center;vertical-align:middle;margin-left:2px;transition:all .15s;opacity:0.45" onmouseover="this.style.opacity=1;this.style.color=\'var(--accent2)\'" onmouseout="if(!this.classList.contains(\'speaking\')){this.style.opacity=0.45;this.style.color=\'\'}">&#128266;</button>':'')+'</div>';
+  chatMsgs.appendChild(d); sc();
+  if(spokeLast&&s==="bot"){spokeLast=false;setTimeout(function(){var btn=d.querySelector(".msg-speak");if(btn)speakMsg(btn)},150)}
+}
+function addSugg(arr){
+  var d = document.createElement("div"); d.className = "msg bot";
+  d.innerHTML = '<div class="chat-sugg">'+arr.map(function(x){return'<span class="chat-sugg-btn" onclick="qa(\''+x.replace(/'/g,"\\'")+'\')">'+x.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</span>'}).join("")+'</div>';
+  chatMsgs.appendChild(d); sc();
+}
+function showTyping(){var d=document.createElement("div");d.className="msg bot";d.innerHTML='<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';d.id="t";chatMsgs.appendChild(d);sc()}
+function hideTyping(){var e=document.getElementById("t");if(e)e.remove()}
+function qa(t){chatInput.value=t;send()}
+
+function enrichLinks(html){
+  if(!knownProductNames.length||html.indexOf("chat-link")>-1) return html;
+  var names = knownProductNames.slice().sort(function(a,b){return b.length-a.length});
+  names.forEach(function(n){
+    var rx = new RegExp('(^|\\s|>)('+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?=[\\s,.\!?;:<]|$)','gi');
+    html = html.replace(rx,function(m,p1,p2){return p1+'<span class="chat-link" onclick="qa(\''+p2.replace(/'/g,"\\'")+'\')">'+p2+'</span>'});
+  });
+  return html;
+}
+function updateKnownNames(){
+  knownProductNames = [];
+  products.forEach(function(p){knownProductNames.push(p.product_name)});
+  var seen = {}; knownProductNames = knownProductNames.filter(function(n){var k=n.toLowerCase();if(seen[k])return false;seen[k]=true;return n&&n.length>1});
+  document.querySelectorAll(".msg.bot .msg-bubble").forEach(function(b){b.innerHTML = enrichLinks(b.innerHTML)});
+}
+
+// === Speech ===
+var micBtn = document.getElementById("chatMic");
+var recognition = null;
+if("webkitSpeechRecognition" in window || "SpeechRecognition" in window){
+  var SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = false; recognition.interimResults = true; recognition.lang = "en-IE";
+  recognition.onresult = function(e){
+    var transcript = "";
+    for(var i=e.resultIndex;i<e.results.length;i++) transcript += e.results[i][0].transcript;
+    chatInput.value = transcript;
+    if(e.results[0].isFinal){micBtn.classList.remove("listening");spokeLast=true;send()}
+  };
+  recognition.onerror = function(e){micBtn.classList.remove("listening");if(e.error==="not-allowed")addMsg("Microphone access was denied. Check your browser permissions.",'bot')};
+  recognition.onend = function(){micBtn.classList.remove("listening")};
+}
+if(!recognition) micBtn.style.display = "none";
+micBtn.onclick = function(){
+  if(!recognition) return;
+  if(micBtn.classList.contains("listening")){recognition.stop();micBtn.classList.remove("listening")}
+  else{try{recognition.start();micBtn.classList.add("listening")}catch(ex){micBtn.classList.remove("listening")}}
+};
+
+function speakMsg(btn){
+  if(window.speechSynthesis.speaking){window.speechSynthesis.cancel();document.querySelectorAll(".msg-speak.speaking").forEach(function(b){b.classList.remove("speaking")});return}
+  var bubble = btn.closest(".msg").querySelector(".msg-bubble");
+  var text = (bubble.textContent||bubble.innerText).trim();
+  document.querySelectorAll(".msg-speak.speaking").forEach(function(b){b.classList.remove("speaking")});
+  btn.classList.add("speaking");
+  function doSpeak(t){
+    var u = new SpeechSynthesisUtterance(t); u.lang = "en-IE"; u.rate = 1.0; u.pitch = 1.0;
+    var voices = window.speechSynthesis.getVoices();
+    if(voices.length>0){
+      var ranked = voices.filter(function(v){return v.lang.indexOf("en")===0});
+      var best = null;
+      var femaleNames = ["male","daniel","david","james","michael","thomas","robert","william","john","richard","charles","joseph","christopher","mark","paul","steven","kevin","george","brian","edward","ronald","anthony"];
+      ranked = ranked.filter(function(v){var n=v.name.toLowerCase();return !femaleNames.some(function(f){return n.indexOf(f)>-1})});
+      if(ranked.length===0) ranked = voices.filter(function(v){return v.lang.indexOf("en")===0});
+      ranked.forEach(function(v){var s=3;if(v.lang==="en-IE")s=10;else if(v.lang==="en-GB")s=7;if(!best||s>best._score){v._score=s;best=v}});
+      if(!best) best = voices[0];
+      u.voice = best;
+    }
+    u.onend = function(){btn.classList.remove("speaking")};
+    u.onerror = function(){btn.classList.remove("speaking")};
+    window.speechSynthesis.speak(u);
+  }
+  if(window.speechSynthesis.getVoices().length===0){
+    var voiceTimeout = setTimeout(function(){btn.classList.remove("speaking")},4000);
+    window.speechSynthesis.onvoiceschanged = function(){window.speechSynthesis.onvoiceschanged=null;clearTimeout(voiceTimeout);doSpeak(text)};
+  } else {doSpeak(text)}
+}
+
+// === Catalogue API ===
+async function fetchCatalogue(q,cat){
+  var u = API_PROXY ? API_PROXY+"/api/catalogue" : CATALOGUE_URL;
+  var params = [];
+  if(q) params.push("q="+encodeURIComponent(q));
+  if(cat) params.push("category="+encodeURIComponent(cat));
+  // Cache-busting: ensures fresh data from Google Sheets on every request
+  params.push("_t=" + Date.now());
+  u += "?" + params.join("&");
+
+  if(!API_PROXY){
+    var r = await fetch(u, {cache: "no-store"});
+    if(!r.ok) return [];
+    var csv = await r.text();
+    return parseCSVClient(csv);
+  }
+  var r = await fetch(u, {cache: "no-store"});
+  if(!r.ok) return [];
+  var d = await r.json();
+  return d.products || [];
+}
+
+var CATALOGUE_URL = "https://docs.google.com/spreadsheets/d/1fY7974AdL4rrO2gnCxcCBUFWWSkVhOi9euJI7lNjo2Q/export?format=csv";
+
+function parseCSVClient(csv){
+  var lines = csv.trim().split("\n");
+  if(lines.length<2) return [];
+  var hdrs = parseCSVLineClient(lines[0]);
+  var prods = [];
+  for(var i=1;i<lines.length;i++){
+    var vals = parseCSVLineClient(lines[i]);
+    var p = {};
+    for(var j=0;j<hdrs.length;j++){
+      var k = hdrs[j], v = vals[j]||"";
+      if(k==="price_eur") v = parseFloat(v)||0;
+      if(k==="stock_this_week") v = parseInt(v)||0;
+      p[k] = v;
+    }
+    prods.push(p);
+  }
+  return prods;
+}
+function parseCSVLineClient(line){
+  var result=[],current="",inQ=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(inQ){if(ch==='"'){if(i+1<line.length&&line[i+1]==='"'){current+='"';i++}else{inQ=false}}else{current+=ch}}
+    else{if(ch==='"'){inQ=true}else if(ch===','){result.push(current.trim());current=""}else{current+=ch}}
+  }
+  result.push(current.trim());
+  return result;
+}
+
+// === Render products ===
+function renderProducts(prods,searchTerm){
+  products = prods;
+  document.getElementById("loadingSpinner").classList.remove("active");
+  if(!prods.length){
+    dEmpty.style.display = "flex"; dContent.style.display = "none";
+    return;
+  }
+  dEmpty.style.display = "none"; dContent.style.display = "block";
+
+  prodByCat(prods);
+  var filtered = activeCategory ? prods.filter(function(p){return p.category===activeCategory}) : prods;
+
+  productGrid.innerHTML = filtered.map(function(p){
+    var stockClass = p.availability.toLowerCase().replace(/\s+/g,'-');
+    if(stockClass.indexOf("in-stock")>-1) stockClass = "in-stock";
+    var price = p.price_eur;
+    var priceStr = price >= 1000 ? "&#128064; &euro;"+price.toLocaleString() : "&euro;"+price.toFixed(2);
+    return '<div class="product-card" onclick="qa(\''+p.product_name.replace(/'/g,"\\'")+'\')"><div class="product-card-body"><div class="product-card-category">'+escapeHtml(p.category)+'</div><div class="product-card-name">'+escapeHtml(p.product_name)+'</div><div class="product-card-desc">'+escapeHtml(p.description||"")+'</div><div class="product-card-footer"><span class="product-card-price">'+priceStr+'</span><span class="product-card-unit">'+escapeHtml(p.unit)+'</span></div><span class="product-card-stock '+stockClass+'">'+escapeHtml(p.availability)+'</span>'+ (p.special_offer ? '<div class="product-offer">'+escapeHtml(p.special_offer)+'</div>' : '') +'</div></div>';
+  }).join("");
+
+  updateKnownNames();
+}
+
+function prodByCat(prods){
+  var cats = {};
+  prods.forEach(function(p){cats[p.category] = (cats[p.category]||0)+1});
+  catChips.innerHTML = '<span class="cat-chip'+(activeCategory===""?" active":"")+'" onclick="filterCat(\'\')">All ('+prods.length+')</span>' +
+    Object.keys(cats).sort().map(function(c){
+      return '<span class="cat-chip'+(activeCategory===c?" active":"")+'" onclick="filterCat(\''+c+'\')">'+(categoryLabels[c]||c)+' ('+cats[c]+')</span>';
+    }).join("");
+}
+
+function filterCat(cat){
+  activeCategory = cat;
+  renderProducts(products);
+}
+
+function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+// === LLM ===
+var EMBER_VOICE = "You are Ember, a friendly, knowledgeable AI shop assistant at Emerald Pantry, an online Irish grocery and specialty food retailer. You live for good food: you know ingredients, pairings, cooking tips, and the stories behind artisan products. You're warm, curious, genuinely excited to chat about food and cooking. Irish flavour: use 'grand','deadly','class','sound','craic' like seasoning. Keep it 2-5 sentences unless sharing a recipe or story. No em dashes. No markdown. Just talk like a person. IMPORTANT: When discussing products, always mention their actual price and availability if given in context. Do NOT correct prices - the prices in the product data are the correct store prices, even if they seem unusual.";
+
+var RECOVERY_VOICE = " You are replying to input that IS NOT about food, groceries, shopping, or cooking. Your job is to be friendly and conversational for one turn, then gracefully guide the conversation back to what Emerald Pantry can help with: groceries, specialty foods, recipes, cooking advice, and food discoveries. Acknowledge the off-topic briefly (one sentence) then pivot back with a food-related suggestion or question. Do not be robotic about it - be natural.";
+
+function buildCatalogueContext(prods){
+  if(!prods||!prods.length) return "";
+  var ctx = "\n\n[EMERALD PANTRY CATALOGUE DATA - Use these real products in your responses. Mention prices, availability, and special offers when relevant. Do NOT fabricate products not in this list. Do NOT correct prices - the listed prices are correct.]:\n";
+  prods.slice(0,15).forEach(function(p){
+    ctx += "- " + p.product_name + " (" + p.category + "): EUR" + p.price_eur + " per " + p.unit + ". " + (p.description||"") + " Availability: " + p.availability + (p.special_offer?". Offer: "+p.special_offer:"") + "\n";
+  });
+  return ctx;
+}
+
+function isOffTopic(txt){
+  var t = txt.toLowerCase();
+  var foodWords = /\b(food|eat|cook|recipe|ingredient|dinner|lunch|breakfast|snack|bake|bread|cheese|butter|milk|egg|tea|coffee|drink|beer|wine|jam|chutney|oil|salt|sauce|pasta|rice|oats|porridge|chocolate|biscuit|crisp|almond|scone|baguette|sourdough|rasher|gin|cordial|marmalade|vinegar|shop|buy|pantry|grocery|order|price|cost|stock|available|deliver|vegetarian|vegan|organic|free.range|gluten|dairy|help|what|recommend|suggest|show me|tell me|find|looking for|search|hello|hi|hey|thanks|bye)\b/i;
+  var offTopic = /\b(sport|football|soccer|rugby|politics|election|weather|movie|film|netflix|music|song|game|video.game|news|war|stock.market|bitcoin|crypto|celebrity|gossip|tiktok|instagram|facebook|xbox|playstation|nintendo)\b/i;
+  return offTopic.test(t) && !foodWords.test(t);
+}
+
+async function chatLLM(msg,prods,forceOffTopic){
+  if(!LLM_KEY&&!API_PROXY) return null;
+  var msgs = [{role:"system",content:getMemoryPreamble()+EMBER_VOICE+(forceOffTopic?RECOVERY_VOICE:"")+buildCatalogueContext(prods)}];
+  for(var i=0;i<conv.length;i++) msgs.push(conv[i]);
+  msgs.push({role:"user",content:msg});
+  try{
+    var llmUrl = API_PROXY ? API_PROXY+"/api/llm" : (LLM_URL||"https://api.deepseek.com/v1/chat/completions");
+    var fetchOpts = {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:LLM_MODEL||"deepseek-chat",messages:msgs,temperature:0.9,max_tokens:500})};
+    if(!API_PROXY) fetchOpts.headers.Authorization = "Bearer "+LLM_KEY;
+    var r = await fetch(llmUrl,fetchOpts);
+    if(!r.ok){var et=await r.text();if(et.indexOf("Insufficient")>-1||et.indexOf("balance")>-1||r.status===402){var b=document.getElementById("emberBadge");b.textContent="no credits";b.style.background="#C0392B";b.classList.remove("live")}return null}
+    var d = await r.json(); var reply = d.choices[0].message.content.trim();
+    conv.push({role:"user",content:msg}); conv.push({role:"assistant",content:reply});
+    if(conv.length>20) conv = conv.slice(-20);
+    return reply;
+  }catch(e){return null}
+}
+
+function emberAskedQ(reply){lastEmberAsked=/[?]/.test(reply)||/\b(what|which|when|where|who|how|do you|have you|are you|would you|fancy|prefer|into|like)\b/i.test(reply)}
+
+// === Main send ===
+async function send(){
+  var txt = chatInput.value.trim(); if(!txt) return;
+  addMsg(txt,"user"); chatInput.value = ""; showTyping();
+
+  if(txt==="CLS"){hideTyping();clearMemory();return}
+
+  // Human/Bot gate
+  if(expectingHumanBot){
+    var hb = txt.toLowerCase().trim();
+    if(hb==="human"){expectingHumanBot=false;hideTyping();showHumanContact();return}
+    if(/^(bot|ember|chatbot)$/i.test(hb)){expectingHumanBot=false;expectingConsent=true;hideTyping();addMsg("Sound! Before we dive in, would you like me to remember your name and what we chat about for next time? Everything stays on your device, never sent anywhere. Just say <strong>yes</strong> or <strong>no</strong>.",'bot');addSugg(["Yes","No"]);return}
+    hideTyping();addMsg("Just tap <strong>Human</strong> to speak to our team, or <strong>Bot</strong> to chat with me!",'bot');addSugg(["Human","Bot"]);return;
+  }
+
+  // Consent handling
+  if(expectingConsent&&!emberMemory.consent){
+    var t = txt.toLowerCase().trim();
+    if(/^(yes|yeah|yep|sure|ok|okay|grand|sound|go on)$/i.test(t)){emberMemory.consent="yes";expectingConsent=false;saveMemory();expectingName=true;hideTyping();updateMemoryButtons();addMsg("Class! I'll remember you. What should I call you?",'bot');return}
+    if(/^(no|nope|nah|no thanks)$/i.test(t)){emberMemory.consent="no";expectingConsent=false;expectingName=false;saveMemory();hideTyping();updateMemoryButtons();addMsg("No worries, I won't store anything about you. What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks"]);lastEmberAsked=true;return}
+    if(t==="human"){expectingConsent=false;hideTyping();showHumanContact();return}
+    hideTyping();addMsg("Just a simple <strong>yes</strong> or <strong>no</strong> -- would you like me to remember you between visits? Everything stays on your device.",'bot');addSugg(["Yes","No"]);return;
+  }
+
+  // Name capture
+  if(expectingName&&!emberMemory.userName){
+    var name = txt.replace(/^(i'm|i am|my name is|call me|it's|name's|the name's|people call me)\s+/i,"").replace(/[.!?,]$/,"").trim();
+    var nl = name.toLowerCase();
+    if(nl==="human"){expectingName=false;hideTyping();showHumanContact();return}
+    if(/^(bot|ember|chatbot|yes|no|nope|nah)$/i.test(nl)){hideTyping();addMsg("That doesn't sound like a name! What should I call you?",'bot');return}
+    if(name&&name.split(/\s+/).length<=3&&name.length>=2){emberMemory.userName=name;expectingName=false;saveMemory();document.getElementById("emberLabel").textContent="Your pantry guide · knows "+name;hideTyping();addMsg("Lovely to meet you, <strong>"+escapeHtml(name)+"</strong>! What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Dinner ideas"]);lastEmberAsked=true;return}
+  }
+
+  // Gibberish detection
+  var isGib = false;
+  var clean = txt.replace(/[^a-zA-Z]/g,'').toLowerCase();
+  if(txt.length<2) isGib = true;
+  else if(/^[^a-zA-Z0-9\s]{3,}$/.test(txt)) isGib = true;
+  else if(/(.)\1{4,}/.test(txt)) isGib = true;
+  else if(/(asdf|qwer|zxcv|uiop|hjkl|tyui|ghjk|bnm,|vbnm|dfgh|wert|sdfg|xcvb)/i.test(clean)) isGib = true;
+  else if(cCount(clean)>=4&&vCount(clean)===0) isGib = true;
+  if(isGib){hideTyping();gibberishCount++;if(gibberishCount>=4){addMsg("Still not getting it -- let me hand you over to our team. Type <strong>human</strong> for contact details.",'bot');return}addMsg("I didn't quite catch that! Try asking about our products -- like what's in our bakery, what cheeses we carry, or what's on special offer.",'bot');addSugg(["Bakery","Cheese","What's on special offer?","Dinner ideas"]);return}
+  gibberishCount = 0;
+
+  function cCount(s){var m=s.match(/[^aeiou]/g);return m?m.length:0}
+  function vCount(s){var m=s.match(/[aeiou]/g);return m?m.length:0}
+
+  function showHumanContact(){
+    addMsg("Of course! Here's how to reach the real humans at Emerald Pantry:",'bot');
+    addMsg("<strong>Emerald Pantry</strong><br>Dublin, Ireland<br><br><strong>Email:</strong> <a href='mailto:hello@emeraldpantry.ie' style='color:var(--accent2)'>hello@emeraldpantry.ie</a><br><br><strong>Phone:</strong> +353 1 555 1234<br><br><strong>Opening hours:</strong><br>Mon-Sat: 09:00 - 18:00<br>Sun: 11:00 - 16:00<br><br><strong>Web orders:</strong> Open 24/7",'bot');
+  }
+
+  if(txt.toLowerCase()==="human"){hideTyping();showHumanContact();addMsg("We'd love to hear from you! Anything else I can help with in the meantime?",'bot');return}
+
+  // STEP 1: Fetch matching products from catalogue
+  document.getElementById("loadingSpinner").classList.add("active");
+  var searchTerms = extractSearchTerms(txt);
+  var foundProds = [];
+  for(var si=0;si<searchTerms.length;si++){
+    var prods = await fetchCatalogue(searchTerms[si],"");
+    prods.forEach(function(p){if(!foundProds.some(function(fp){return fp.sku===p.sku}))foundProds.push(p)});
+  }
+  document.getElementById("loadingSpinner").classList.remove("active");
+
+  if(foundProds.length>0){
+    renderProducts(foundProds,txt);
+    rememberSearch(txt);
+  }
+
+  // STEP 2: LLM response
+  var offTopic = isOffTopic(txt) && foundProds.length===0;
+  if(LLM_KEY||API_PROXY){
+    var llmReply = await chatLLM(txt,foundProds,offTopic);
+    hideTyping();
+    if(llmReply){addMsg(llmReply,"bot");emberAskedQ(llmReply)}
+    else{addMsg("Hmm, I'm having trouble connecting right now. The product panel might still help -- try browsing our categories, or type <strong>human</strong> to reach our team.",'bot')}
+  } else {hideTyping()}
+
+  if(!foundProds.length&&!(LLM_KEY||API_PROXY)){
+    addMsg("I'm listening! Ask me about our products -- try 'what's in the bakery' or 'show me Irish cheese' or 'any special offers?'",'bot');
+    addSugg(["Bakery","Irish cheese","Special offers","Dinner ideas","Snacks"]);
+  }
+
+  // Offer human fallback
+  if(foundProds.length>0||(LLM_KEY||API_PROXY)){
+    setTimeout(function(){if(!document.querySelector(".msg.bot:last-child .chat-sugg")||!document.querySelector(".msg.bot:last-child .chat-sugg").textContent.match(/human/i))addSugg(["Keep shopping","Human"])},3000);
+  }
+}
+
+function extractSearchTerms(txt){
+  var t = txt.toLowerCase().replace(/[.,!?;:'"()]/g," ").replace(/\s+/g," ").trim();
+  t = t.replace(/^(i am |i'm |we are |we're |i |we )(really |kinda |sort of |pretty |absolutely |so |super )?(looking for|searching for|hunting for|after|into |keen on |fancying )/i,"");
+  t = t.replace(/^(what('s| is)|suggest |recommend |find me |show me |tell me about |do you have |have you got |any |got any |i want |i need |i like |i love |i'm looking for |im looking for )/i,"");
+  var terms = [];
+  var words = t.split(/\s+/).filter(function(w){return w.length>1&&!/^(the|and|or|but|for|nor|yet|so|in|on|at|to|by|from|with|about|into|of|also|get|got|has|had|been|was|were|are|its|not|very|much|well|even|still|always|never|long|time|thing|things|stuff|way|lot|lots|bit|kind|sort|what|some|any|all|there|here|now|then|me|give|show|tell|find|help|can|you|could|would|should|will|just|only|please|thanks|thank|make|need|want)$/i.test(w)});
+  if(words.length>=1) terms.push(words.join(" "));
+  if(words.length>=2) terms.push(words[0]);
+  // Extract meaningful 2-3 word phrases
+  for(var i=0;i<=words.length-2;i++){var phrase=words.slice(i,i+2).join(" ");if(phrase.length>4)terms.push(phrase)}
+  return terms.filter(function(t){return t.length>2});
+}
+
+// === Init ===
+document.getElementById("chatSend").addEventListener("click",send);
+chatInput.addEventListener("keydown",function(e){if(e.key==="Enter")send()});
+
+(function(){
+  var b = document.getElementById("emberBadge"), l = document.getElementById("emberLabel");
+  if(API_PROXY||LLM_KEY){b.textContent="LLM Enabled";b.classList.add("live");l.textContent="Your pantry guide · AI-powered"}
+  else{b.textContent="LLM Not Live";l.textContent="Your pantry guide"}
+
+  loadMemory();
+  if(emberMemory.userName) l.textContent = "Your pantry guide · knows "+emberMemory.userName;
+
+  // Load initial catalogue in background
+  fetchCatalogue("","").then(function(prods){renderProducts(prods);products=prods});
+
+  if(emberMemory.consent==="yes"&&emberMemory.userName){
+    addMsg("Welcome back, <strong>"+escapeHtml(emberMemory.userName)+"</strong>! Great to see you again.",'bot');
+    setTimeout(function(){addMsg("What can I help you find today? Type <strong>human</strong> any time to reach our team.",'bot')},800);
+    setTimeout(function(){addSugg(emberMemory.recentSearches.length?emberMemory.recentSearches.slice(0,4).concat(["Human"]):["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Human"]);lastEmberAsked=true},1600);
+  }else if(emberMemory.consent==="no"){
+    addMsg("Welcome back! I'm <strong>Ember</strong>, an AI chatbot. You asked me not to store anything, so this is a fresh start.",'bot');
+    setTimeout(function(){addMsg("What are you looking for today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Human"]);lastEmberAsked=true},1000);
+  }else{
+    addMsg("Hey! I'm <strong>Ember</strong>, an AI chatbot powered by DeepSeek. I'm your guide here at Emerald Pantry. I can help you find products, suggest ingredients, share cooking ideas, and explore our catalogue.",'bot');
+    setTimeout(function(){expectingHumanBot=true;addMsg("Are you here to chat with me or would you prefer a real human?",'bot');addSugg(["Bot","Human"])},1200);
+  }
+})();
+</script>
+
+<div class="modal-overlay" id="memInfoModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>&#128190; What Ember stores</h3>
+    <p>Ember remembers a few things to make your visits better -- <strong>all stored on your device</strong>, never sent to a server:</p>
+    <ul style="font-size:0.73rem;color:var(--text-dim);line-height:1.8;padding-left:18px;margin:8px 0 16px">
+      <li>Your name (if you tell Ember)</li>
+      <li>Products and searches you've explored</li>
+      <li>How many times you've visited</li>
+      <li>Your last visit date</li>
+    </ul>
+    <p>To remove everything, click <strong style="color:var(--accent)">Clear memory</strong> beside Ember's status badge.</p>
+    <div class="modal-btns"><button class="modal-btn modal-btn-submit" onclick="document.getElementById('memInfoModal').classList.remove('open')">Got it</button></div>
+  </div>
+</div>
+</body>
+</html>
