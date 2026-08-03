@@ -367,6 +367,7 @@ var emberMemory = {visits:0,lastVisit:"",recentSearches:[],totalSearches:0,userN
 var expectingName = false;
 var expectingConsent = false;
 var expectingHumanBot = false;
+var onboardingStep = 0; // 0=pending, 1=bot/human choice, 2=consent, 3=name, 4=done
 var gibberishCount = 0;
 var lastEmberAsked = false;
 var spokeLast = false;
@@ -399,6 +400,7 @@ function clearMemory(){
   expectingName = false;
   expectingConsent = false;
   expectingHumanBot = true;
+  onboardingStep = 1;
   loadedCatalogue = false;
   basket = {}; updateBasketIndicator();
   addMsg("All clear! I've forgotten everything about you. Fresh start.",'bot');
@@ -412,6 +414,7 @@ function clearMemory(){
 }
 function rememberMe(){
   emberMemory.consent = "yes"; saveMemory(); expectingName = true; expectingConsent = false; expectingHumanBot = false;
+  onboardingStep = 3;
   document.getElementById("emberLabel").textContent = "Your pantry guide · AI-powered";
   updateMemoryButtons();
   updateOnboardingLock();
@@ -454,24 +457,14 @@ function updateOnboardingLock(){
 var onboardingStep = null;
 function renderOnboardingLock(){
   var disc = document.getElementById("discovery");
-  // Build step indicators
-  var steps = [];
-  // Step 1: Bot/Human choice
-  var step1Done = !expectingHumanBot && (expectingConsent || expectingName || emberMemory.consent === "no" || (emberMemory.consent === "yes" && emberMemory.userName));
-  var step1Active = expectingHumanBot;
-  steps.push({label:"Choose Bot or Human",done:step1Done,active:step1Active});
-  // Step 2: Consent
-  var step2Done = !expectingConsent && (expectingName || emberMemory.consent === "no" || (emberMemory.consent === "yes" && emberMemory.userName));
-  var step2Active = expectingConsent;
-  steps.push({label:"Choose to be remembered",done:step2Done,active:step2Active});
-  // Step 3: Name
-  var step3Done = !expectingName && emberMemory.consent !== "" && (emberMemory.consent === "no" || emberMemory.userName);
-  var step3Active = expectingName;
-  if(emberMemory.consent !== "no") steps.push({label:"Tell Ember your name",done:step3Done,active:step3Active});
+  var allSteps = [{label:"Choose Bot or Human"},{label:"Choose to be remembered"},{label:"Tell Ember your name"}];
+  var activeIdx = onboardingStep - 1;
 
-  var stepsHtml = steps.map(function(s){
-    var cls = s.active ? "active" : (s.done ? "done" : "");
-    var check = s.done ? ' <span class="step-check">&#10003;</span>' : '';
+  var stepsHtml = allSteps.map(function(s,i){
+    var cls = "";
+    if(i < activeIdx) cls = "done";
+    else if(i === activeIdx) cls = "active";
+    var check = i < activeIdx ? ' <span class="step-check">&#10003;</span>' : '';
     return '<div class="discovery-locked-step '+cls+'"><span class="step-dot"></span>'+s.label+check+'</div>';
   }).join("");
 
@@ -914,17 +907,17 @@ async function send(){
   // Human/Bot gate
   if(expectingHumanBot){
     var hb = txt.toLowerCase().trim();
-    if(hb==="human"){expectingHumanBot=false;hideTyping();showHumanContact();updateOnboardingLock();return}
-    if(/^(bot|ember|chatbot)$/i.test(hb)){expectingHumanBot=false;expectingConsent=true;hideTyping();updateOnboardingLock();addMsg("Sound! Before we dive in, would you like me to remember your name and what we chat about for next time? Everything stays on your device, never sent anywhere. Just say <strong>yes</strong> or <strong>no</strong>.",'bot');addSugg(["Yes","No"]);return}
+    if(hb==="human"){expectingHumanBot=false;onboardingStep=4;hideTyping();showHumanContact();updateOnboardingLock();return}
+    if(/^(bot|ember|chatbot)$/i.test(hb)){expectingHumanBot=false;expectingConsent=true;onboardingStep=2;hideTyping();updateOnboardingLock();addMsg("Sound! Before we dive in, would you like me to remember your name and what we chat about for next time? Everything stays on your device, never sent anywhere. Just say <strong>yes</strong> or <strong>no</strong>.",'bot');addSugg(["Yes","No"]);return}
     hideTyping();addMsg("Just tap <strong>Human</strong> to speak to our team, or <strong>Bot</strong> to chat with me!",'bot');addSugg(["Human","Bot"]);return;
   }
 
   // Consent handling
   if(expectingConsent&&!emberMemory.consent){
     var t = txt.toLowerCase().trim();
-    if(/^(yes|yeah|yep|sure|ok|okay|grand|sound|go on)$/i.test(t)){emberMemory.consent="yes";expectingConsent=false;saveMemory();expectingName=true;hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("Class! I'll remember you. What should I call you?",'bot');return}
-    if(/^(no|nope|nah|no thanks)$/i.test(t)){emberMemory.consent="no";expectingConsent=false;expectingName=false;saveMemory();hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("No worries, I won't store anything about you. What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks"]);lastEmberAsked=true;return}
-    if(t==="human"){expectingConsent=false;hideTyping();updateOnboardingLock();showHumanContact();return}
+    if(/^(yes|yeah|yep|sure|ok|okay|grand|sound|go on)$/i.test(t)){emberMemory.consent="yes";expectingConsent=false;saveMemory();expectingName=true;onboardingStep=3;hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("Class! I'll remember you. What should I call you?",'bot');return}
+    if(/^(no|nope|nah|no thanks)$/i.test(t)){emberMemory.consent="no";expectingConsent=false;expectingName=false;onboardingStep=4;saveMemory();hideTyping();updateMemoryButtons();updateOnboardingLock();addMsg("No worries, I won't store anything about you. What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks"]);lastEmberAsked=true;return}
+    if(t==="human"){expectingConsent=false;onboardingStep=4;hideTyping();updateOnboardingLock();showHumanContact();return}
     hideTyping();addMsg("Just a simple <strong>yes</strong> or <strong>no</strong> -- would you like me to remember you between visits? Everything stays on your device.",'bot');addSugg(["Yes","No"]);return;
   }
 
@@ -932,9 +925,9 @@ async function send(){
   if(expectingName&&!emberMemory.userName){
     var name = txt.replace(/^(i'm|i am|my name is|call me|it's|name's|the name's|people call me)\s+/i,"").replace(/[.!?,]$/,"").trim();
     var nl = name.toLowerCase();
-    if(nl==="human"){expectingName=false;hideTyping();updateOnboardingLock();showHumanContact();return}
+    if(nl==="human"){expectingName=false;onboardingStep=4;hideTyping();updateOnboardingLock();showHumanContact();return}
     if(/^(bot|ember|chatbot|yes|no|nope|nah)$/i.test(nl)){hideTyping();addMsg("That doesn't sound like a name! What should I call you?",'bot');return}
-    if(name&&name.split(/\s+/).length<=3&&name.length>=2){emberMemory.userName=name;expectingName=false;saveMemory();document.getElementById("emberLabel").textContent="Your pantry guide · knows "+name;hideTyping();updateOnboardingLock();addMsg("Lovely to meet you, <strong>"+escapeHtml(name)+"</strong>! What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Dinner ideas"]);lastEmberAsked=true;return}
+    if(name&&name.split(/\s+/).length<=3&&name.length>=2){emberMemory.userName=name;expectingName=false;onboardingStep=4;saveMemory();document.getElementById("emberLabel").textContent="Your pantry guide · knows "+name;hideTyping();updateOnboardingLock();addMsg("Lovely to meet you, <strong>"+escapeHtml(name)+"</strong>! What can I help you find in the pantry today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Dinner ideas"]);lastEmberAsked=true;return}
   }
 
   // Gibberish detection
@@ -1025,6 +1018,7 @@ chatInput.addEventListener("keydown",function(e){if(e.key==="Enter")send()});
     expectingHumanBot = false;
     expectingConsent = false;
     expectingName = false;
+    onboardingStep = 4;
   }
   updateOnboardingLock();
 
@@ -1037,7 +1031,7 @@ chatInput.addEventListener("keydown",function(e){if(e.key==="Enter")send()});
     setTimeout(function(){addMsg("What are you looking for today?",'bot');addSugg(["What's on special offer?","Bakery","Cheese","Irish tea","Snacks","Human"]);lastEmberAsked=true},1000);
   }else{
     addMsg("Hey! I'm <strong>Ember</strong>, an AI chatbot powered by DeepSeek. I'm your guide here at Emerald Pantry. I can help you find products, suggest ingredients, share cooking ideas, and explore our catalogue.",'bot');
-    setTimeout(function(){expectingHumanBot=true;updateOnboardingLock();addMsg("Are you here to chat with me or would you prefer a real human?",'bot');addSugg(["Bot","Human"])},1200);
+    setTimeout(function(){expectingHumanBot=true;onboardingStep=1;updateOnboardingLock();addMsg("Are you here to chat with me or would you prefer a real human?",'bot');addSugg(["Bot","Human"])},1200);
   }
 })();
 </script>
