@@ -556,10 +556,6 @@ function loadProducts(){
     if(productGrid) productGrid.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
   });
 }
-  }).catch(function(e){
-    if(dContent) dContent.innerHTML = '<div class="no-results"><div class="no-results-inner"><div class="no-results-icon">&#9888;</div><h4>Could not load catalogue</h4><p>Check your connection and try refreshing.</p></div></div>';
-  });
-}
 function rememberSearch(s){if(!s)return;emberMemory.recentSearches.unshift(s);if(emberMemory.recentSearches.length>10)emberMemory.recentSearches.pop();emberMemory.totalSearches++;saveMemory()}
 function getMemoryPreamble(){
   var parts = [];
@@ -1194,7 +1190,6 @@ function humanContact(){
 }
 
 async function send(){
-  try {
   var txt = chatInput.value.trim(); if(!txt) return;
   addMsg(txt,"user"); chatInput.value = "";
 
@@ -1291,7 +1286,6 @@ async function send(){
   if(foundProds.length>0||(LLM_KEY||API_PROXY)){
     setTimeout(function(){if(!document.querySelector(".msg.bot:last-child .chat-sugg")||!document.querySelector(".msg.bot:last-child .chat-sugg").textContent.match(/human/i))addSugg(["Keep shopping","Human"])},3000);
   }
-  } catch(e){ hideTyping(); }
 }
 
 function detectPreFilter(txt){
