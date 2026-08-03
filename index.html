@@ -491,6 +491,8 @@ function updateOnboardingLock(){
   input.disabled = lockInput;
   send.disabled = lockInput;
   if(mic) mic.disabled = lockInput;
+  // Clear placeholder for name step
+  if(onboardingStep === 3){ input.placeholder = "Enter your name..."; setTimeout(function(){ input.focus(); }, 100); }
 
   if(ramp){
     if(inOnboarding){ramp.classList.add("onboarding-active");document.getElementById("humanRampText").innerHTML='Skip setup — <span class="human-ramp-cta">talk to a human</span> instead'}
