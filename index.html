@@ -604,6 +604,8 @@ function qa(t){hideTyping();chatInput.value=t;send()}
 
 function enrichLinks(html){
   if(!knownProductNames.length||html.indexOf("chat-link")>-1) return html;
+  // Strip markdown bold/italic so product names can be matched
+  html = html.replace(/\*\*/g, '').replace(/\*([^*]+)\*/g, '$1');
   var names = knownProductNames.slice().sort(function(a,b){return b.length-a.length});
   names.forEach(function(n){
     var rx = new RegExp('(^|\\s|>)('+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?=[\\s,.\!?;:<]|$)','gi');
