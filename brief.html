@@ -119,6 +119,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
   </div>
 
   <div class="section">
+    <div class="section-label">Data Quality</div>
+    <h2>@Orla — Data Steward &amp; Quarantine Design</h2>
+    <p>The solution includes a seventh agent: <strong>@Orla Ní Cheallaigh</strong>, a data quality steward who audits the ingested catalogue. Her findings are documented on the <a href="data.html" style="color:var(--accent2)">Data Quality page</a> — 6 findings spanning price anomalies (HIGH: EUR 2.9M marmalade, EUR 778K gin), stock/availability mismatches (MED), barcode format issues, and OFF match rates (5/30).</p>
+    <p>Orla also proposed a <strong>production quarantine architecture</strong>: a validation agent that sits between the Google Sheet and the customer-facing UX. Dirty data would be intercepted, routed to a human review queue, and only released to the catalogue after a reviewer confirms, corrects, or dismisses each flag — with false-positive persistence so known issues are not re-raised.</p>
+    <p><strong>Why not yet implemented:</strong> for this academic prototype, the lecturer needs to see how the chatbot handles problematic data — incorrect prices, zero-stock contradictions, missing OFF enrichment. Quarantining would hide this behaviour from assessment. The current approach — surface everything with transparency labels, then document what should change in production — is the correct design for this submission.</p>
+  </div>
+
+  <div class="section">
     <div class="section-label">Development Approach</div>
     <h2>Built by a team of AI agent colleagues</h2>
     <p>Developed using the <strong>Five Innovators model</strong>: six specialist AI agents with defined roles, domains, capabilities, and boundaries — plus a dedicated QA agent.</p>
@@ -129,7 +137,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
       <div class="card"><div class="card-icon">&#128101;</div><h4>@Cillian — Manager</h4><p>Orchestrator. Phased assignments, quality gates between handoffs, synthesis. Directed the QA review by @Keelin. Product owner for the overall delivery.</p></div>
       <div class="card"><div class="card-icon">&#128172;</div><h4>@Maeve — Marketer</h4><p>Brand voice. Wrote Ember's system prompt, off-topic refocusing, consent/trust scripts, product storytelling, and 12-framework positioning.</p></div>
       <div class="card"><div class="card-icon">&#128269;</div><h4>@Keelin — QA</h4><p>Quality assurance. 6-category rubric, 31-finding academic review across 12 frameworks. Built automated filter test suite (18 tests). Authored the <a href="qa.html" style="color:var(--accent2)">QA dashboard</a>.</p></div>
-      <div class="card"><div class="card-icon">&#129367;</div><h4>@Ember — The Bot</h4><p>Warm Irish food guide. DeepSeek-powered, grounded in live Sheet + OFF. Suggests products, pairings, meals. Handles off-topic. Guides purchase flow.</p></div>
+      <div class="card"><div class="card-icon">&#128270;</div><h4>@Orla — Data Steward</h4><p>Data quality. Audits catalogue for price anomalies, barcode mismatches, stock contradictions, OFF match rates. Proposed production quarantine architecture. Authored the <a href="data.html" style="color:var(--accent2)">Data Quality report</a>.</p></div>
+      <div class="card" style="background:linear-gradient(135deg,rgba(212,168,75,0.12),rgba(212,168,75,0.04));border-color:rgba(212,168,75,0.3)"><div class="card-icon">&#129367;</div><h4>@Ember — The Bot</h4><p>Warm Irish food guide. DeepSeek-powered, grounded in live Sheet + OFF. Suggests products, pairings, meals. Handles off-topic. Guides purchase flow.</p></div>
     </div>
   </div>
 
