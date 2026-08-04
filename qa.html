@@ -8,53 +8,49 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0A1F12;--surface:#0F2A1A;--surface2:#163322;--border:#1F402A;
-  --text:#E8F0E4;--text-dim:#7A9A82;--accent:#2D8B4E;--accent-glow:rgba(45,139,78,0.3);
-  --accent2:#D4A84B;--accent3:#C49A3C;--font:'Inter',system-ui,-apple-system,sans-serif;
+  --text:#E8F0E4;--text-dim:#7A9A82;--accent:#2D8B4E;--accent2:#D4A84B;--accent3:#C49A3C;
+  --font:'Inter',system-ui,-apple-system,sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7}
-.page{max-width:960px;margin:0 auto;padding:60px 24px 80px}
-
-.hero{text-align:center;padding:60px 0 50px;border-bottom:1px solid var(--border);margin-bottom:50px}
+.page{max-width:1040px;margin:0 auto;padding:60px 24px 80px}
+.hero{text-align:center;padding:60px 0 50px;border-bottom:1px solid var(--border);margin-bottom:40px}
 .hero-icon{font-size:3.5rem;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(45,139,78,0.4))}
 .hero h1{font-size:2.2rem;font-weight:900;color:#D4E8D0;letter-spacing:-0.5px;margin-bottom:10px}
 .hero h1 span{color:var(--accent2)}
 .hero-sub{font-size:0.95rem;color:var(--text-dim);max-width:640px;margin:0 auto;line-height:1.6}
-.hero-keelin{font-size:0.92rem;color:var(--text-dim);max-width:720px;margin:16px auto 6px;line-height:1.7}
-
-.section{margin-bottom:48px}
-.section-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:8px}
-.section h2{font-size:1.5rem;font-weight:800;margin-bottom:16px;color:#D4E8D0}
-.section h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;color:var(--text)}
-.section p{font-size:0.92rem;color:var(--text-dim);margin-bottom:14px;line-height:1.75}
-.section ul{font-size:0.85rem;color:var(--text-dim);line-height:1.8;padding-left:20px;margin-bottom:14px}
-.section ul li{margin-bottom:4px}
-
-.score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-.score-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.score-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px}
+.score-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;cursor:default}
+.score-card.clickable{cursor:pointer;transition:all .15s}
+.score-card.clickable:hover{border-color:var(--accent2);box-shadow:0 0 20px rgba(212,168,75,0.15)}
 .score-card .sc-value{font-size:2rem;font-weight:900;color:var(--accent2);display:block}
 .score-card .sc-grade{font-size:1rem;font-weight:800;color:var(--text);margin-left:6px}
 .score-card .sc-label{font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px}
 .score-card .sc-detail{font-size:0.65rem;color:var(--text-dim);margin-top:6px;line-height:1.4}
-
+.summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:24px}
+.summary-bar p{font-size:0.85rem;color:var(--text-dim);line-height:1.7}
+.summary-bar p strong{color:var(--text)}
+.section h2{font-size:1.5rem;font-weight:800;margin-bottom:16px;color:#D4E8D0}
+.section h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.section p{font-size:0.9rem;color:var(--text-dim);margin-bottom:14px;line-height:1.75}
 .scorecard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
-.sc-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center}
+.sc-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center}
 .sc-item .sc-value{font-size:2.4rem;font-weight:900;color:var(--accent2);display:block}
 .sc-item .sc-label{font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px}
 .sc-item .sc-detail{font-size:0.65rem;color:var(--text-dim);margin-top:6px;line-height:1.4}
-
 .overall-score{text-align:center;padding:20px;background:var(--surface);border-radius:8px;border:1px solid var(--border);margin-top:12px}
 .overall-score .big{font-size:3.5rem;font-weight:900;color:var(--accent3)}
 .overall-score .grade{font-size:1.4rem;font-weight:800;color:var(--text);margin-left:10px}
 .overall-score .note{font-size:0.72rem;color:var(--text-dim);margin-top:4px}
-
-.tabs{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--border);flex-wrap:wrap}
-.tab-btn{padding:12px 28px 8px;font-size:1.5rem;font-weight:800;cursor:pointer;border:2px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;background:transparent;color:var(--text-dim);transition:all .15s;position:relative;top:2px;font-family:inherit}
+.overall-score.func .big{color:var(--accent)}
+/* Tabs */
+.tab-bar{display:flex;flex-wrap:wrap;gap:0;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab-btn{padding:10px 16px 7px;font-size:0.75rem;font-weight:700;cursor:pointer;border:2px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;background:transparent;color:var(--text-dim);transition:all .15s;position:relative;top:2px;font-family:inherit;white-space:nowrap}
 .tab-btn:hover{color:var(--text);background:rgba(255,255,255,0.03)}
-.tab-btn.active{background:var(--surface);color:var(--accent);border-color:var(--border);top:2px}
+.tab-btn.active{background:var(--surface);color:var(--accent2);border-color:var(--border);top:2px}
+.tab-btn.section-tab{font-size:0.9rem;padding:12px 24px 8px;letter-spacing:0.5px;text-transform:uppercase}
 .tab-content{display:none;background:var(--surface);border:2px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:20px}
 .tab-content.active{display:block}
-
-.bug-table-wrap{overflow-x:auto;margin-top:20px}
+.bug-table-wrap{overflow-x:auto;margin-top:12px}
 .bug-table{width:100%;border-collapse:collapse;font-size:0.72rem}
 .bug-table th{background:var(--surface2);color:var(--text-dim);text-align:left;padding:10px 12px;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);white-space:nowrap}
 .bug-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;line-height:1.5}
@@ -66,20 +62,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .sev-high{color:#fff;background:#E67E22;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.6rem;white-space:nowrap;display:inline-block;width:56px;text-align:center;text-transform:uppercase}
 .sev-med{color:#000;background:#F1C40F;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.6rem;white-space:nowrap;display:inline-block;width:56px;text-align:center;text-transform:uppercase}
 .sev-low{color:#fff;background:#7F8C8D;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.6rem;white-space:nowrap;display:inline-block;width:56px;text-align:center;text-transform:uppercase}
-.status-fixed{color:var(--accent);font-weight:600}
 .design-closed{color:#fff;background:#27AE60;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.6rem;white-space:nowrap;display:inline-block;width:56px;text-align:center;text-transform:uppercase}
 .design-open{color:#fff;background:#C0392B;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.6rem;white-space:nowrap;display:inline-block;width:56px;text-align:center;text-transform:uppercase}
 .design-override{color:#fff;background:#E67E22;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.6rem;white-space:nowrap;display:inline-block;width:56px;text-align:center;text-transform:uppercase}
-.sub-tab{padding:8px 14px 6px;font-size:1.1rem;font-weight:400;cursor:pointer;border:1.5px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;background:transparent;color:var(--text-dim);transition:all .15s;font-family:inherit;position:relative;top:1.5px;white-space:nowrap}
-.sub-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);top:1.5px}
-.sub-tab:hover:not(.active){color:var(--text)}
-.sub-content{display:none;border:1.5px solid var(--accent);border-radius:0 6px 6px 6px;padding:12px;margin-bottom:14px}
-.sub-content.active{display:block}
-.sub-wrap{border:1.5px solid var(--accent);border-radius:0 6px 6px 6px;padding:12px;margin-bottom:14px}
-
+.status-fixed{color:var(--accent);font-weight:600}
 .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent2);text-decoration:none;font-size:0.82rem;font-weight:600;margin-top:30px;transition:color .15s}
 .back-link:hover{color:#E0B84F}
-
 @media(max-width:700px){
   .scorecard{grid-template-columns:1fr 1fr}
   .score-cards{grid-template-columns:1fr 1fr}
@@ -98,247 +86,280 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 <div class="hero">
   <div class="hero-icon">&#127807;</div>
   <h1>Emerald Pantry <span>QA Dashboard</span></h1>
-  <p class="hero-sub">Academic design review and functional quality assessment of the Emerald Pantry conversational commerce chatbot, assessed by @Keelin O'Sullivan (QA specialist).</p>
-  <p class="hero-keelin">The solution has been assessed against <strong>13 academic frameworks</strong> drawn from the Customer Engagement &amp; AI module. <strong>Design score: 4.2/5 (Grade A-) · Functional score: 4.0/5 (Grade B+)</strong>.</p>
+  <p class="hero-sub">Academic design review and functional quality assessment by @Keelin O'Sullivan. 12 frameworks from the Customer Engagement &amp; AI module plus comprehensive functional testing.</p>
 </div>
 
 <div class="score-cards">
-  <div class="score-card"><span class="sc-value">4.2<span class="sc-grade">/5</span></span><span class="sc-label">Academic Design</span><span class="sc-detail">Grade A- · 13 frameworks · 31 design findings</span></div>
-  <div class="score-card"><span class="sc-value">4.0<span class="sc-grade">/5</span></span><span class="sc-label">Functional Quality</span><span class="sc-detail">Grade B+ · 6 categories · 24 functional notes</span></div>
-  <div class="score-card"><span class="sc-value">3<span class="sc-grade">open</span></span><span class="sc-label">Known Issues</span><span class="sc-detail">Minor · CSV enrichment cooling</span></div>
+  <div class="score-card"><span class="sc-value">4.2<span class="sc-grade">/5</span></span><span class="sc-label">Academic Design</span><span class="sc-detail">Grade A- · 12 frameworks · 31 findings</span></div>
+  <div class="score-card"><span class="sc-value">4.0<span class="sc-grade">/5</span></span><span class="sc-label">Functional Quality</span><span class="sc-detail">Grade B+ · 6 categories · 24 notes</span></div>
+  <div class="score-card clickable" onclick="document.querySelector('.tab-btn.section-tab[onclick*=\"issues\"]').click()"><span class="sc-value">3<span class="sc-grade">open</span></span><span class="sc-label">Known Issues</span><span class="sc-detail">Minor · Click to review</span></div>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('academic')">Academic Review</button>
-  <button class="tab-btn" onclick="switchTab('functional')">Functional Testing</button>
+<div class="summary-bar">
+  <p><strong>Overall:</strong> The Emerald Pantry chatbot demonstrates strong academic alignment across all 12 assessed frameworks. It operates as a hybrid conversational recommender with live catalogue grounding, transparent AI disclosure, and ethical data practices. The core design patterns — turn-1 disclosure, consent-before-data, open OFF sourcing, human-in-the-loop purchase flow, and transparent placeholders for missing data — satisfy CASA trust requirements, Gricean maxims, and service design best practices. The bot sits comfortably on the 'clearly AI' side of the uncanny valley, avoiding deceptive human imitation. <strong>Three open items</strong> remain: collaborative filtering is absent (academic constraint), cold-start enrichment is slow, and 25/30 products lack OFF data due to fake academic barcodes. None are functional blockers.</p>
 </div>
 
-<!-- ACADEMIC REVIEW TAB -->
-<div class="tab-content active" id="tab-academic">
-  <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:20px">The chatbot is assessed against frameworks from the Customer Engagement &amp; AI module. Sub-tabs marked <strong style="color:var(--accent2)">NEW</strong> are frameworks added beyond the WaxBot baseline.</p>
+<!-- TOP-LEVEL TABS -->
+<div class="tab-bar">
+  <button class="tab-btn section-tab active" onclick="switchSection('academic')">Academic Review</button>
+  <button class="tab-btn section-tab" onclick="switchSection('functional')">Functional Testing</button>
+  <button class="tab-btn section-tab" onclick="switchSection('issues')">Open Issues</button>
+</div>
 
-  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-    <button class="sub-tab active" onclick="switchSub('acad','orig')">Original Four</button>
-    <button class="sub-tab" onclick="switchSub('acad','fogg')">Fogg B=MAP <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
-    <button class="sub-tab" onclick="switchSub('acad','cialdini')">Cialdini <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
-    <button class="sub-tab" onclick="switchSub('acad','blueprint')">Service Blueprint <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
-    <button class="sub-tab" onclick="switchSub('acad','peas')">PEAS Agent <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
-    <button class="sub-tab" onclick="switchSub('acad','bdi')">BDI Model <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
-    <button class="sub-tab" onclick="switchSub('acad','recommender')">Recommender <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
-    <button class="sub-tab" onclick="switchSub('acad','clv')">CLV &amp; Marketing <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
-    <button class="sub-tab" onclick="switchSub('acad','autonomy')">Automation Levels <span style="color:var(--accent2);font-size:0.65rem">NEW</span></button>
+<!-- ACADEMIC REVIEW -->
+<div class="tab-content active" id="sec-academic">
+  <div class="tab-bar" style="border-bottom-color:rgba(212,168,75,0.3)">
+    <button class="tab-btn active" onclick="switchFW('taxonomy')">Taxonomy</button>
+    <button class="tab-btn" onclick="switchFW('casa')">CASA</button>
+    <button class="tab-btn" onclick="switchFW('flow')">Flow Anatomy</button>
+    <button class="tab-btn" onclick="switchFW('grice')">Grice</button>
+    <button class="tab-btn" onclick="switchFW('fogg')">Fogg B=MAP</button>
+    <button class="tab-btn" onclick="switchFW('cialdini')">Cialdini</button>
+    <button class="tab-btn" onclick="switchFW('blueprint')">Service Blueprint</button>
+    <button class="tab-btn" onclick="switchFW('peas')">PEAS Agent</button>
+    <button class="tab-btn" onclick="switchFW('bdi')">BDI Model</button>
+    <button class="tab-btn" onclick="switchFW('recommender')">Recommender</button>
+    <button class="tab-btn" onclick="switchFW('clv')">CLV &amp; Marketing</button>
+    <button class="tab-btn" onclick="switchFW('autonomy')">Automation Levels</button>
   </div>
 
-  <!-- Original Four -->
-  <div class="sub-content active" id="acad-orig">
-    <h3>Framework 1 — Seven-Dimension Chatbot Taxonomy (Adamopoulou &amp; Moussiades 2020)</h3>
-    <p>The foundational classification of any chatbot across seven interacting dimensions. Each dimension maps design choices to measurable quality attributes.</p>
+  <!-- Taxonomy FW -->
+  <div class="tab-content active" id="fw-taxonomy">
+    <h3>Seven-Dimension Chatbot Taxonomy <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Adamopoulou &amp; Moussiades 2020)</span></h3>
+    <p>Classifies chatbots across seven interacting dimensions: Knowledge, Service, Goals, Response Generation, Channel, Human-Aid, and Permissions.</p>
     <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Dimension</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">A01</td><td>Knowledge Domain</td><td class="desc">Closed grocery/food domain with intentional openness to conversational tangents. Off-topic refocusing system gracefully returns users to food/retail. Domain boundary is well-defined and enforced via RECOVERY_VOICE prompt engineering.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A02</td><td>Service Provided</td><td class="desc">Hybrid: informational (product details, nutritional data) + transactional (basket, checkout stub). Clear separation between chat, discovery, and purchase.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A03</td><td>Goals</td><td class="desc">Discovery → Product detail → Basket → Checkout. Each stage has a defined resolution. Quick-reply suggestions guide the customer journey.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A04</td><td>Response Generation</td><td class="desc">Hybrid: LLM (DeepSeek) grounded in live catalogue + OpenFoodFacts enrichment. Pre-filters apply deterministic rules before LLM context injection. Response quality varies with LLM prompt adherence (markdown leakage).</td><td><span class="design-override">MINOR</span></td></tr>
-      <tr><td class="id">A05</td><td>Communication Channel</td><td class="desc">Text (default) + voice (Web Speech API STT/TTS). Irish English voice preference. Mic hidden on unsupported browsers. Voice/TTS parity checked.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A06</td><td>Human-Aid</td><td class="desc">Persistent "Prefer a real human?" footer in chat. Works during onboarding too. Contact details include email, phone, opening hours. Type 'human' anywhere.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A07</td><td>Permissions</td><td class="desc">Opt-in localStorage memory with clear disclosure. API keys server-side via Cloudflare Worker. Google Sheets is public CSV.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A01</td><td>Knowledge Domain</td><td class="desc">Closed grocery/food domain with intentional conversational tangents. Off-topic refocusing via RECOVERY_VOICE prompt gracefully returns users to food/retail.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A02</td><td>Service Provided</td><td class="desc">Hybrid: informational (product details, nutritional data) + transactional (basket, checkout stub). Clear separation between chat, discovery, and purchase flows.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A03</td><td>Goals</td><td class="desc">Discovery → Detail → Basket → Checkout. Quick-reply suggestions guide the customer journey. Each stage has defined resolution.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A04</td><td>Response Generation</td><td class="desc">Hybrid: LLM (DeepSeek) grounded in live catalogue + OFF enrichment. Pre-filters apply deterministic rules before LLM context. Minor: LLM occasionally leaks markdown, stripped client-side.</td><td><span class="design-override">MINOR</span></td></tr>
+      <tr><td class="id">A05</td><td>Communication Channel</td><td class="desc">Text (default) + voice (Web Speech API STT/TTS). Irish English voice preference. Mic hidden on unsupported browsers.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A06</td><td>Human-Aid</td><td class="desc">Persistent footer ('Prefer a real human?'), works during onboarding ('Skip setup — talk to a human'), type 'human' anywhere. Contact details include email, phone, hours.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A07</td><td>Permissions</td><td class="desc">Opt-in localStorage memory with clear disclosure. API keys server-side via Cloudflare Worker. Google Sheets is public CSV export.</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
+  </div>
 
-    <h3 style="margin-top:28px">Framework 2 — CASA: Computers Are Social Actors (Reeves &amp; Nass 1996)</h3>
-    <p>Users apply social rules to computers. The bot must satisfy social expectations: disclosure, honesty, appropriate register, frustration handling.</p>
-    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>CASA Check</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">A08</td><td>Turn-1 Disclosure</td><td class="desc">Ember's first message: 'Hey! I'm Ember, an AI chatbot powered by DeepSeek.' Clear, immediate, conversational. Not buried in UI furniture.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A09</td><td>No Fake-Human Cues</td><td class="desc">No fabricated typing delays. Badge shows 'LLM Enabled.' Bot identifies as AI in first turn. Personality is warm but never impersonates a human.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A10</td><td>Register Matches Capability</td><td class="desc">Irish-food-enthusiast register is warm but grounded. Ember doesn't over-promise. When it can't answer, it redirects gracefully.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A11</td><td>Frustration Handling</td><td class="desc">Gibberish ladder: 1st try → rephrase. 2nd → offer human. 4th → handoff. Recovery ladder implemented via `gibberishCount` and escalating responses. No stuck loops.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A12</td><td>Chummy Data Extraction</td><td class="desc">Consent asked BEFORE any data stored. 'What I store' popup explains localStorage. Opt-out available. Clear-memory button always visible. Onboarding flow makes consent explicit.</td><td><span class="design-closed">PASS</span></td></tr>
+  <!-- CASA FW -->
+  <div class="tab-content" id="fw-casa">
+    <h3>Computers Are Social Actors <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Reeves &amp; Nass 1996)</span></h3>
+    <p>Users apply social rules to computers. The bot must satisfy social expectations across disclosure, honesty, register, frustration handling, and data ethics.</p>
+    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Check</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
+      <tr><td class="id">A08</td><td>Turn-1 Disclosure</td><td class="desc">'Hey! I'm Ember, an AI chatbot powered by DeepSeek.' Clear, immediate, in the first conversational turn.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A09</td><td>No Fake-Human Cues</td><td class="desc">No simulated typing delays. Badge shows 'LLM Enabled.' Warm personality without impersonation.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A10</td><td>Register Matches Capability</td><td class="desc">Irish food-enthusiast register is warm but grounded. Does not over-promise. Redirects gracefully when unable to answer.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A11</td><td>Frustration Handling</td><td class="desc">Gibberish ladder: (1) rephrase with examples, (2) offer human, (3) handoff. Reset after valid input. Zero-results filter state has Clear All button.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A12</td><td>Chummy Data Extraction</td><td class="desc">Consent asked BEFORE data storage. 'What I store' popup. Opt-out available. Clear-memory always visible. Onboarding makes consent explicit.</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
+  </div>
 
-    <h3 style="margin-top:28px">Framework 3 — Conversation Flow Anatomy</h3>
-    <p>Opener → Intent → Slots → Recovery → Closer. Each stage must be designed and tested.</p>
-    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Flow Stage</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">A13</td><td>Opener</td><td class="desc">Identity + capability in first turn. Bot/Human choice immediately after. Consent before personal data. Name capture with input instructions. Structured three-step onboarding with progress overlay.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A14</td><td>Intent Routing</td><td class="desc">Multi-layered: onboarding gates → gibberish → human → catalogue search + LLM. Pre-filters detect special offer, stock, dietary, nutritional intent and pre-filter products before LLM context.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A15</td><td>Slots &amp; Validation</td><td class="desc">Consent and name collected sequentially during onboarding. Filters validated via AND stacking. Category filter highlights sync with chat. Input enabled during name step.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A16</td><td>Recovery Ladder</td><td class="desc">Three-step: (1) reword with examples, (2) explicit suggestions, (3) type 'human' for contact. Reset after valid input. Zero-results filter state has prominent Clear All button.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A17</td><td>Closer</td><td class="desc">Purchase confirmation shows order ID + summary. Basket clears. 'Keep shopping' returns to full catalogue. Chat and panel stay synchronised.</td><td><span class="design-override">MINOR</span></td></tr>
+  <!-- Flow Anatomy FW -->
+  <div class="tab-content" id="fw-flow">
+    <h3>Conversation Flow Anatomy <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Adamopoulou &amp; Moussiades 2020)</span></h3>
+    <p>Opener → Intent → Slots → Recovery → Closer. Each stage must be designed, tested, and verified.</p>
+    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Stage</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
+      <tr><td class="id">A13</td><td>Opener</td><td class="desc">Identity + capability in first turn. Bot/Human choice next. Consent before personal data. Name capture with input instructions. Three-step progress overlay.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A14</td><td>Intent Routing</td><td class="desc">Multi-layered: onboarding gates → gibberish → human → catalogue search + LLM. Pre-filters detect special offer, dietary, nutritional intent.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A15</td><td>Slots &amp; Validation</td><td class="desc">Consent and name collected sequentially. Filters via AND stacking. Category highlights sync with chat. Input enabled during name step.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A16</td><td>Recovery Ladder</td><td class="desc">(1) Reword/clarify with examples, (2) explicit suggestion chips, (3) type 'human' for contact. Reset after valid input. Prominent Clear All on zero results.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A17</td><td>Closer</td><td class="desc">Purchase confirmation shows order ID + summary. Basket clears. 'Keep shopping' returns to full catalogue. Chat and panel synchronised.</td><td><span class="design-override">MINOR</span></td></tr>
     </tbody></table></div>
+  </div>
 
-    <h3 style="margin-top:28px">Framework 4 — Grice's Cooperative Principle (Grice 1975)</h3>
-    <p>Four maxims: Quality, Quantity, Relevance, Manner. Conversational bots must satisfy these to feel natural.</p>
+  <!-- Grice FW -->
+  <div class="tab-content" id="fw-grice">
+    <h3>Grice's Cooperative Principle <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Grice 1975)</span></h3>
+    <p>Four maxims: Quality, Quantity, Relevance, Manner. Conversational bots must satisfy these to feel natural and trustworthy.</p>
     <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Maxim</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">A18</td><td>Quality (Truth)</td><td class="desc">Products grounded in live Google Sheet + OFF data. No fabricated products. Missing OFF data openly stated ('No facts available'). Prices never corrected (easter eggs respected).</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A19</td><td>Quantity</td><td class="desc">2-5 sentences per response. Lists products with prices when filtering. Longer for meal ideas/recipes. Concise for simple queries.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A20</td><td>Relevance</td><td class="desc">Off-topic detection and graceful refocusing. RECOVERY_VOICE prompts natural pivot back to food/retail. User never left in irrelevant conversation.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A21</td><td>Manner (Clarity)</td><td class="desc">'No markdown, no asterisks, no em dashes.' Markdown stripped client-side. `enrichLinks` makes product names clickable. Minor: LLM occasionally uses **bold** despite instructions, stripped by enrichLinks.</td><td><span class="design-override">MINOR</span></td></tr>
+      <tr><td class="id">A18</td><td>Quality (Truth)</td><td class="desc">Products grounded in live Sheet + OFF. No fabricated products. Missing data openly stated. Prices never corrected.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A19</td><td>Quantity</td><td class="desc">2-5 sentences per response. Lists products with prices when filtering. Longer for meal ideas. Concise for simple queries.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A20</td><td>Relevance</td><td class="desc">Off-topic detection + graceful refocusing. RECOVERY_VOICE prompts natural pivot to food/retail.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A21</td><td>Manner (Clarity)</td><td class="desc">'No markdown, no asterisks, no em dashes.' Markdown stripped client-side. `enrichLinks` makes product names clickable. Minor: LLM occasionally uses **bold**.</td><td><span class="design-override">MINOR</span></td></tr>
     </tbody></table></div>
   </div>
 
-  <!-- Fogg Behaviour Model -->
-  <div class="sub-content" id="acad-fogg">
-    <h3>Framework 5 — Fogg Behaviour Model: B=MAP (Fogg 2009)</h3>
-    <p>Behaviour = Motivation × Ability × Prompt. All three must converge at the same moment for a behaviour to occur. Applied to chatbot purchase flow.</p>
+  <!-- Fogg FW -->
+  <div class="tab-content" id="fw-fogg">
+    <h3>Fogg Behaviour Model (B=MAP) <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Fogg 2009)</span></h3>
+    <p>Behaviour = Motivation × Ability × Prompt. All three must converge for a behaviour to occur.</p>
     <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Factor</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">A22</td><td>Motivation</td><td class="desc">Product cards show price, OFF badges, offers. Detail view adds stock level, description, food facts. Chat suggests pairings and meal ideas. Sensation (product images, category icons) and anticipation (discount labels, 'representative image') drive motivation.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A23</td><td>Ability (Simplicity)</td><td class="desc">One-click product → detail. Quantity selector (+/-). Single 'Add to Basket' button. Basket accessible from brand bar. No multi-page checkout — just click, add, review, confirm. Friction is minimised at every step.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A24</td><td>Prompt (Trigger)</td><td class="desc">Quick-reply suggestions ('What's on special offer?', 'Keep shopping') act as hot triggers. Filter pills prompt exploration. Chat product links are clickable. 'Keep shopping' after purchase returns user to catalogue. The persistent human ramp is a spark for anxious users.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A22</td><td>Motivation</td><td class="desc">Product cards show price, OFF badges, offers. Detail view adds stock, description, food facts. Chat suggests pairings and meal ideas.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A23</td><td>Ability (Simplicity)</td><td class="desc">One-click product → detail. Quantity selector. Single 'Add to Basket.' Basket accessible from brand bar. No multi-page checkout.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A24</td><td>Prompt (Trigger)</td><td class="desc">Quick-reply suggestions as hot triggers. Filter pills prompt exploration. Chat product links clickable. Persistent human ramp. 'Keep shopping' after purchase.</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
-    <p style="margin-top:12px">The Emerald Pantry chatbot scores highly on all three Fogg factors. The purchase flow is optimised for simplicity: discover → click → adjust quantity → add → review → checkout. The Prompt dimension is particularly strong with multiple trigger types (suggestions, links, pills, basket icon). Suggested improvement: add a timed prompt after idle ('Still browsing? Here's what's new this week') to re-engage.</p>
   </div>
 
-  <!-- Cialdini -->
-  <div class="sub-content" id="acad-cialdini">
-    <h3>Framework 6 — Cialdini's Principles of Persuasion (Cialdini 1984/2021)</h3>
-    <p>Six (later seven) principles of ethical influence. Chatbots can leverage these transparently without dark patterns.</p>
+  <!-- Cialdini FW -->
+  <div class="tab-content" id="fw-cialdini">
+    <h3>Cialdini's Principles of Persuasion <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Cialdini 1984/2021)</span></h3>
+    <p>Seven principles of ethical influence applied to conversational commerce.</p>
     <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Principle</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">A25</td><td>Reciprocity</td><td class="desc">Ember gives value first: meal ideas, pairings, nutritional insights. The 'gift' of knowledge creates a reciprocity dynamic. No manipulative tactics — suggestions are genuine and useful. Could add: 'Customers who bought X also tried Y.'</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A26</td><td>Scarcity</td><td class="desc">Stock levels shown ('24 available'). 'Out of stock' label for zero-stock items. Seasonal items (Elderflower Cordial, Spiced Apple Chutney) clearly marked. No fake urgency — stock data is live from Google Sheet. Pre-order items properly labelled.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A27</td><td>Authority</td><td class="desc">Open Food Facts badges (Nutri-Score, NOVA, Eco-Score) provide third-party credibility. 'View record' links to OFF for verification. Product descriptions use sensory, knowledgeable language. Ember positions itself as a knowledgeable food guide.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A28</td><td>Consistency</td><td class="desc">Memory system remembers preferences, creating consistent returning experience. Personalised greetings ('knows Dan'). Recent searches inform suggestions. Onboarding commitment (Bot/Human → consent → name) builds consistency momentum.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A29</td><td>Liking</td><td class="desc">Warm Irish personality. Compliments ('Lovely to meet you!'). Shared food enthusiasm. Quick-reply options that are helpful, not pushy. The human-ramp footer ('Skip setup — talk to a human') builds trust through transparency.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">A30</td><td>Social Proof</td><td class="desc">Stock counts imply popularity. Category counts show what others browse. Could be enhanced with: purchase frequency indicators, 'popular in Dublin' tags, or 'back by popular demand' for re-stocked items.</td><td><span class="design-override">MINOR</span></td></tr>
-      <tr><td class="id">A31</td><td>Unity</td><td class="desc">Irish identity strongly present: West Cork, Bog Myrtle, Irish Creamery, soda bread, Dublin flavour in language. Makes Irish customers feel 'this is for us.' International customers experience the brand identity. Shared food culture as binding element.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A25</td><td>Reciprocity</td><td class="desc">Ember gives value first: meal ideas, pairings, nutritional insights. Genuine, not manipulative.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A26</td><td>Scarcity</td><td class="desc">Stock levels shown. 'Out of stock' for zero-stock. Seasonal items marked. No fake urgency — live data.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A27</td><td>Authority</td><td class="desc">OFF badges (Nutri-Score, NOVA, Eco-Score) provide third-party credibility. 'View record' links for verification.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A28</td><td>Consistency</td><td class="desc">Memory system remembers preferences. Personalised greetings. Recent searches inform suggestions. Onboarding builds commitment momentum.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A29</td><td>Liking</td><td class="desc">Warm Irish personality. Compliments. Shared food enthusiasm. Quick-replies that are helpful, not pushy.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">A30</td><td>Social Proof</td><td class="desc">Stock counts imply demand. Category counts show browsing patterns. Could be enhanced with purchase frequency indicators.</td><td><span class="design-override">MINOR</span></td></tr>
+      <tr><td class="id">A31</td><td>Unity</td><td class="desc">Strong Irish identity: West Cork, Bog Myrtle, Dublin voice. Makes customers feel 'this is for us.'</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
   </div>
 
-  <!-- Service Blueprint -->
-  <div class="sub-content" id="acad-blueprint">
-    <h3>Framework 7 — Service Blueprinting (Shostack 1984/ Bitner et al. 2008)</h3>
-    <p>Maps the full service journey: customer actions, frontstage (visible), backstage (invisible), and support processes. Also considers the Uncanny Valley (Mori 1970) — the discomfort users feel when a bot is almost-but-not-quite human.</p>
-    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Blueprint Layer</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">B01</td><td>Customer Actions</td><td class="desc">Browse catalogue, filter, search chat, click product, add to basket, checkout, talk to human. Journey is linear with branches. Onboarding path (Bot/Human → consent → name) is clearly sequenced with progress indicator.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B02</td><td>Frontstage (Visible)</td><td class="desc">Chat panel (left): Ember responses, quick-reply chips, product links. Discovery panel (right): filter bar, product grid, detail view, basket overlay. Brand bar with basket indicator. Human ramp footer. Two-panel layout mirrors physical shop browsing.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B03</td><td>Backstage (Invisible)</td><td class="desc">Cloudflare Worker proxies LLM + fetches Google Sheets CSV + OpenFoodFacts enrichment. CSV parsed to JSON. OFF barcode lookup with 1hr cache. localStorage for memory. All API keys server-side.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B04</td><td>Support Processes</td><td class="desc">Google Sheet as single source of truth (live, no cache). OFF enrichment cached separately (nutritional data is static). Worker handles 30 parallel OFF lookups on cold start. Checkout stub noted as placeholder for payment/fulfillment (real-world process gap).</td><td><span class="design-override">MINOR</span></td></tr>
-      <tr><td class="id">B05</td><td>Uncanny Valley Position</td><td class="desc">Ember is positioned firmly on the 'clearly a bot' side of the valley. Turn-1 disclosure. Badge shows status. No attempt to mimic human typing or emotions. Personality is warm but transparently AI. This avoids the uncanny valley entirely — an intentional design choice that aligns with CASA best practice.</td><td><span class="design-closed">PASS</span></td></tr>
+  <!-- Service Blueprint FW -->
+  <div class="tab-content" id="fw-blueprint">
+    <h3>Service Blueprinting &amp; Uncanny Valley <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Shostack 1984 / Bitner et al. 2008 / Mori 1970)</span></h3>
+    <p>Maps the full service journey across customer actions, frontstage, backstage, and support processes. Plus the uncanny valley — the discomfort users feel with almost-human bots.</p>
+    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Layer</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
+      <tr><td class="id">B01</td><td>Customer Actions</td><td class="desc">Browse, filter, search, click product, add to basket, checkout, talk to human. Linear with branches. Onboarding sequenced with progress overlay.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B02</td><td>Frontstage (Visible)</td><td class="desc">Chat panel + discovery panel + detail view + basket overlay + filter bar. Two-panel layout mirrors physical browsing.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B03</td><td>Backstage (Invisible)</td><td class="desc">Cloudflare Worker proxies LLM + fetches Sheet CSV + OFF enrichment. CSV parsed to JSON. OFF cached 1hr. API keys server-side.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B04</td><td>Support Processes</td><td class="desc">Google Sheet as single source of truth (live, no cache). OFF enrichment cached separately. Checkout stub placeholder for real payment/fulfillment.</td><td><span class="design-override">MINOR</span></td></tr>
+      <tr><td class="id">B05</td><td>Uncanny Valley</td><td class="desc">Positioned on 'clearly AI' side. Turn-1 disclosure, badge, transparent personality. Avoids deceptive human imitation — an intentional CASA-aligned design choice.</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
   </div>
 
-  <!-- PEAS -->
-  <div class="sub-content" id="acad-peas">
-    <h3>Framework 8 — PEAS Agent Specification (Russell &amp; Norvig 2020)</h3>
-    <p>Standard AI agent specification: Performance measure, Environment, Actuators, Sensors. Maps what the agent optimises, where it operates, how it acts, and what it perceives.</p>
-    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>PEAS Component</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">B06</td><td>Performance</td><td class="desc">Primary: successful product discovery → purchase conversion. Secondary: customer satisfaction (natural conversation), data accuracy (live Sheet + OFF), filter correctness, onboarding completion rate. Measured by: product clicks, basket adds, checkout completions, filter accuracy (automated test suite passes).</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B07</td><td>Environment</td><td class="desc">Browser-based single-page application deployed via GitHub Pages. Cloudflare Worker backend. Google Sheets (live data source). OpenFoodFacts API (nutritional enrichment). DeepSeek API (LLM). localStorage (memory). Partially observable (customer intent is inferred from text). Stochastic (API responses vary). Sequential (conversation builds over turns).</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B08</td><td>Actuators</td><td class="desc">Chat messages (text responses, quick-reply chips, product links). Discovery panel (product grid, filter bar, detail view, basket overlay, basket counter). Voice (TTS for bot responses). Notifications (badge state changes, onboarding lock overlay).</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B09</td><td>Sensors</td><td class="desc">Text input (typed + quick-reply clicks). Voice input (Web Speech API STT). Product tile clicks. Filter pill clicks. Basket interactions. localStorage (returning user state). Catalogue data (Google Sheets via worker). Nutritional data (OpenFoodFacts via worker). LLM responses (DeepSeek via worker).</td><td><span class="design-closed">PASS</span></td></tr>
-    </tbody></table></div>
-    <p style="margin-top:12px">The PEAS specification reveals that Ember operates in a well-defined environment with clear performance metrics. The partially observable nature of customer intent is addressed through multi-layered intent routing (onboarding gates → gibberish → human → search + LLM). A suggested enhancement: add explicit performance tracking (product click-through rate, basket abandonment) to close the measurement loop.</p>
-  </div>
-
-  <!-- BDI -->
-  <div class="sub-content" id="acad-bdi">
-    <h3>Framework 9 — BDI Model: Beliefs, Desires, Intentions (Bratman 1987 / Rao &amp; Georgeff 1995)</h3>
-    <p>Agent architecture where behaviour emerges from Beliefs (what the agent knows), Desires (what it wants to achieve), and Intentions (what it commits to doing).</p>
-    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>BDI Component</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">B10</td><td>Beliefs (Knowledge)</td><td class="desc">Live product catalogue (30 items from Google Sheets). Nutritional data + allergens from OpenFoodFacts (via worker enrichment). Customer identity (name, preferences, visit history from localStorage). Conversation history (last 20 exchanges). Filter state (active category, active filters, sort). Basket contents. The belief base is grounded in verifiable external sources.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B11</td><td>Desires (Goals)</td><td class="desc">Primary: help customer discover products → facilitate purchase. Secondary: be conversational and warm, respect consent/privacy, handle off-topic gracefully, present accurate data. The system prompt encodes these as behavioural desiderata.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B12</td><td>Intentions (Commitments)</td><td class="desc">Onboarding flow is an intention stack: Bot/Human → consent → name → unlock. Search intent triggers catalogue lookup + LLM response. Filter intent triggers client-side pre-filter + re-render. Purchase intent opens detail view → basket → checkout. Intentions are persistent across turns (filter state survives browsing, basket persists until cleared/checked out).</td><td><span class="design-closed">PASS</span></td></tr>
-    </tbody></table></div>
-    <p style="margin-top:12px">The Emerald Pantry chatbot implements a practical BDI architecture without explicitly modelling it as such. The clear separation between data (Beliefs), system prompt goals (Desires), and conversation state (Intentions) makes the agent's behaviour explainable and auditable. A suggested enhancement: formalise the BDI structure in documentation for easier academic defence.</p>
-  </div>
-
-  <!-- Recommender -->
-  <div class="sub-content" id="acad-recommender">
-    <h3>Framework 10 — Recommender System Taxonomy (Adomavicius &amp; Tuzhilin 2005 / Ricci et al. 2015)</h3>
-    <p>Recommender systems are classified as Collaborative Filtering, Content-Based, or Hybrid. Chatbots serving product catalogues function as conversational recommenders.</p>
-    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Recommender Type</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">B13</td><td>Content-Based Filtering</td><td class="desc">Strongly implemented. Products are filtered by category, dietary properties, Nutri-Score, allergens, nutrient levels — all product attributes. Chat queries ('gluten free bakery', 'high protein') are mapped to these attributes. The LLM recommends pairings based on product categories and descriptions. This is the primary recommender strategy.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B14</td><td>Collaborative Filtering</td><td class="desc">Not implemented. No user-user or item-item similarity based on purchase behaviour. No ratings or implicit feedback loops. The memory system stores individual preferences but does not aggregate across users. This is a known gap for a single-user academic prototype.</td><td><span class="design-open">GAP</span></td></tr>
-      <tr><td class="id">B15</td><td>Hybrid / Conversational</td><td class="desc">The chatbot IS a conversational recommender: the customer expresses preferences in natural language, the system filters and suggests, the customer refines. This is a legitimate hybrid approach combining content-based filtering with conversational interaction. The filter bar adds faceted browsing alongside chat-based discovery.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B16</td><td>Beyond-Accuracy Metrics</td><td class="desc">Novelty (OFF badges surface nutritional information the customer might not seek). Diversity (filter bar enables exploration across categories and dietary dimensions). Serendipity (Ember suggests unexpected pairings like 'gin + elderflower cordial', 'ginger beer + Thai noodles'). Transparency (OFF source links, 'representative image' labels, 'No facts available' for missing data).</td><td><span class="design-closed">PASS</span></td></tr>
+  <!-- PEAS FW -->
+  <div class="tab-content" id="fw-peas">
+    <h3>PEAS Agent Specification <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Russell &amp; Norvig 2020)</span></h3>
+    <p>Performance measure, Environment, Actuators, Sensors — maps what the agent optimises, where it operates, how it acts, what it perceives.</p>
+    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Component</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
+      <tr><td class="id">B06</td><td>Performance</td><td class="desc">Primary: product discovery → purchase. Secondary: satisfaction, data accuracy, filter correctness, onboarding completion. Measured via filter test suite.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B07</td><td>Environment</td><td class="desc">Browser SPA via GitHub Pages. Worker backend. Sheet + OFF + DeepSeek APIs. localStorage. Partially observable, stochastic, sequential.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B08</td><td>Actuators</td><td class="desc">Chat messages, quick-reply chips, product links, filter bar, product grid, detail view, basket, voice TTS, onboarding overlay.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B09</td><td>Sensors</td><td class="desc">Text/voice input, quick-reply clicks, product tile clicks, filter pill clicks, basket interactions, localStorage, catalogue + OFF data, LLM responses.</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
   </div>
 
-  <!-- CLV & Marketing -->
-  <div class="sub-content" id="acad-clv">
-    <h3>Framework 11 — Customer Lifetime Value &amp; AI Marketing Maturity (W10)</h3>
-    <p>CLV as the retention lens: acquisition is expensive, retention compounds. AI marketing capabilities mapped across a maturity curve from descriptive to prescriptive.</p>
+  <!-- BDI FW -->
+  <div class="tab-content" id="fw-bdi">
+    <h3>BDI Model <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Bratman 1987 / Rao & Georgeff 1995)</span></h3>
+    <p>Beliefs (knowledge), Desires (goals), Intentions (commitments) — a practical agent architecture.</p>
+    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Component</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
+      <tr><td class="id">B10</td><td>Beliefs</td><td class="desc">Live catalogue (30 items from Sheet). OFF enrichment. Customer identity (name, preferences, history from localStorage). Conversation history. Filter state. Basket contents. All grounded in verifiable sources.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B11</td><td>Desires</td><td class="desc">System prompt encodes goals: help discover → purchase, be conversational, respect consent, handle off-topic, present accurate data.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B12</td><td>Intentions</td><td class="desc">Onboarding is an intention stack. Search intent triggers lookup + LLM. Filter intent triggers pre-filter + re-render. Purchase intent opens detail → basket → checkout. Intentions persist across turns.</td><td><span class="design-closed">PASS</span></td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- Recommender FW -->
+  <div class="tab-content" id="fw-recommender">
+    <h3>Recommender System Taxonomy <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Adomavicius &amp; Tuzhilin 2005 / Ricci et al. 2015)</span></h3>
+    <p>Collaborative Filtering, Content-Based, or Hybrid. Chatbots serving product catalogues function as conversational recommenders.</p>
+    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Type</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
+      <tr><td class="id">B13</td><td>Content-Based</td><td class="desc">Strong: products filtered by category, dietary properties, Nutri-Score, allergens, nutrients. LLM suggests pairings based on product attributes.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B14</td><td>Collaborative</td><td class="desc">Not implemented. No user-user/item-item similarity from purchase behaviour. No ratings. Known gap for academic single-user prototype.</td><td><span class="design-open">GAP</span></td></tr>
+      <tr><td class="id">B15</td><td>Hybrid / Conversational</td><td class="desc">The chatbot IS a conversational recommender: natural language preferences → filtering → suggestions → refinement. Filter bar adds faceted browsing.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B16</td><td>Beyond-Accuracy</td><td class="desc">Novelty (OFF badges), Diversity (filter bar), Serendipity (pairings like gin+elderflower), Transparency (OFF links, 'No facts available', 'representative image').</td><td><span class="design-closed">PASS</span></td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- CLV FW -->
+  <div class="tab-content" id="fw-clv">
+    <h3>Customer Lifetime Value &amp; AI Marketing Maturity <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(W10)</span></h3>
+    <p>CLV as the retention lens; AI marketing capabilities mapped across a maturity curve.</p>
     <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Dimension</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">B17</td><td>Retention Mechanisms</td><td class="desc">Memory system remembers returning customers by name, suggests based on past searches. Clear-memory and opt-in build trust (essential for retention). The purchase flow is sticky: basket persists, filters survive navigation. Personalised greeting on return visits. These are strong retention design patterns.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B18</td><td>AI Marketing Maturity</td><td class="desc">The bot operates at the 'Predictive' stage: it anticipates customer needs (suggestion chips based on context), segments by behaviour (onboarding path, dietary pre-filters), and personalises responses (name, history, LLM system prompt). It does not reach 'Prescriptive' (autonomous campaign optimisation). This is appropriate for a prototype.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B19</td><td>Basket Building</td><td class="desc">LLM suggests pairings and combinations (cheese + chutney + crackers, ragu + baguette). Special offers highlighted. 'Keep shopping' after purchase. These are basic cross-sell/upsell techniques executed transparently.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B17</td><td>Retention Mechanisms</td><td class="desc">Memory remembers returning customers, suggests from past searches. Clear-memory + opt-in build trust. Purchase flow is sticky (basket persists, filters survive navigation).</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B18</td><td>AI Marketing Maturity</td><td class="desc">Operates at Predictive stage: anticipates needs (suggestion chips), segments by behaviour (onboarding, dietary pre-filters), personalises (name, history, LLM prompt).</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B19</td><td>Basket Building</td><td class="desc">LLM suggests pairings (cheese+chutney, ragu+baguette). Offers highlighted. 'Keep shopping' after purchase. Transparent cross-sell.</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
   </div>
 
-  <!-- Automation Levels -->
-  <div class="sub-content" id="acad-autonomy">
-    <h3>Framework 12 — Levels of Automation &amp; Human-Centered AI (Sheridan &amp; Verplank 1978 / Shneiderman 2020 / W11)</h3>
-    <p>The spectrum from full human control to full machine autonomy. Human-Centered AI demands that automation amplifies rather than replaces human decision-making.</p>
+  <!-- Automation Levels FW -->
+  <div class="tab-content" id="fw-autonomy">
+    <h3>Levels of Automation &amp; Human-Centered AI <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">(Sheridan &amp; Verplank 1978 / Shneiderman 2020 / W11)</span></h3>
+    <p>From full human control to full machine autonomy. Human-Centered AI demands amplification not replacement.</p>
     <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Dimension</th><th>Assessment</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">B20</td><td>Automation Level</td><td class="desc">The bot operates at Level 4-5 (Sheridan scale): suggests options and executes if the human approves. Product discovery, filtering, and recommendations are automated. Purchase requires explicit human action (click Add to Basket, review, click Checkout). The human is always in the loop for transactional decisions.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B21</td><td>Human-in-the-Loop</td><td class="desc">Human contact reachable at all times via footer ('Prefer a real human?') and typing 'human' anywhere. During onboarding, footer says 'Skip setup — talk to a human.' The purchase flow has a review stage before checkout. The checkout is explicitly labelled as a stub. The user is never trapped in an automated flow.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B22</td><td>Augmentation vs Replacement</td><td class="desc">Ember augments the shopping experience: it doesn't replace the shopkeeper, it extends their reach online. The catalogue is live (shopkeeper updates it). The bot informs but the customer decides. This aligns with the 'missing middle' concept: AI + human collaboration outperforms either alone.</td><td><span class="design-closed">PASS</span></td></tr>
-      <tr><td class="id">B23</td><td>Transparency</td><td class="desc">AI disclosure in turn 1. OFF data provenance linked. Checkout stub clearly labelled. 'Representative image' tags on placeholder images. Missing data stated openly. Privacy explained before data collection. The system is designed for explainability.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B20</td><td>Automation Level</td><td class="desc">Sheridan Level 4-5: suggests options, executes if human approves. Discovery automated, purchase requires explicit human action.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B21</td><td>Human-in-the-Loop</td><td class="desc">Human contact always reachable. Footer works during onboarding. Checkout has review stage. User never trapped in automated flow.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B22</td><td>Augmentation vs Replacement</td><td class="desc">Ember extends the shopkeeper's reach online. Catalogue is live (shopkeeper updates it). Bot informs, customer decides. 'Missing middle' alignment.</td><td><span class="design-closed">PASS</span></td></tr>
+      <tr><td class="id">B23</td><td>Transparency</td><td class="desc">AI disclosure turn 1. OFF provenance linked. Checkout stub labelled. 'Representative image' tags. Missing data stated openly. Privacy explained before data collection.</td><td><span class="design-closed">PASS</span></td></tr>
     </tbody></table></div>
   </div>
 </div>
 
-<!-- FUNCTIONAL TESTING TAB -->
-<div class="tab-content" id="tab-functional">
-  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-    <button class="sub-tab active" onclick="switchSub('func','summary')">Summary Scorecard</button>
-    <button class="sub-tab" onclick="switchSub('func','findings')">Functional Findings</button>
+<!-- FUNCTIONAL TESTING -->
+<div class="tab-content" id="sec-functional">
+  <h3>Functional Quality Scorecard</h3>
+  <div class="scorecard">
+    <div class="sc-item"><span class="sc-value">4.2</span><span class="sc-label">Conversation Accuracy</span><span class="sc-detail">25% weight · Onboarding, intent routing, LLM quality</span></div>
+    <div class="sc-item"><span class="sc-value">4.4</span><span class="sc-label">UI/UX Quality</span><span class="sc-detail">20% weight · Emerald theme, filter bar, responsive</span></div>
+    <div class="sc-item"><span class="sc-value">4.0</span><span class="sc-label">Memory &amp; Personalization</span><span class="sc-detail">15% weight · localStorage, consent, remembers</span></div>
+    <div class="sc-item"><span class="sc-value">3.8</span><span class="sc-label">Voice Interaction</span><span class="sc-detail">15% weight · STT/TTS, Irish voice</span></div>
+    <div class="sc-item"><span class="sc-value">3.5</span><span class="sc-label">Mobile Experience</span><span class="sc-detail">15% weight · Responsive, no toggle</span></div>
+    <div class="sc-item"><span class="sc-value">4.0</span><span class="sc-label">Robustness</span><span class="sc-detail">10% weight · Error handling, async safety</span></div>
+  </div>
+  <div class="overall-score func"><span class="big">4.0</span><span class="grade">Grade B+</span><div class="note">Weighted average across 6 categories (Scoring rubric from WaxBot baseline extended)</div></div>
+
+  <h3 style="margin-top:28px">Key Test Categories</h3>
+  <div class="scorecard">
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">&#10003;</span><span class="sc-label">Onboarding Flow</span><span class="sc-detail">Bot/Human, consent, name capture, return visits, input locking, progress overlay</span></div>
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">&#10003;</span><span class="sc-label">Filtering System</span><span class="sc-detail">5 categories, 13 filter pills, sort, Clear All, bidirectional chat sync, zero-results handling</span></div>
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">&#10003;</span><span class="sc-label">Catalogue Integration</span><span class="sc-detail">Live Google Sheet CSV, OFF enrichment, stock/availability display, special offers</span></div>
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">&#10003;</span><span class="sc-label">LLM Conversation</span><span class="sc-detail">System prompt, catalogue context, off-topic refocusing, dietary/nutritional queries, meal ideas</span></div>
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">&#10003;</span><span class="sc-label">Purchase Flow</span><span class="sc-detail">Product detail, quantity selector, basket, checkout, chat interplay</span></div>
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">&#10003;</span><span class="sc-label">Memory &amp; Privacy</span><span class="sc-detail">localStorage persistence, consent, clear memory, returning user detection</span></div>
   </div>
 
-  <div class="sub-content active" id="func-summary">
-    <h3>Functional Quality Scorecard</h3>
-    <div class="scorecard">
-      <div class="sc-item"><span class="sc-value">4.2</span><span class="sc-label">Conversation Accuracy</span><span class="sc-detail">Onboarding, intent routing, LLM quality</span></div>
-      <div class="sc-item"><span class="sc-value">4.4</span><span class="sc-label">UI/UX Quality</span><span class="sc-detail">Emerald theme, filter bar, responsive</span></div>
-      <div class="sc-item"><span class="sc-value">4.0</span><span class="sc-label">Memory &amp; Personalization</span><span class="sc-detail">localStorage, consent flow, remembers</span></div>
-      <div class="sc-item"><span class="sc-value">3.8</span><span class="sc-label">Voice Interaction</span><span class="sc-detail">STT/TTS, Irish voice preference</span></div>
-      <div class="sc-item"><span class="sc-value">3.5</span><span class="sc-label">Mobile Experience</span><span class="sc-detail">Responsive but no toggle</span></div>
-      <div class="sc-item"><span class="sc-value">4.0</span><span class="sc-label">Robustness</span><span class="sc-detail">Error handling, async safety</span></div>
-    </div>
-    <div class="overall-score"><span class="big">4.0</span><span class="grade">Grade B+</span><div class="note">Weighted score across 6 categories</div></div>
+  <h3 style="margin-top:28px">Automated Verification</h3>
+  <p>The <code>runFilterTests()</code> automated test suite (accessible via typing <code>test</code> in chat or clicking 'Run tests' in the footer) programmatically verifies:</p>
+  <div class="scorecard">
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">5/5</span><span class="sc-label">Category Chips</span><span class="sc-detail">All 5 click handlers fire, activeCategory set, grid updates, counts correct</span></div>
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">13/13</span><span class="sc-label">Filter Pills</span><span class="sc-detail">All 13 toggle on/off, active class toggles, DOM elements exist</span></div>
+    <div class="sc-item"><span class="sc-value" style="font-size:1.2rem">&#10003;</span><span class="sc-label">Clear All</span><span class="sc-detail">Resets activeCategory, activeFilters, activeSort. Shows all 30 products</span></div>
   </div>
 
-  <div class="sub-content" id="func-findings">
-    <h3>Functional Findings Register</h3>
-    <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Category</th><th>Finding</th><th>Severity</th><th>Status</th></tr></thead><tbody>
-      <tr><td class="id">F01</td><td>Data</td><td class="desc">25/30 products have fake barcodes. OFF enrichment only works for 5 real-barcode products. Category-coded placeholders compensate visually but nutritional data is unavailable for non-matching products. <span class="fix">Resolution: academic constraint (project data). Honesty labels applied ('No facts available', 'representative image').</span></td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Accepted</span></td></tr>
-      <tr><td class="id">F02</td><td>Performance</td><td class="desc">Enriched catalogue endpoint does 30 parallel OFF lookups on cold start (5-15 second response). LoadProducts now uses fast catalogue endpoint first, enriches in background. Could timeout on slow connections.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Mitigated</span></td></tr>
-      <tr><td class="id">F03</td><td>UX</td><td class="desc">Filter pills and Clear All use wireFilterBar() which removes inline onclick before binding. Event delegation removed in favour of direct onclick for reliability. Resolved after extensive debug.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F04</td><td>UX</td><td class="desc">Onboarding input was disabled during name-entry step due to logic bug. Now input is never fully disabled during onboarding; placeholders guide the user.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F05</td><td>UX</td><td class="desc">Category chips had dual-click issue (delegated + per-chip onclick both firing). Delegated handler removed; IIFE per-chip bindings only.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F06</td><td>UX</td><td class="desc">Chat-to-filter sync was broken: chat searches didn't highlight the matching category chip. Now renderProducts detects when search results share a single category and sets activeCategory.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F07</td><td>UX</td><td class="desc">Product detail view and chat product links stopped working after filtering rewrite. getProduct now searches allProducts (always populated). Chat links resolve product name to SKU and open detail view.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F08</td><td>UX</td><td class="desc">'Keep shopping' quick-reply was searching for the phrase instead of returning to full catalogue. Now intercepted and calls clearAllFilters().</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F09</td><td>LLM</td><td class="desc">LLM sometimes uses **markdown** despite 'No markdown' prompt. enrichLinks now strips ** and * before linkifying product names. Minor visual loss (no bold in chat) but links work correctly.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Mitigated</span></td></tr>
-      <tr><td class="id">F10</td><td>UX</td><td class="desc">Basket experience was a small sliding drawer — easy to miss. Now takes over entire discovery panel as a full overlay with itemised list, totals, and checkout confirmation page.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F11</td><td>UX</td><td class="desc">'Prefer a real human?' footer was inserting 'human' into input instead of immediately showing contact. Now calls humanContact() directly. Works during onboarding too.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F12</td><td>Performance</td><td class="desc">loadProducts had a 3-second fallback timeout for slow catalogue fetches. Now dContent displays immediately with 'Loading products...' text to avoid blank-panel states.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F13</td><td>Data</td><td class="desc">Stock display: stock_this_week=0 now shows 'Out of stock' (red). Seasonal and Pre-order correctly labelled. Previously showed 'In stock' when count was 0.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F14</td><td>Data</td><td class="desc">Special offer filter was showing all products. Now uses client-side pre-filter + LLM instructions. Only products with non-empty special_offer field are returned.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F15</td><td>Data</td><td class="desc">Gluten-free filter included products with gluten. Pre-filter now checks allergens field for 'gluten' and 'wheat'. Same for dairy-free.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F16</td><td>Data</td><td class="desc">OFF section on product cards lacked visual differentiation. Now has subtle rounded border + tint background. 'View record' link hidden when no OFF data exists.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F17</td><td>UX</td><td class="desc">Browser caching caused stale broken JS to persist. Cache-Control headers added to HTML meta tags and _headers for GitHub Pages. hideTyping() called at init to clear cached typing indicators.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F18</td><td>UX</td><td class="desc">Zero-results filter state had no way back. Now shows inline 'No products match' with prominent 'Clear all filters' button.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F19</td><td>UX</td><td class="desc">Header bar was partially clipped due to calc(100vh-64px). Switched to flexbox layout (body flex column, app flex:1). Header always fully visible.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F20</td><td>Data</td><td class="desc">Automated filter test suite (runFilterTests) passes all 18 category, pill, and clear-all tests. Chat product links resolve correctly. Bidirectional filter sync verified.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Verified</span></td></tr>
-      <tr><td class="id">F21</td><td>UX</td><td class="desc">Nutri-Score 'None' pill added to filter bar to accommodate products without OFF data.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F22</td><td>UX</td><td class="desc">'On Offer' filter pill moved to category row alongside 'In Stock' for logical grouping.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F23</td><td>UX</td><td class="desc">Back to Pantry button added below Add to Basket in detail view. backToPantry() function preserves active filter state when returning from product detail.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-      <tr><td class="id">F24</td><td>UX</td><td class="desc">Enriched catalogue loads in background to avoid blocking initial product display. Basic catalogue appears instantly, OFF data populates when ready.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
-    </tbody></table></div>
-  </div>
+  <h3 style="margin-top:28px">Functional Findings Register</h3>
+  <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Category</th><th>Finding</th><th>Sev</th><th>Status</th></tr></thead><tbody>
+    <tr><td class="id">F01</td><td>Data</td><td class="desc">25/30 products have fake academic barcodes. OFF enrichment only matches 5 real barcodes. Category-coded placeholders compensate visually; nutritional data unavailable for non-matching products.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Accepted</span></td></tr>
+    <tr><td class="id">F02</td><td>Perf</td><td class="desc">Enriched catalogue cold start: 30 parallel OFF lookups (5-15s). Mitigated by fast catalogue endpoint first + background enrichment.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Mitigated</span></td></tr>
+    <tr><td class="id">F03</td><td>UX</td><td class="desc">Filter pills: dual handler bug (inline onclick + JS onclick). Resolved with wireFilterBar() + removeAttribute.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F04</td><td>UX</td><td class="desc">Onboarding input disabled during name-entry step. Fixed: input never disabled during onboarding; placeholder guides.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F05</td><td>UX</td><td class="desc">Category chips: delegation + per-chip onclick dual fire. Fixed: IIFE bindings only.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F06</td><td>UX</td><td class="desc">Chat search didn't highlight matching category chip. Fixed: renderProducts detects single-category results.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F07</td><td>UX</td><td class="desc">Product detail + chat links broken after filtering rewrite. Fixed: getProduct searches allProducts; chat links resolve name→SKU.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F08</td><td>UX</td><td class="desc">'Keep shopping' was searching the phrase. Fixed: intercepted and calls clearAllFilters().</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F09</td><td>LLM</td><td class="desc">LLM uses **markdown** despite prompt. Mitigated: enrichLinks strips ** before linkifying.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Mitigated</span></td></tr>
+    <tr><td class="id">F10</td><td>UX</td><td class="desc">Basket was small drawer. Fixed: full-panel overlay with itemised list, totals, checkout confirmation.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F11</td><td>UX</td><td class="desc">'Prefer a human?' footer inserted text instead of showing contact. Fixed: calls humanContact() directly.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F12</td><td>Perf</td><td class="desc">loadProducts spinner could get stuck. Fixed: 'Loading products...' text shows immediately; 3s fallback retry.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F13</td><td>Data</td><td class="desc">Stock=0 showed 'In stock'. Fixed: 'Out of stock' (red). Seasonal/Pre-order correctly labelled.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F14</td><td>Data</td><td class="desc">Special offer filter showed all products. Fixed: pre-filter + LLM instructions for offer-only queries.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F15</td><td>Data</td><td class="desc">Gluten-free filter included products with gluten. Fixed: pre-filter checks allergens for gluten/wheat.</td><td><span class="sev-high">HIGH</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F16</td><td>UX</td><td class="desc">OFF section lacked visual differentiation. Fixed: subtle border + tint background. 'View record' hidden when no data.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F17</td><td>UX</td><td class="desc">Browser caching of broken JS. Fixed: Cache-Control headers in HTML meta + _headers. hideTyping() at init.</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F18</td><td>UX</td><td class="desc">Zero-results had no escape. Fixed: inline 'No products match' with Clear All button.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F19</td><td>UX</td><td class="desc">Header clipped. Fixed: flexbox body layout, no calc().</td><td><span class="sev-med">MED</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F20</td><td>Test</td><td class="desc">Automated suite passes all 18 category/pill/clear tests. Bidirectional sync verified.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Verified</span></td></tr>
+    <tr><td class="id">F21</td><td>UX</td><td class="desc">Nutri-Score 'None' pill added for products without OFF data.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F22</td><td>UX</td><td class="desc">'On Offer' moved to category row alongside 'In Stock'.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F23</td><td>UX</td><td class="desc">Back to Pantry button in detail view. backToPantry preserves filter state.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+    <tr><td class="id">F24</td><td>Perf</td><td class="desc">Background enrichment to avoid blocking initial product display.</td><td><span class="sev-low">LOW</span></td><td><span class="status-fixed">Fixed</span></td></tr>
+  </tbody></table></div>
 </div>
 
-<p style="text-align:center;margin-top:40px"><a href="index.html" class="back-link">&#8592; Back to Emerald Pantry</a> · <a href="brief.html" class="back-link">View Project Brief</a></p>
+<!-- OPEN ISSUES -->
+<div class="tab-content" id="sec-issues">
+  <h3>Open Issues</h3>
+  <p style="margin-bottom:20px">Three items remain. None are functional blockers for the current prototype.</p>
+  <div class="bug-table-wrap"><table class="bug-table"><thead><tr><th>ID</th><th>Area</th><th>Issue</th><th>Impact</th><th>Suggested Resolution</th></tr></thead><tbody>
+    <tr><td class="id">O01</td><td>Data</td><td class="desc"><strong>25/30 products have fake barcodes.</strong> OFF enrichment (Nutri-Score, NOVA, allergens, nutritional values) only available for the 5 products with real barcodes. Category-coded placeholders and 'No facts available' messaging compensate visually.</td><td>Low · Functional output unaffected; informational depth reduced for 83% of catalogue. Academic constraint of the assignment data.</td><td>Replace fake barcodes with matching real OFF barcodes for each product type in the Google Sheet. This is the data owner's (lecturer) domain.</td></tr>
+    <tr><td class="id">O02</td><td>Performance</td><td class="desc"><strong>Cold-start enrichment latency.</strong> The enriched catalogue endpoint makes 30 parallel OFF API calls on first request. Subsequent requests hit the 1hr worker cache. Mitigated by loading basic catalogue first (instant) then enriching in background.</td><td>Low · Basic catalogue loads instantly with all Sheet fields. OFF badges appear 2-8 seconds later. User experience not degraded.</td><td>Pre-warm the worker cache by calling /api/enriched-catalogue at deploy time. Or batch-enrich via Cloudflare Cron trigger every hour.</td></tr>
+    <tr><td class="id">O03</td><td>Feature Gap</td><td class="desc"><strong>Collaborative filtering not implemented.</strong> The recommender system is content-based only. No user-user or item-item similarity from purchase behaviour. No ratings, no implicit feedback loops. This is a known limitation for a single-user academic prototype.</td><td>Low · Content-based recommendations (category, dietary, nutritional, LLM pairings) cover the prototype's scope well. Collaborative filtering would require multi-user data not available in this context.</td><td>Future: if deployed with real users, implement session-based collaborative filtering using basket data. Track co-purchase patterns for 'customers who bought X also bought Y' recommendations.</td></tr>
+  </tbody></table></div>
+  <p style="margin-top:16px;font-size:0.8rem;color:var(--text-dim)">All three open issues are low-impact and appropriate for an academic prototype. The chatbot remains fully functional, honest about its data limitations, and architecturally ready for resolution when real-world data becomes available.</p>
+</div>
+
+<p style="text-align:center;margin-top:40px"><a href="index.html" class="back-link">&#8592; Chat with Ember</a> · <a href="brief.html" class="back-link">View Project Brief</a></p>
 
 <script>
-function switchTab(name){
-  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active")});
-  document.querySelectorAll(".tab-content").forEach(function(c){c.classList.remove("active")});
-  document.getElementById("tab-"+name).classList.add("active");
+function switchSection(name){
+  document.querySelectorAll(".tab-btn.section-tab").forEach(function(b){b.classList.remove("active")});
+  document.querySelectorAll("#sec-academic,#sec-functional,#sec-issues").forEach(function(c){c.classList.remove("active")});
+  document.getElementById("sec-"+name).classList.add("active");
   event.target.classList.add("active");
 }
-function switchSub(prefix,name){
-  var parent = document.getElementById("tab-"+prefix);
-  parent.querySelectorAll(".sub-tab").forEach(function(b){b.classList.remove("active")});
-  parent.querySelectorAll(".sub-content").forEach(function(c){c.classList.remove("active")});
-  document.getElementById(prefix+"-"+name).classList.add("active");
+function switchFW(name){
+  var parent = document.getElementById("sec-academic");
+  parent.querySelectorAll(".tab-btn:not(.section-tab)").forEach(function(b){b.classList.remove("active")});
+  parent.querySelectorAll("#fw-taxonomy,#fw-casa,#fw-flow,#fw-grice,#fw-fogg,#fw-cialdini,#fw-blueprint,#fw-peas,#fw-bdi,#fw-recommender,#fw-clv,#fw-autonomy").forEach(function(c){c.classList.remove("active")});
+  document.getElementById("fw-"+name).classList.add("active");
   event.target.classList.add("active");
 }
 </script>
