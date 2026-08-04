@@ -609,7 +609,13 @@ function enrichLinks(html){
   var names = knownProductNames.slice().sort(function(a,b){return b.length-a.length});
   names.forEach(function(n){
     var rx = new RegExp('(^|\\s|>)('+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?=[\\s,.\!?;:<]|$)','gi');
-    html = html.replace(rx,function(m,p1,p2){return p1+'<span class="chat-link" onclick="qa(\''+p2.replace(/'/g,"\\'")+'\')">'+p2+'</span>'});
+    html = html.replace(rx,function(m,p1,p2){
+      var src = allProducts.length > 0 ? allProducts : products;
+      var found = null;
+      for(var i=0;i<src.length;i++){ if(src[i].product_name.toLowerCase() === p2.toLowerCase()){ found = src[i]; break; } }
+      if(found) return p1+'<span class="chat-link" onclick="openDetail(\''+found.sku.replace(/'/g,"\\'")+'\')">'+p2+'</span>';
+      return p1+'<span class="chat-link" onclick="qa(\''+p2.replace(/'/g,"\\'")+'\')">'+p2+'</span>';
+    });
   });
   return html;
 }
@@ -956,7 +962,7 @@ function backToPantry(){
   addMsg("Back to the pantry! What else catches your eye?",'bot');
 }
 
-function getProduct(sku){for(var i=0;i<products.length;i++){if(products[i].sku===sku)return products[i]}return null}
+function getProduct(sku){var src = allProducts.length > 0 ? allProducts : products; for(var i=0;i<src.length;i++){if(src[i].sku===sku)return src[i]}return null}
 
 function openDetail(sku){
   var p = getProduct(sku); if(!p) return;
