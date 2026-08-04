@@ -613,7 +613,8 @@ function enrichLinks(html){
 }
 function updateKnownNames(){
   knownProductNames = [];
-  products.forEach(function(p){knownProductNames.push(p.product_name)});
+  var source = allProducts.length > 0 ? allProducts : products;
+  source.forEach(function(p){knownProductNames.push(p.product_name)});
   var seen = {}; knownProductNames = knownProductNames.filter(function(n){var k=n.toLowerCase();if(seen[k])return false;seen[k]=true;return n&&n.length>1});
   document.querySelectorAll(".msg.bot .msg-bubble").forEach(function(b){b.innerHTML = enrichLinks(b.innerHTML)});
 }
