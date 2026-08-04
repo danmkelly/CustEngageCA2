@@ -221,7 +221,7 @@ body{display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family
 .cat-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 /* Filter bar */
-.filter-bar{border-bottom:1px solid var(--border);padding:8px 14px;flex-shrink:0}
+.filter-bar{border-bottom:1px solid var(--border);padding:8px 14px;flex-shrink:0;position:sticky;top:0;background:var(--surface);z-index:2}
 .filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:5px}
 .filter-row:last-child{margin-bottom:0}
 .filter-label{font-size:0.56rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-right:2px;white-space:nowrap;flex-shrink:0}
@@ -291,12 +291,7 @@ body{display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family
 .modal-btn-cancel{background:transparent;color:var(--text-dim);border:1px solid var(--border)}
 .modal-btn-cancel:hover{color:var(--text);border-color:var(--text-dim)}
 
-/* Loading spinner */
-.loading-spinner{display:none;padding:40px;text-align:center}
-.loading-spinner.active{display:block}
-.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 12px;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-spinner p{font-size:0.72rem;color:var(--text-dim);margin-top:8px}
+/* Loading spinner — unused, kept for reference */
 
 @media(max-width:768px){
   body{overflow:hidden;display:flex;flex-direction:column;height:100vh}
@@ -367,10 +362,6 @@ body{display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family
 
   <!-- DISCOVERY PANEL -->
   <div class="discovery" id="discovery">
-    <div class="loading-spinner" id="loadingSpinner">
-      <div class="spinner"></div>
-      <p>Searching the pantry...</p>
-    </div>
     <div class="d-empty" id="dEmpty">
       <div class="d-empty-inner">
         <div class="d-empty-icon">&#129367;</div>
@@ -536,7 +527,7 @@ function loadProducts(){
   if(loadedCatalogue) return;
   loadedCatalogue = true;
   clearTimeout(loadTimeout);
-  document.getElementById("discovery").innerHTML = '<div class="loading-spinner active" id="loadingSpinner"><div class="spinner"></div><p>Loading the pantry...</p></div><div class="d-empty" id="dEmpty" style="display:none"><div class="d-empty-inner"><div class="d-empty-icon">&#129367;</div><h3>Your Pantry Discovery</h3><p>Chat with Ember about what you\'re looking for. Products will appear here as they\'re found.</p></div></div><div id="dContent" style="display:none"><div class="filter-bar" id="filterBar"><div class="filter-row"><span class="filter-label">Category</span><div class="cat-chips" id="catChips"></div><span class="filter-pill" data-filter="inStock" onclick="toggleFilter(\'inStock\')">In Stock</span><span class="filter-pill" data-filter="offer" onclick="toggleFilter(\'offer\')">On Offer</span><span class="filter-clear muted" id="filterClear" onclick="clearAllFilters()">Clear all</span></div><div class="filter-row"><span class="filter-label">Diet</span><span class="filter-pill" data-filter="vegan" onclick="toggleFilter(\'vegan\')">Vegan</span><span class="filter-pill" data-filter="vegetarian" onclick="toggleFilter(\'vegetarian\')">Vegetarian</span><span class="filter-pill" data-filter="organic" onclick="toggleFilter(\'organic\')">Organic</span><span class="filter-pill" data-filter="glutenFree" onclick="toggleFilter(\'glutenFree\')">Gluten-Free</span><span class="filter-pill" data-filter="dairyFree" onclick="toggleFilter(\'dairyFree\')">Dairy-Free</span></div><div class="filter-row"><span class="filter-label">Nutri-Score</span><span class="filter-pill nutriscore-a" data-filter="nutriA" onclick="toggleFilter(\'nutriA\')">A</span><span class="filter-pill nutriscore-b" data-filter="nutriB" onclick="toggleFilter(\'nutriB\')">B</span><span class="filter-pill nutriscore-c" data-filter="nutriC" onclick="toggleFilter(\'nutriC\')">C</span><span class="filter-pill nutriscore-d" data-filter="nutriD" onclick="toggleFilter(\'nutriD\')">D</span><span class="filter-pill nutriscore-e" data-filter="nutriE" onclick="toggleFilter(\'nutriE\')">E</span><span class="filter-pill nutri-none" data-filter="nutriNone" onclick="toggleFilter(\'nutriNone\')">None</span><span class="filter-divider"></span><span class="filter-label">Sort</span><select class="sort-select" id="sortSelect" onchange="setSort(this.value)"><option value="">Default</option><option value="priceAsc">Price ↑</option><option value="priceDesc">Price ↓</option><option value="name">Name A-Z</option><option value="nutriBest">Nutri-Score Best</option><option value="proteinDesc">Protein ↑</option><option value="sugarAsc">Sugar ↓</option><option value="saltAsc">Salt ↓</option><option value="kcalAsc">Energy ↓</option></select></div></div><div class="panel-section product-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#129367;</span><h4>Products</h4><span id="resultCount" style="font-size:0.58rem;color:var(--text-dim);margin-left:auto"></span></div><div class="product-grid" id="productGrid"></div></div></div>';
+  document.getElementById("discovery").innerHTML = '<div class="d-empty" id="dEmpty" style="display:none"><div class="d-empty-inner"><div class="d-empty-icon">&#129367;</div><h3>Your Pantry Discovery</h3><p>Chat with Ember about what you\'re looking for. Products will appear here as they\'re found.</p></div></div><div id="dContent" style="display:none"><div class="filter-bar" id="filterBar"><div class="filter-row"><span class="filter-label">Category</span><div class="cat-chips" id="catChips"></div><span class="filter-pill" data-filter="inStock" onclick="toggleFilter(\'inStock\')">In Stock</span><span class="filter-pill" data-filter="offer" onclick="toggleFilter(\'offer\')">On Offer</span><span class="filter-clear muted" id="filterClear" onclick="clearAllFilters()">Clear all</span></div><div class="filter-row"><span class="filter-label">Diet</span><span class="filter-pill" data-filter="vegan" onclick="toggleFilter(\'vegan\')">Vegan</span><span class="filter-pill" data-filter="vegetarian" onclick="toggleFilter(\'vegetarian\')">Vegetarian</span><span class="filter-pill" data-filter="organic" onclick="toggleFilter(\'organic\')">Organic</span><span class="filter-pill" data-filter="glutenFree" onclick="toggleFilter(\'glutenFree\')">Gluten-Free</span><span class="filter-pill" data-filter="dairyFree" onclick="toggleFilter(\'dairyFree\')">Dairy-Free</span></div><div class="filter-row"><span class="filter-label">Nutri-Score</span><span class="filter-pill nutriscore-a" data-filter="nutriA" onclick="toggleFilter(\'nutriA\')">A</span><span class="filter-pill nutriscore-b" data-filter="nutriB" onclick="toggleFilter(\'nutriB\')">B</span><span class="filter-pill nutriscore-c" data-filter="nutriC" onclick="toggleFilter(\'nutriC\')">C</span><span class="filter-pill nutriscore-d" data-filter="nutriD" onclick="toggleFilter(\'nutriD\')">D</span><span class="filter-pill nutriscore-e" data-filter="nutriE" onclick="toggleFilter(\'nutriE\')">E</span><span class="filter-pill nutri-none" data-filter="nutriNone" onclick="toggleFilter(\'nutriNone\')">None</span><span class="filter-divider"></span><span class="filter-label">Sort</span><select class="sort-select" id="sortSelect" onchange="setSort(this.value)"><option value="">Default</option><option value="priceAsc">Price ↑</option><option value="priceDesc">Price ↓</option><option value="name">Name A-Z</option><option value="nutriBest">Nutri-Score Best</option><option value="proteinDesc">Protein ↑</option><option value="sugarAsc">Sugar ↓</option><option value="saltAsc">Salt ↓</option><option value="kcalAsc">Energy ↓</option></select></div></div><div class="panel-section product-section"><div class="panel-hdr"><span class="panel-hdr-icon">&#129367;</span><h4>Products</h4><span id="resultCount" style="font-size:0.58rem;color:var(--text-dim);margin-left:auto"></span></div><div class="product-grid" id="productGrid"></div></div></div>';
   dEmpty = document.getElementById("dEmpty");
   dContent = document.getElementById("dContent");
   productGrid = document.getElementById("productGrid");
@@ -544,9 +535,6 @@ function loadProducts(){
   wireFilterBar();
   // Show the panel immediately with a loading state, then fill with data
   dContent.style.display = "block";
-  var spinner4 = document.getElementById("loadingSpinner");
-  if(spinner4) spinner4.classList.add("active");
-  productGrid.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.76rem">Loading products...</div>';
   clearTimeout(loadTimeout);
   loadTimeout = setTimeout(function(){
     if(!products || !products.length){ fetchCatalogue("","").then(function(p){if(p.length){renderProducts(p);products=p;allProducts=p.slice()}}); }
@@ -1264,8 +1252,6 @@ async function send(){
 
   // STEP 1: Fetch matching products from catalogue
   showTyping();
-  var spinner2 = document.getElementById("loadingSpinner");
-  if(spinner2) spinner2.classList.add("active");
   var foundProds = [];
 
   // Client-side pre-filtering for common intent patterns
@@ -1283,8 +1269,6 @@ async function send(){
       prods.forEach(function(p){if(!foundProds.some(function(fp){return fp.sku===p.sku}))foundProds.push(p)});
     }
   }
-  var spinner3 = document.getElementById("loadingSpinner");
-  if(spinner3) spinner3.classList.remove("active");
   hideTyping();
 
   if(foundProds.length>0){
