@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emerald Pantry — Technical Reference</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A1F12;--surface:#0F2A1A;--surface2:#163322;--border:#1F402A;
+  --text:#E8F0E4;--text-dim:#7A9A82;--accent:#2D8B4E;--accent2:#D4A84B;--accent3:#C49A3C;
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7}
+.page{max-width:1040px;margin:0 auto;padding:60px 24px 80px}
+.hero{text-align:center;padding:60px 0 50px;border-bottom:1px solid var(--border);margin-bottom:50px}
+.hero-icon{font-size:3.5rem;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(45,139,78,0.4))}
+.hero h1{font-size:2.2rem;font-weight:900;color:#D4E8D0;letter-spacing:-0.5px;margin-bottom:10px}
+.hero h1 span{color:var(--accent2)}
+.hero-sub{font-size:0.95rem;color:var(--text-dim);max-width:700px;margin:0 auto;line-height:1.6}
+.section{margin-bottom:48px}
+.section-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:8px}
+.section h2{font-size:1.4rem;font-weight:800;margin-bottom:16px;color:#D4E8D0}
+.section h3{font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--text);margin-top:20px}
+.section p{font-size:0.88rem;color:var(--text-dim);margin-bottom:14px;line-height:1.75}
+.section p strong{color:var(--text)}
+.section ul,.section ol{font-size:0.85rem;color:var(--text-dim);line-height:1.8;padding-left:20px;margin-bottom:14px}
+.section li{margin-bottom:6px}
+.section code{background:var(--surface2);color:var(--accent2);padding:2px 6px;border-radius:4px;font-size:0.82rem;font-family:'SF Mono','Fira Code','Consolas',monospace}
+pre{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;font-size:0.78rem;line-height:1.6;color:var(--text-dim);font-family:'SF Mono','Fira Code','Consolas',monospace;margin-bottom:16px}
+pre code{background:none;color:var(--text-dim);padding:0}
+.arch-diagram{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;margin:20px 0}
+.arch-flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.arch-node{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 18px;text-align:center;font-size:0.78rem;font-weight:600}
+.arch-node.label{background:var(--accent);color:#fff;border-color:var(--accent);font-size:0.7rem}
+.arch-node.gold{background:rgba(212,168,75,0.2);border-color:var(--accent2);color:var(--accent2)}
+.arch-arrow{color:var(--accent3);font-size:1.2rem;font-weight:700}
+.arch-label{font-size:0.6rem;color:var(--text-dim);text-align:center;margin-top:4px}
+.info-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0}
+.info-box p{font-size:0.82rem;margin-bottom:6px}
+.evidence-tag{display:inline-block;background:rgba(212,168,75,0.12);color:var(--accent2);padding:3px 8px;border-radius:4px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;transition:all .2s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card-icon{font-size:1.4rem;margin-bottom:8px}
+.card h4{font-size:0.78rem;font-weight:700;margin-bottom:4px;color:var(--text)}
+.card p{font-size:0.68rem;color:var(--text-dim);line-height:1.5}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent2);text-decoration:none;font-size:0.82rem;font-weight:600;margin-top:30px;transition:color .15s}
+.back-link:hover{color:#E0B84F}
+@media(max-width:700px){
+  .card-grid{grid-template-columns:1fr}.arch-flow{flex-direction:column}.arch-arrow{transform:rotate(90deg)}.hero h1{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="hero" style="max-width:1040px;margin:0 auto;padding:60px 24px 40px;text-align:center;border-bottom:1px solid var(--border);margin-bottom:50px">
+  <div class="hero-icon">&#128295;</div>
+  <h1>Emerald Pantry <span>Technical Reference</span></h1>
+  <p class="hero-sub">Development toolchain, agent architecture, data pipeline design, and live-data evidence — the technical story behind the chatbot.</p>
+</div>
+<div class="page">
+
+  <div class="section">
+    <div class="section-label">Development Environment</div>
+    <h2>OpenCode &amp; DeepSeek — the toolchain</h2>
+    <p>The entire Emerald Pantry chatbot was developed using <strong>OpenCode</strong> (an AI-assisted coding environment) powered by <strong>DeepSeek</strong> (via <code>deepseek-v4-pro</code>). All code generation, refactoring, debugging, and deployment happened within this single toolchain. No traditional IDE was used.</p>
+    <div class="info-box">
+      <p><strong>Model:</strong> DeepSeek V4 Pro (via <code>opencode-go/deepseek-v4-pro</code>)</p>
+      <p><strong>Interface:</strong> OpenCode CLI — file read/write, shell execution, git operations, web fetching, glob search, grep search</p>
+      <p><strong>Deployment:</strong> <code>git push</code> to GitHub Pages · <code>npx wrangler deploy</code> to Cloudflare Workers</p>
+      <p><strong>Evidence:</strong> All commits (see <a href="https://github.com/danmkelly/CustEngageCA2/commits/main" style="color:var(--accent2)">commit history</a>) were authored by OpenCode sessions. Each commit message describes the agent-orchestrated change.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Development Methodology</div>
+    <h2>The Five Innovators + QA model</h2>
+    <p>The project was structured using the <strong>Five Innovators model</strong> (Victor del Rosal) — a framework for dividing innovation work across five non-overlapping specialisms, plus a dedicated QA specialist. Each agent has a defined persona file (<code>.md</code>) in the repository that specifies its domain, beliefs, boundaries, and skills.</p>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">&#128270;</div><h4>@Emer Greenan — Researcher</h4><p>Food market intelligence. Mapped the Google Sheet catalogue to OpenFoodFacts taxonomy. Designed the enrichment pipeline. Specified data quality rules and dietary classification.</p></div>
+      <div class="card"><div class="card-icon">&#127912;</div><h4>@Sadhbh Kelly — Designer</h4><p>Web experience. Emerald-green/gold theme, two-panel layout, product cards, filter bar, detail view, basket overlay, onboarding lock, responsive mobile breakpoints.</p></div>
+      <div class="card"><div class="card-icon">&#128736;</div><h4>@Darragh Walsh — Maker</h4><p>Chatbot engineer. Cloudflare Worker (3 endpoints), CSV parser, OFF enrichment, DeepSeek integration, conversation engine, filter system, purchase flow, voice STT/TTS, test suite.</p></div>
+      <div class="card"><div class="card-icon">&#128172;</div><h4>@Maeve Flynn — Marketer</h4><p>Brand voice. Ember's system prompt, off-topic refocusing language, consent/trust scripts, product storytelling, framework positioning for QA dashboard.</p></div>
+      <div class="card"><div class="card-icon">&#128101;</div><h4>@Cillian Burke — Manager</h4><p>Orchestrator. Task decomposition, specialist dispatch, quality gates between handoffs, synthesis of outputs. Directed QA review. Product owner for delivery.</p></div>
+      <div class="card"><div class="card-icon">&#128269;</div><h4>@Keelin O'Sullivan — QA</h4><p>Quality assurance. 6-category weighted scoring rubric. 31-finding academic review across 12 frameworks. Automated filter test suite (18/18 passed). QA dashboard author.</p></div>
+    </div>
+    <p style="margin-top:16px"><strong>Handoff pattern:</strong> Researcher → Designer → Maker → Marketer, with Manager running quality gates at each stage. Keelin tested continuously against the rubric, re-testing after each deployment. Each agent's persona file is committed in the repository and linked from the footer.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Academic Foundation</div>
+    <h2>Lecture decks as reference material</h2>
+    <p>The 52 lecture slide decks from the Customer Engagement &amp; AI module (W01–W11) served as the primary academic reference. Key frameworks extracted from specific decks:</p>
+    <div class="info-box">
+      <table style="width:100%;font-size:0.8rem;color:var(--text-dim);border-collapse:collapse">
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W06 Deck 2</td><td style="padding:6px 8px">Chatbot Taxonomy (Adamopoulou &amp; Moussiades 2020)</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W06 Deck 3</td><td style="padding:6px 8px">CASA — Computers Are Social Actors (Reeves &amp; Nass 1996)</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W06 Deck 4</td><td style="padding:6px 8px">Conversation Flow Anatomy</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W07 Deck 2</td><td style="padding:6px 8px">Grice's Cooperative Principle</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W05 Deck 2</td><td style="padding:6px 8px">Fogg Behaviour Model (B=MAP)</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W05 Deck 3</td><td style="padding:6px 8px">Cialdini's Principles of Persuasion</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W07 Deck 3</td><td style="padding:6px 8px">Service Blueprinting &amp; Uncanny Valley</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W08 Deck 2</td><td style="padding:6px 8px">PEAS Agent Specification (Russell &amp; Norvig)</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W08 Deck 3</td><td style="padding:6px 8px">BDI Model (Bratman / Rao &amp; Georgeff)</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W09 Deck 1–3</td><td style="padding:6px 8px">Recommender System Taxonomy</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W10 Deck 1–3</td><td style="padding:6px 8px">AI Marketing Maturity &amp; Customer Lifetime Value</td></tr>
+        <tr><td style="padding:6px 8px;color:var(--accent2);white-space:nowrap">W11 Deck 2–3</td><td style="padding:6px 8px">Levels of Automation &amp; Human-Centered AI</td></tr>
+      </table>
+    </div>
+    <p>Each framework was systematically applied to the chatbot design by @Keelin and documented in the <a href="qa.html" style="color:var(--accent2)">QA Dashboard</a> with 31 individual findings (A01–A31, B01–B23). The frameworks were not retrofitted — they informed design decisions during the build process: onboarding structure (Flow Anatomy), turn-1 disclosure (CASA), 'No facts available' messaging (Grice — Quality), purchase flow simplicity (Fogg — Ability), and third-party nutritional sourcing (Cialdini — Authority).</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">System Architecture</div>
+    <h2>Browser → Worker → Data Sources</h2>
+    <div class="arch-diagram">
+      <div class="arch-flow">
+        <div style="text-align:center">
+          <div class="arch-node label">Browser</div>
+          <div class="arch-label">GitHub Pages<br>SPA — no framework</div>
+        </div>
+        <span class="arch-arrow">&rarr;</span>
+        <div style="text-align:center">
+          <div class="arch-node gold">Cloudflare Worker</div>
+          <div class="arch-label">3 endpoints<br>emerald-pantry-proxy</div>
+        </div>
+        <span class="arch-arrow">&rarr;</span>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="arch-node"><div>DeepSeek API</div><div class="arch-label">LLM — chat completions</div></div>
+          <div class="arch-node"><div>Google Sheets</div><div class="arch-label">CSV export — live</div></div>
+          <div class="arch-node"><div>OpenFoodFacts API</div><div class="arch-label">Product by barcode</div></div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Worker Endpoints</h3>
+    <div class="info-box">
+      <p><strong><code>GET/POST /api/llm</code></strong> — Proxies chat completion requests to DeepSeek. The API key lives in a Cloudflare environment variable (<code>npx wrangler secret put LLM_KEY</code>). The browser never sees it.</p>
+      <p><strong><code>GET /api/catalogue</code></strong> — Fetches the Google Sheet as CSV, parses it to JSON, returns product list. Accepts <code>?q=</code> (text search) and <code>?category=</code> filters. <strong>No cache — every request is a fresh Sheet fetch</strong> (see evidence below).</p>
+      <p><strong><code>GET /api/enriched-catalogue</code></strong> — Same as above, then makes 30 parallel barcode lookups to the OFF API and merges nutritional data into each product. OFF data cached 1 hour (nutritional facts are static); Sheet data is always live.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Data Pipeline</div>
+    <h2>Google Sheets → OpenFoodFacts enrichment</h2>
+
+    <h3>Google Sheets integration</h3>
+    <p>The product catalogue lives at <code>https://docs.google.com/spreadsheets/d/1fY7974AdL4rrO2gnCxcCBUFWWSkVhOi9euJI7lNjo2Q/edit</code>. The Worker fetches it via the CSV export endpoint (<code>/export?format=csv</code>). A custom CSV parser handles quoted fields (product descriptions contain commas). No Google Sheets API key needed — the sheet is published and the CSV export is public.</p>
+
+    <h3>OpenFoodFacts integration — why the barcode API, not MCP</h3>
+    <p>The OFF integration uses the <strong>public product API</strong>: <code>GET https://world.openfoodfacts.org/api/v2/product/{barcode}.json</code>. This endpoint returns full nutritional data, allergens, Nutri-Score, NOVA group, Eco-Score, dietary flags, ingredient analysis, and product images — all from a single HTTP call with no authentication required.</p>
+    <p><strong>Why not MCP (Model Context Protocol)?</strong> An MCP server wrapping the OFF API would add deployment complexity (a separate server process), authentication overhead, and an additional network hop for what is fundamentally a single GET request per barcode. The Worker already handles the enrichment directly — 30 parallel <code>fetch()</code> calls, each to a simple REST endpoint. MCP would be the right choice if the integration required multi-step tool orchestration (e.g., search → narrow → compare → enrich), but for product-by-barcode data lookup, a direct HTTP call is simpler, faster, and more maintainable.</p>
+    <p>The Worker's <code>extractOffFields()</code> function maps the rich OFF response to a compact enrichment object with only the fields the chatbot needs: Nutri-Score, NOVA, Eco-Score, allergens, dietary tags, nutrient levels per 100g, product image URL, and OFF categories hierarchy. This keeps the payload small for the frontend.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Live Data Evidence</div>
+    <h2>How to verify live data pulls</h2>
+    <p>The chatbot makes live data pulls at multiple points. Each is independently verifiable:</p>
+
+    <h3>1. Google Sheet — zero-cache catalogue fetch</h3>
+    <p>Every <code>/api/catalogue</code> request appends <code>&amp;t={timestamp}</code> to the Google Sheets CSV URL, bypassing any CDN or browser cache. The Worker response includes <code>Cache-Control: no-cache, no-store, must-revalidate</code>. Browser-side, every <code>fetch()</code> uses <code>{cache: "no-store"}</code>.</p>
+    <div class="info-box">
+      <p><span class="evidence-tag">Evidence</span> <strong>Open DevTools → Network tab → filter for <code>catalogue</code>.</strong> You will see a request to the Worker on every page load, every search, and every filter change. The response always includes the current timestamp in the <code>updated</code> field. Compare this with the Google Sheet to confirm data freshness.</p>
+      <p style="margin-top:8px"><span class="evidence-tag">Evidence</span> <strong>Change a value in the Google Sheet</strong> (e.g., a price or stock count). Type the product name in the chatbot. The new value appears immediately — no cache delay, no stale data window.</p>
+      <p style="margin-top:8px"><span class="evidence-tag">Evidence</span> <strong>Worker code:</strong> <code>var resp = await fetch(CATALOGUE_URL + "&t=" + Date.now());</code> in <code>worker.js</code> line 63. Response headers: <code>"Cache-Control": "no-cache, no-store, must-revalidate"</code>.</p>
+    </div>
+
+    <h3>2. OpenFoodFacts — barcode enrichment</h3>
+    <p>Each product with a real barcode triggers a lookup to <code>world.openfoodfacts.org/api/v2/product/{barcode}</code>. The Worker makes all 30 lookups in parallel via <code>Promise.all()</code>. OFF nutritional data is cached 1 hour (it's static); the Google Sheet data around it is always live.</p>
+    <div class="info-box">
+      <p><span class="evidence-tag">Evidence</span> <strong>Open DevTools → Network tab → filter for <code>enriched-catalogue</code>.</strong> The response includes <code>"source": "emerald-pantry + openfoodfacts"</code>. Each product with OFF data has <code>nutriscore_grade</code>, <code>nova_group</code>, <code>allergens</code>, <code>image_url</code> fields. Compare these against the OFF website: search for the barcode at <code>world.openfoodfacts.org/product/{barcode}</code>.</p>
+      <p style="margin-top:8px"><span class="evidence-tag">Evidence</span> <strong>Worker code:</strong> <code>enrichProduct()</code> in <code>worker.js</code> lines 153–165. The <code>OFF_URL</code> constant at line 11. Cache TTL: <code>"Cache-Control": "public, max-age=3600"</code> (1 hour).</p>
+    </div>
+
+    <h3>3. DeepSeek LLM — conversation proxy</h3>
+    <p>Every user message (post-onboarding) triggers an LLM call to <code>api.deepseek.com/v1/chat/completions</code>. The request includes conversation history (last 20 exchanges), the Ember system prompt, and full catalogue context for the products currently in view.</p>
+    <div class="info-box">
+      <p><span class="evidence-tag">Evidence</span> <strong>Open DevTools → Network tab → filter for <code>llm</code>.</strong> Each user message after onboarding produces a POST to the Worker's <code>/api/llm</code> endpoint. The response contains the LLM-generated reply. The <code>Authorisation</code> header is never visible in the browser — it's injected server-side by the Worker.</p>
+      <p style="margin-top:8px"><span class="evidence-tag">Evidence</span> <strong>Worker code:</strong> LLM proxy in <code>worker.js</code> lines 28–37. Key from <code>env.LLM_KEY</code> (Cloudflare secret). Frontend sends a plain JSON body with <code>model</code>, <code>messages</code>, <code>temperature</code>, <code>max_tokens</code>.</p>
+    </div>
+
+    <h3>4. Automated test verification</h3>
+    <p>The <code>runFilterTests()</code> function (accessible by typing <code>test</code> in chat) programmatically verifies all 18 filter interactions against live data. It checks that clicking "Bakery" returns exactly the number of bakery products in the live catalogue, that Clear All restores the full 30, and that all 13 filter pills toggle correctly.</p>
+    <pre><code>// Run in the chatbot: type "test" and press Enter
+// Or open DevTools console and run: runFilterTests()
+// Tests verify: 5 categories, 13 filter pills, Clear All, button</code></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Deployment</div>
+    <h2>GitHub Pages + Cloudflare Workers</h2>
+    <p><strong>Frontend:</strong> Static HTML/CSS/JS served via GitHub Pages from the <code>main</code> branch root. Cache-control headers set via <code>_headers</code> file and HTML <code>&lt;meta&gt;</code> tags to prevent stale JS caching.</p>
+    <p><strong>Backend:</strong> Cloudflare Worker (<code>emerald-pantry-proxy</code>) deployed via <code>npx wrangler deploy</code>. The DeepSeek API key is stored as a Cloudflare secret. Three endpoints handle LLM proxy, catalogue fetch, and enriched catalogue.</p>
+    <p><strong>Repository:</strong> <a href="https://github.com/danmkelly/CustEngageCA2" style="color:var(--accent2)">github.com/danmkelly/CustEngageCA2</a> — all source, agent personas, and documentation in a single public repo.</p>
+  </div>
+
+  <p style="text-align:center;margin-top:40px">
+    <a href="index.html" class="back-link">&#8592; Chat with Ember</a> ·
+    <a href="brief.html" class="back-link">Project Brief</a> ·
+    <a href="qa.html" class="back-link">QA Dashboard</a>
+  </p>
+</div>
+</body>
+</html>
