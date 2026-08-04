@@ -747,7 +747,12 @@ function parseCSVLineClient(line){
 
 // === Render products ===
 function renderProducts(prods,searchTerm){
-  if(!searchTerm || searchTerm === "") allProducts = prods.slice();
+  if(!searchTerm || searchTerm === ""){ allProducts = prods.slice(); activeCategory = ""; }
+  // If search results all share one category, sync the UI chip
+  if(searchTerm && searchTerm !== "" && prods.length > 0 && allProducts.length > 0){
+    var cats = {}; prods.forEach(function(p){ cats[p.category] = (cats[p.category]||0)+1; });
+    if(Object.keys(cats).length === 1){ activeCategory = Object.keys(cats)[0]; }
+  }
   if(searchTerm && searchTerm !== "" && allProducts.length > 0 && prods.length < allProducts.length){
     var tmp = allProducts; allProducts = prods; doRender(); allProducts = tmp;
   } else { doRender(); }
@@ -829,7 +834,6 @@ function doRender(){
 function filterCat(cat){
   activeCategory = cat;
   doRender();
-  if(cat){ addMsg("Showing: <strong>"+(categoryLabels[cat]||cat)+"</strong>",'bot'); }
 }
 
 function toggleFilter(key){
@@ -854,14 +858,7 @@ function escapeHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
 
 // Wire up filter bar event handlers (called after DOM rebuild)
 function wireFilterBar(){
-  // Category chip delegated click
-  if(catChips){
-    catChips.onclick = function(e){
-      var el = e.target.closest(".cat-chip");
-      if(!el) return;
-      filterCat(el.getAttribute("data-cat") || "");
-    };
-  }
+  // Category chips handled directly by prodByCat - no delegation needed here
   // Filter pill clicks - remove inline handlers first, then bind once
   document.querySelectorAll(".filter-pill[data-filter]").forEach(function(el){
     el.removeAttribute("onclick");
