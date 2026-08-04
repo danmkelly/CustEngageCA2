@@ -26,7 +26,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .hero-icon{font-size:3.5rem;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(45,139,78,0.4))}
 .hero h1{font-size:2.4rem;font-weight:900;color:#D4E8D0;letter-spacing:-0.5px;margin-bottom:10px}
 .hero h1 span{color:var(--accent2)}
-.hero-sub{font-size:0.95rem;color:var(--text-dim);max-width:600px;margin:0 auto;line-height:1.6}
+.hero-sub{font-size:0.95rem;color:var(--text-dim);max-width:700px;margin:0 auto;line-height:1.6}
 .section{margin-bottom:48px}
 .section-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:8px}
 .section h2{font-size:1.5rem;font-weight:800;margin-bottom:16px;color:#D4E8D0}
@@ -46,20 +46,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .arch-node{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 20px;text-align:center;font-size:0.78rem;font-weight:600}
 .arch-node.label{background:var(--accent);color:#fff;border-color:var(--accent);font-size:0.7rem}
 .arch-arrow{color:var(--accent3);font-size:1.2rem;font-weight:700}
-.arch-node.small{font-size:0.68rem;padding:10px 14px}
-.cta{display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(-45deg,var(--accent),#1F5C34,#2D8B4E,#24763F,#2D8B4E);background-size:400% 400%;color:#fff;padding:20px 40px;border-radius:12px;text-decoration:none;font-weight:800;letter-spacing:0.5px;margin-top:30px;transition:all .2s;box-shadow:0 8px 30px rgba(45,139,78,0.3);animation:wave-cta 2.5s ease infinite}
-.cta-main{font-size:1.1rem}
-.cta-tagline{font-size:0.7rem;font-weight:500;opacity:0.85;font-style:italic;letter-spacing:0.2px}
-.cta:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(45,139,78,0.5)}
 @keyframes wave-cta{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 @media(max-width:700px){
-  .page{grid-template-columns:1fr}
-  .page-sidebar{position:static;display:flex;flex-direction:row;gap:12px;flex-wrap:wrap}
-  .sidebar-cta{flex:1 1 200px}
-  .card-grid{grid-template-columns:1fr}
-  .hero h1{font-size:1.6rem}
-  .arch-flow{flex-direction:column}
-  .arch-arrow{transform:rotate(90deg)}
+  .page{grid-template-columns:1fr}.page-sidebar{position:static;display:flex;flex-direction:row;gap:12px;flex-wrap:wrap}
+  .sidebar-cta{flex:1 1 200px}.card-grid{grid-template-columns:1fr}.hero h1{font-size:1.6rem}.arch-flow{flex-direction:column}.arch-arrow{transform:rotate(90deg)}
 }
 </style>
 </head>
@@ -67,203 +57,93 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 <div class="hero" style="max-width:1100px;margin:0 auto;padding:60px 24px 40px;text-align:center;border-bottom:1px solid var(--border);margin-bottom:50px">
   <div class="hero-icon">&#127807;</div>
   <h1 style="font-size:2.4rem;font-weight:900;color:#D4E8D0;letter-spacing:-0.5px;margin-bottom:10px">Emerald Pantry <span style="color:var(--accent2)">Chatbot</span></h1>
-  <p class="hero-sub" style="font-size:0.95rem;color:var(--text-dim);max-width:700px;margin:0 auto;line-height:1.6">An AI-powered shopping assistant for an Irish online grocery and specialty food retailer: live catalogue data from Google Sheets, conversational AI via DeepSeek, and a secure Cloudflare Worker proxy layer.</p>
+  <p class="hero-sub">An AI-powered conversational shopping assistant for an Irish online grocery and specialty food retailer. Live catalogue from Google Sheets, nutritional enrichment from OpenFoodFacts, conversational AI via DeepSeek, full purchase flow, and a secure Cloudflare Worker proxy — assessed against 12 academic frameworks.</p>
 </div>
 <div class="page">
-
   <div class="page-main">
 
   <div class="section">
-    <div class="section-label">The Business Challenge</div>
-    <h2>Bringing the pantry counter online</h2>
-    <p><strong>Emerald Pantry</strong> is an online grocery and specialty food retailer based in Ireland. The pitch is simple: quality Irish and international foods, hand-picked by people who know and love food, delivered to your door. But the experience of browsing an online grocery catalogue can feel sterile: a grid of thumbnails, a search box, a checkout. There is no opportunity for the friendly, knowledgeable advice that makes a great food shop special.</p>
-    <p>The answer: a friendly, AI-powered chatbot named <strong>Ember</strong> that mimics the experience of talking to a knowledgeable shop assistant -- suggesting products, answering food questions, and helping customers discover new items from the live catalogue.</p>
-  </div>
-
-  <div class="section">
     <div class="section-label">How Ember Works</div>
-    <h2>AI-powered food discovery, grounded in a live catalogue</h2>
-
+    <h2>Conversational AI grounded in two live data sources</h2>
     <div class="card-grid">
-      <div class="card">
-        <div class="card-icon">&#129302;</div>
-        <h4>Conversational AI</h4>
-        <p>Ember is powered by <strong>DeepSeek</strong>, a large language model. Customers can ask "what's good for dinner tonight?", "show me Irish cheeses", or "anything gluten-free in the bakery?" and get natural, knowledgeable responses grounded in real products.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128202;</div>
-        <h4>Live Catalogue Data</h4>
-        <p>Ember pulls product data dynamically from a <strong>Google Sheet</strong>: 30 products across 5 categories (bakery, dairy, drinks, snacks, store-cupboard). Prices, availability, stock levels, special offers, and descriptions are always current -- no stale data.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128722;</div>
-        <h4>Product Discovery</h4>
-        <p>The discovery panel fills with matching products as customers chat. Filter by category, see prices and availability at a glance, and click any product to learn more. Every product Ember mentions is a real item in the live catalogue.</p>
-      </div>
+      <div class="card"><div class="card-icon">&#129302;</div><h4>Conversational AI</h4><p>Powered by <strong>DeepSeek</strong>. Ask anything — "what's for dinner?", "show me Irish cheese", "healthy breakfast ideas", "high protein snacks" — and Ember responds with real products, prices, pairings, and cooking suggestions grounded in live data.</p></div>
+      <div class="card"><div class="card-icon">&#128202;</div><h4>Live Google Sheet Catalogue</h4><p>30 products across 5 categories. Prices, stock, availability, and special offers fetched <strong>live on every request</strong> with zero caching — lecturer changes appear instantly.</p></div>
+      <div class="card"><div class="card-icon">&#129367;</div><h4>OpenFoodFacts Enrichment</h4><p>Every product enriched with Nutri-Score, NOVA processing group, Eco-Score, allergens, dietary flags, and nutritional values (protein, fiber, sugar, salt, energy) per 100g — sourced from world.openfoodfacts.org.</p></div>
+      <div class="card"><div class="card-icon">&#127991;</div><h4>Rich Filter Bar</h4><p>Categories with live counts. Quick toggles for In Stock, On Offer, dietary needs, Nutri-Score A-E+None. Sort by price, Nutri-Score, protein, sugar, salt, energy. Bidirectional sync with chat.</p></div>
+      <div class="card"><div class="card-icon">&#128722;</div><h4>Purchase Flow</h4><p>Click product → detail view with image, OFF facts, quantity selector. Add to Basket → full-panel basket overlay with itemised list, totals, remove, checkout. Checkout confirmation with order ID.</p></div>
+      <div class="card"><div class="card-icon">&#128100;</div><h4>Trust &amp; Transparency</h4><p>Turn-1 AI disclosure. Consent before data storage. OFF data provenance linked. 'No facts available' for unmatched products. 'Representative image' tags. Human contact always reachable.</p></div>
     </div>
   </div>
 
   <div class="section">
     <div class="section-label">Technical Architecture</div>
-    <h2>Secure, serverless, and key-safe</h2>
-    <p>The DeepSeek API requires a secret key and Google Sheets is a public CSV export. A <strong>Cloudflare Worker</strong> acts as a thin proxy layer: the browser calls the worker, the worker injects the LLM secret key server-side, fetches and caches the Google Sheet CSV, and returns parsed product data. No keys in source code, no keys in DevTools.</p>
-
+    <h2>Secure proxy, live data, smart enrichment</h2>
     <div class="arch">
       <div class="arch-flow">
-        <div class="arch-node label">Browser</div>
-        <span class="arch-arrow">&rarr;</span>
-        <div class="arch-node label">Cloudflare Worker</div>
-        <span class="arch-arrow">&rarr;</span>
+        <div class="arch-node label">Browser</div><span class="arch-arrow">&rarr;</span>
+        <div class="arch-node label">Cloudflare Worker</div><span class="arch-arrow">&rarr;</span>
         <div class="arch-node"><div>DeepSeek LLM</div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:2px">Conversational AI</div></div>
-        <div class="arch-node"><div>Google Sheets</div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:2px">Product catalogue</div></div>
+        <div class="arch-node"><div>Google Sheets</div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:2px">Live catalogue CSV</div></div>
+        <div class="arch-node"><div>OpenFoodFacts</div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:2px">Nutrition, allergens, images</div></div>
       </div>
     </div>
-
-    <div class="arch" style="margin-top:16px">
-      <div class="arch-flow">
-        <div class="arch-node label">Phase 2 (Planned)</div>
-        <span class="arch-arrow">&rarr;</span>
-        <div class="arch-node"><div>OpenFoodFacts</div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:2px">Nutrition & allergens</div></div>
-      </div>
-    </div>
-
-    <div class="tech-row" style="margin-top:24px">
+    <p style="margin-top:16px">The Worker has three endpoints: <code>/api/llm</code> (DeepSeek proxy, key server-side), <code>/api/catalogue</code> (live CSV, no cache), and <code>/api/enriched-catalogue</code> (Sheet + OFF merged, nutritional data cached 1hr). The frontend loads basic catalogue instantly, then enriches with OFF in background. No API keys in source code.</p>
+    <div class="tech-row" style="margin-top:16px">
       <div class="tech-badge"><span class="tech-badge-icon">&#127760;</span> GitHub Pages</div>
       <div class="tech-badge"><span class="tech-badge-icon">&#9729;</span> Cloudflare Workers</div>
       <div class="tech-badge"><span class="tech-badge-icon">&#129302;</span> DeepSeek Chat</div>
-      <div class="tech-badge"><span class="tech-badge-icon">&#128202;</span> Google Sheets API</div>
+      <div class="tech-badge"><span class="tech-badge-icon">&#128202;</span> Google Sheets (live CSV)</div>
+      <div class="tech-badge"><span class="tech-badge-icon">&#129367;</span> OpenFoodFacts API</div>
       <div class="tech-badge"><span class="tech-badge-icon">&#9889;</span> Vanilla JS</div>
       <div class="tech-badge"><span class="tech-badge-icon">&#127912;</span> Pure CSS</div>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-label">Key Features</div>
-    <h2>What Ember can do right now</h2>
+    <div class="section-label">Data Flow</div>
+    <h2>How the two data sources join</h2>
+    <ol style="color:var(--text-dim);font-size:0.88rem;line-height:2;padding-left:20px">
+      <li><strong>Google Sheet</strong> is the single source of truth. Fetched as CSV every request with <strong>zero cache</strong> for price, stock, and availability.</li>
+      <li><strong>Cloudflare Worker /api/enriched-catalogue</strong>: fetches Sheet, then makes 30 parallel barcode lookups to OFF. Merges live Sheet fields with cached nutritional data.</li>
+      <li><strong>Browser</strong>: calls <code>/api/catalogue</code> for instant display, then <code>/api/enriched-catalogue</code> in background for OFF badges and nutritional values.</li>
+      <li><strong>LLM context</strong>: every product in view is injected into the system prompt with ALL fields — price, stock, offer, allergens, Nutri-Score, NOVA, nutrients, origins, description.</li>
+      <li><strong>Transparency</strong>: each product card shows a labelled OFF section with 'view record' link. Missing data stated openly as 'No facts available'.</li>
+    </ol>
+  </div>
 
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-icon">&#128269;</div>
-        <h4>Product Search</h4>
-        <p>Natural language search across the full catalogue: "what do you have in the bakery?", "show me Irish cheese", "anything on special offer?" Matching products appear in the discovery panel in real time.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128172;</div>
-        <h4>Conversational LLM</h4>
-        <p>Every user message gets a response from DeepSeek. Ember is warm, knowledgeable, Irish-flavoured, and grounded in actual catalogue data. She references real products, real prices, and real availability.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128488;</div>
-        <h4>Off-Topic Refocusing</h4>
-        <p>If a customer asks about sports, politics, or the weather, Ember acknowledges briefly and gracefully guides the conversation back to food and shopping. Friendly, not robotic.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#127991;</div>
-        <h4>Category Filtering</h4>
-        <p>Products in the discovery panel can be filtered by category: bakery, dairy, drinks, snacks, store-cupboard. See counts and browse easily.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128100;</div>
-        <h4>Human Handoff</h4>
-        <p>Type "human" at any time to get Emerald Pantry's contact details. A persistent handoff prompt sits at the bottom of the chat panel.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#127908;</div>
-        <h4>Voice Input &amp; Output</h4>
-        <p>Speak to Ember via the microphone button. Ember reads her responses aloud. Irish English voice selection prioritised.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128190;</div>
-        <h4>Memory &amp; Personalisation</h4>
-        <p>localStorage-based memory (opt-in): remembers your name, recent searches, and visit count. All data stays on your device. Full clear-memory option.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#129367;</div>
-        <h4>Phase 2: OpenFoodFacts</h4>
-        <p>Planned enrichment: cross-reference catalogue products against OpenFoodFacts for nutritional data, allergen flags, ingredient lists, and eco-scores.</p>
-      </div>
-    </div>
+  <div class="section">
+    <div class="section-label">Design &amp; Quality</div>
+    <h2>Assessed against 12 academic frameworks</h2>
+    <p>Systematically reviewed by <strong>@Keelin O'Sullivan</strong> (QA specialist) against frameworks from the Customer Engagement &amp; AI module: Chatbot Taxonomy, CASA, Flow Anatomy, Grice, Fogg B=MAP, Cialdini, Service Blueprinting/Uncanny Valley, PEAS Agent, BDI Model, Recommender Taxonomy, CLV &amp; AI Marketing Maturity, and Levels of Automation.</p>
+    <p style="margin-top:8px;padding:12px 16px;background:rgba(212,168,75,0.06);border:1px solid rgba(212,168,75,0.2);border-radius:8px"><strong style="color:var(--accent2)">&#128269; QA Dashboard:</strong> <strong>Design score: 4.2/5 (A-) · Functional: 4.0/5 (B+)</strong>. 31 academic findings + 24 functional notes + 3 open issues. Automated filter test suite (18/18 pass). <a href="qa.html" style="color:var(--accent2);font-weight:700">View the full QA dashboard &rarr;</a></p>
   </div>
 
   <div class="section">
     <div class="section-label">Development Approach</div>
     <h2>Built by a team of AI agent colleagues</h2>
-    <p>The project was developed using a structured team of six specialist AI agents, each with a defined role, domain expertise, and boundaries. This mirrors how a real innovation team would operate.</p>
-
+    <p>Developed using the <strong>Five Innovators model</strong>: six specialist AI agents with defined roles, domains, capabilities, and boundaries — plus a dedicated QA agent.</p>
     <div class="card-grid">
-      <div class="card">
-        <div class="card-icon">&#128270;</div>
-        <h4>@Emer -- Researcher</h4>
-        <p>Food market intelligence. Researched the Emerald Pantry catalogue, mapped product categories, and planned OpenFoodFacts enrichment for nutritional data and dietary filtering.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#127912;</div>
-        <h4>@Sadhbh -- Designer</h4>
-        <p>Web experience designer. Created the emerald-green, gold-accented theme, product-card layouts, category chips, and responsive mobile design.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128736;</div>
-        <h4>@Darragh -- Maker</h4>
-        <p>Chatbot engineer. Built Ember's conversation engine, Google Sheets CSV parsing, Cloudflare Worker proxy, search logic, and the LLM integration.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128101;</div>
-        <h4>@Cillian -- Manager</h4>
-        <p>Orchestrator and delivery lead. Decomposed the build into specialist assignments, ran quality gates, and synthesised outputs into the final product.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128172;</div>
-        <h4>@Maeve -- Marketer</h4>
-        <p>Brand voice and copywriter. Wrote Ember's personality script, product descriptions, off-topic refocusing language, and the Irish food-enthusiast voice.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128269;</div>
-        <h4>@Keelin -- QA</h4>
-        <p>Quality assurance specialist. Reused from the WaxBot project. Tests conversation paths, edge cases, LLM behaviour, memory persistence, and mobile responsiveness.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#129367;</div>
-        <h4>@Ember -- The Bot</h4>
-        <p>The AI pantry guide herself. Powered by DeepSeek, grounded in the live Google Sheet catalogue, with a warm Irish food-enthusiast personality.</p>
-      </div>
+      <div class="card"><div class="card-icon">&#128270;</div><h4>@Emer — Researcher</h4><p>Food market intelligence. Mapped Sheet catalogue to OFF taxonomy. Designed enrichment pipeline (barcode → nutrition → dietary flags). Planned category hierarchy and data quality rules.</p></div>
+      <div class="card"><div class="card-icon">&#127912;</div><h4>@Sadhbh — Designer</h4><p>Emerald theme, two-panel layout, product cards with OFF section, filter bar, detail view, basket overlay, onboarding lock UX, responsive mobile.</p></div>
+      <div class="card"><div class="card-icon">&#128736;</div><h4>@Darragh — Maker</h4><p>Full chatbot build: Worker (3 endpoints), CSV parser, OFF enrichment, DeepSeek integration, conversation engine, filter system, purchase flow, voice STT/TTS.</p></div>
+      <div class="card"><div class="card-icon">&#128101;</div><h4>@Cillian — Manager</h4><p>Orchestrator. Phased assignments, quality gates between handoffs, synthesis. Directed the QA review by @Keelin. Product owner for the overall delivery.</p></div>
+      <div class="card"><div class="card-icon">&#128172;</div><h4>@Maeve — Marketer</h4><p>Brand voice. Wrote Ember's system prompt, off-topic refocusing, consent/trust scripts, product storytelling, and 12-framework positioning.</p></div>
+      <div class="card"><div class="card-icon">&#128269;</div><h4>@Keelin — QA</h4><p>Quality assurance. 6-category rubric, 31-finding academic review across 12 frameworks. Built automated filter test suite (18 tests). Authored the <a href="qa.html" style="color:var(--accent2)">QA dashboard</a>.</p></div>
+      <div class="card"><div class="card-icon">&#129367;</div><h4>@Ember — The Bot</h4><p>Warm Irish food guide. DeepSeek-powered, grounded in live Sheet + OFF. Suggests products, pairings, meals. Handles off-topic. Guides purchase flow.</p></div>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-label">Data Flow</div>
-    <h2>How the catalogue data moves</h2>
-    <p>The Emerald Pantry product catalogue lives in a Google Sheet (30 products, 10 fields). Here is how that data reaches the customer:</p>
-    <ol style="color:var(--text-dim);font-size:0.88rem;line-height:2;padding-left:20px">
-      <li><strong>Google Sheet</strong> is the single source of truth. Products are added, updated, or removed here by the Emerald Pantry team.</li>
-      <li><strong>Cloudflare Worker</strong> fetches the sheet as CSV (<code>/export?format=csv</code>), parses it into JSON, and caches it for 5 minutes. If a query parameter <code>?q=</code> is provided, it filters products by name, category, or description match.</li>
-      <li><strong>Browser</strong> fetches from the Worker's <code>/api/catalogue</code> endpoint on page load and on every customer search. Results render in the discovery panel as product cards.</li>
-      <li><strong>LLM context</strong> receives the top matching products as system-prompt context, so Ember can reference real products with real prices and real availability in her responses.</li>
-      <li><strong>Future: OpenFoodFacts</strong> will be queried by barcode to enrich each product with nutritional data, allergen flags, and eco-scores, displayed as additional badges on product cards.</li>
-    </ol>
   </div>
-
-  </div>
-
   <div class="page-sidebar">
     <div class="sidebar-label">Jump to action</div>
-
-    <a class="sidebar-cta sidebar-cta-ember" href="index.html">
-      <span class="cta-main">&#129367; Chat with Ember</span>
-      <span class="cta-tagline">Try asking about Irish cheese, the bakery, or what's for dinner!</span>
-    </a>
-
-    <a class="sidebar-cta sidebar-cta-qa" href="qa.html">
-      <span class="cta-main">&#128269; QA Dashboard</span>
-      <span class="cta-sub">Design: 4.2/5 (A-) · Functional: 4.0/5 (B+)</span>
-    </a>
-
+    <a class="sidebar-cta sidebar-cta-ember" href="index.html"><span class="cta-main">&#129367; Chat with Ember</span><span class="cta-tagline">Try asking about Irish cheese, the bakery, or what's for dinner!</span></a>
+    <a class="sidebar-cta sidebar-cta-qa" href="qa.html"><span class="cta-main">&#128269; QA Dashboard</span><span class="cta-sub">Design: 4.2/5 (A-) · Functional: 4.0/5 (B+)</span></a>
     <div style="padding:20px 24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center">
       <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:12px">Catalogue Stats</div>
-      <div style="font-size:1.5rem;font-weight:900;color:var(--accent2)">30</div>
-      <div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px">Products</div>
-      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px">5 Categories</div>
-      <div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px">Bakery / Dairy / Drinks<br>Snacks / Store Cupboard</div>
-      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px">Live from Google Sheets</div>
+      <div style="font-size:1.5rem;font-weight:900;color:var(--accent2)">30</div><div style="font-size:0.65rem;color:var(--text-dim)">Products</div>
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px">5 Categories</div><div style="font-size:0.65rem;color:var(--text-dim)">Bakery / Dairy / Drinks / Snacks / Store Cupboard</div>
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px">2 Data Sources</div><div style="font-size:0.65rem;color:var(--text-dim)">Google Sheets + OpenFoodFacts</div>
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px">12 Frameworks</div><div style="font-size:0.65rem;color:var(--text-dim)">Academic design review</div>
     </div>
   </div>
 </div>
