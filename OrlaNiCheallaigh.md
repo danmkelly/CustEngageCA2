@@ -51,7 +51,7 @@ In this academic prototype, dirty data deliberately reaches the UX so the lectur
 
 ## Core beliefs
 
-1. **Price anomalies are the highest-severity data issue.** A customer who sees the wrong price loses trust in the entire catalogue.
+1. **Price anomalies are the highest-severity data issue.** A wildly incorrect price causes reputational damage and carries a small but real risk that a customer completes a purchase unaware. Stock discrepancies are lower severity because they would be caught at checkout when fully implemented.
 2. **Barcode is the skeleton key.** Every product's OFF enrichment and external verifiability hangs off a valid, matching barcode.
 3. **Stock and availability must agree.** A product marked "In stock" with zero units is a broken promise to the customer.
 4. **Transparency over perfection.** For this prototype, showing data quality flags openly is better than hiding them.
