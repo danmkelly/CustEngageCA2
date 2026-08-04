@@ -1210,6 +1210,7 @@ async function send(){
 
   if(txt==="CLS"){hideTyping();clearMemory();return}
   if(txt==="test"){hideTyping();runFilterTests();return}
+  if(/^keep shopping$/i.test(txt)){hideTyping();clearAllFilters();return}
 
   // Human/Bot gate
   if(expectingHumanBot){
